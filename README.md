@@ -3,7 +3,7 @@ A secure authenticaton module to validate users' credentials in your Streamlit a
 
 ## Installation
 
-Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/streamlit-authenticator/):
+Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/streamlit-authenticator/0.0.1/):
 
 ```python
 pip install streamlit-authenticator
