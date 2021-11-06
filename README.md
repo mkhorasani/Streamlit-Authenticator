@@ -43,6 +43,7 @@ Then finally render the login module as follows. Here you will need to provide a
 ```python
 name, authentication_status = authenticator.login('Login','main')
 ```
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
 You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content, or to prompt an unverified user to enter a correct username and password.
 
@@ -54,3 +55,7 @@ elif authentication_status == False:
 elif authentication_status == None:
     st.warning('Please enter your username and password')
 ```
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/logged_in.PNG)
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/incorrect_login.PNG)
