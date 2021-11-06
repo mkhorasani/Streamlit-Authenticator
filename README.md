@@ -45,7 +45,7 @@ name, authentication_status = authenticator.login('Login','main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
-You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content, or to prompt an unverified user to enter a correct username and password.
+You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content.
 
 ```python
 if authentication_status:
@@ -57,5 +57,7 @@ elif authentication_status == None:
 ```
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/logged_in.PNG)
+
+Or prompt an unverified user to enter a correct username and password.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/incorrect_login.PNG)
