@@ -45,7 +45,7 @@ name, authentication_status = authenticator.login('Login','main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
-5. You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. Logging out will revert the authentication status to None and will delete the associated reauthentication cookie aswell.
+5. You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content.
 
 ```python
 if authentication_status:
@@ -62,3 +62,5 @@ elif authentication_status == None:
 Or prompt an unverified user to enter a correct username and password.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/incorrect_login.PNG)
+
+Please note that logging out will revert the authentication status to *None* and will delete the associated reauthentication cookie aswell.
