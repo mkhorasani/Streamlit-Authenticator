@@ -18,7 +18,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 ```
 
-1. Initially define your users' names, usernames, and plain text passwords.
+* Initially define your users' names, usernames, and plain text passwords.
 
 ```python
 names = ['John Smith','Rebecca Briggs']
@@ -26,26 +26,26 @@ usernames = ['jsmith','rbriggs']
 passwords = ['123','456']
 ```
 
-2. Then use the hasher module to convert the plain text passwords to hashed passwords.
+* Then use the hasher module to convert the plain text passwords to hashed passwords.
 
 ```python
 hashed_passwords = stauth.hasher(passwords).generate()
 ```
 
-3. Subsequently use the hashed passwords to create an authentication object. Here you will need to enter a name for the JWT cookie that will be stored on the client's browser and  used to reauthenticate the user without reentering their credentials. In addition you will need to provide any random key to be used to hash the cookie's signature. Finally you will need to specify the number of days to use the cookie for, if you do not require passwordless reauthentication, you may set this to 0.
+* Subsequently use the hashed passwords to create an authentication object. Here you will need to enter a name for the JWT cookie that will be stored on the client's browser and  used to reauthenticate the user without reentering their credentials. In addition you will need to provide any random key to be used to hash the cookie's signature. Finally you will need to specify the number of days to use the cookie for, if you do not require passwordless reauthentication, you may set this to 0.
 
 ```python
 authenticator = stauth.authenticate(names,usernames,hashed_passwords,'some_cookie_name','some_signature_key',cookie_expiry_days=30)
 ```
 
-4. Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
+* Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
 
 ```python
 name, authentication_status = authenticator.login('Login','main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
-5. You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content.
+* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content.
 
 ```python
 if authentication_status:
