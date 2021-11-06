@@ -9,7 +9,7 @@ Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/strea
 pip install streamlit-authenticator
 ```
 
-## Examples
+## Example
 
 Using streamlit-authenticator is as simple as importing the module and using it to verify your predefined users' credentials.
 
