@@ -50,6 +50,7 @@ name, authentication_status = authenticator.login('Login','main')
 ```python
 if authentication_status:
     st.write('Welcome *%s*' % (name))
+    st.title('Some content')
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
