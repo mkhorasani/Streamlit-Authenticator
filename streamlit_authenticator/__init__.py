@@ -88,7 +88,7 @@ class authenticate:
         str
             The JWT cookie for passwordless reauthentication.
         """
-        return jwt.encode({'name':st.session_state['name_var'],
+        return jwt.encode({'name':st.session_state['name'],
         'exp_date':self.exp_date},self.key,algorithm='HS256')
 
     def token_decode(self):
@@ -116,7 +116,7 @@ class authenticate:
         Boolean
             The validation state for the input password by comparing it to the hashed password on disk.
         """
-        return bcrypt.checkpw(self.password_var.encode(),self.passwords[self.index].encode())
+        return bcrypt.checkpw(self.password.encode(),self.passwords[self.index].encode())
 
     def login(self,form_name,location='main'):
         """Create a new instance of "authenticate".
@@ -141,67 +141,67 @@ class authenticate:
 
         cookie_manager = stx.CookieManager()
 
-        if 'authenticated' not in st.session_state:
-            st.session_state['authenticated'] = None
-        if 'name_var' not in st.session_state:
-            st.session_state['name_var'] = None
+        if 'authentication_status' not in st.session_state:
+            st.session_state['authentication_status'] = None
+        if 'name' not in st.session_state:
+            st.session_state['name'] = None
 
-        if st.session_state['authenticated'] != True:
+        if st.session_state['authentication_status'] != True:
             try:
                 self.token = cookie_manager.get(self.cookie_name)
                 self.token = self.token_decode()
 
                 if self.token['exp_date'] > datetime.utcnow().timestamp():
-                    st.session_state['name_var'] = self.token['name']
-                    st.session_state['authenticated'] = True
+                    st.session_state['name'] = self.token['name']
+                    st.session_state['authentication_status'] = True
                 else:
-                    st.session_state['authenticated'] = None
+                    st.session_state['authentication_status'] = None
             except:
-                st.session_state['authenticated'] = None
+                st.session_state['authentication_status'] = None
 
-            if st.session_state['authenticated'] != True:
+            if st.session_state['authentication_status'] != True:
                 if self.location == 'main':
                     login_form = st.form('Login')
                 elif self.location == 'sidebar':
                     login_form = st.sidebar.form('Login')
 
                 login_form.subheader(self.form_name)
-                self.username_var = login_form.text_input('Username')
-                self.password_var = login_form.text_input('Password',type='password')
+                self.username = login_form.text_input('Username')
+                self.password = login_form.text_input('Password',type='password')
 
                 if login_form.form_submit_button('Login'):
                     self.index = None
                     for i in range(0,len(self.usernames)):
-                        if self.usernames[i] == self.username_var:
+                        if self.usernames[i] == self.username:
                             self.index = i
                     if self.index != None:
                         try:
                             if self.check_pw():
-                                st.session_state['name_var'] = self.names[self.index]
+                                st.session_state['name'] = self.names[self.index]
                                 self.exp_date = self.exp_date()
                                 self.token = self.token_encode()
                                 cookie_manager.set(self.cookie_name, self.token)
-                                st.session_state['authenticated'] = True
+                                st.session_state['authentication_status'] = True
                             else:
-                                st.session_state['authenticated'] = False
+                                st.session_state['authentication_status'] = False
                         except:
                             raise ValueError("Please enter hashed passwords and not plain text passwords into the 'authenticate' module.")
                     else:
-                        st.session_state['authenticated'] = False
+                        st.session_state['authentication_status'] = False
 
-        if st.session_state['authenticated'] == True:
+        if st.session_state['authentication_status'] == True:
             if self.location == 'main':
                 if st.button('Logout'):
                     cookie_manager.delete(self.cookie_name)
-                    st.session_state['name_var'] = None
-                    st.session_state['authenticated'] = None
+                    st.session_state['name'] = None
+                    st.session_state['authentication_status'] = None
             elif self.location == 'sidebar':
                 if st.sidebar.button('Logout'):
                     cookie_manager.delete(self.cookie_name)
-                    st.session_state['name_var'] = None
-                    st.session_state['authenticated'] = None
+                    st.session_state['name'] = None
+                    st.session_state['authentication_status'] = None
 
-        return st.session_state['name_var'], st.session_state['authenticated']
+        return st.session_state['name'], st.session_state['authentication_status']
 
 if not _RELEASE:
     names = ['John Smith','Rebecca Briggs']
@@ -210,12 +210,28 @@ if not _RELEASE:
 
     hashed_passwords = hasher(passwords).generate()
 
-    authenticator = authenticate(names,usernames,hashed_passwords,'streamlit_authenticator','123456',cookie_expiry_days=30)
+    authenticator = authenticate(names,usernames,hashed_passwords,
+    'some_cookie_name','some_signature_key',cookie_expiry_days=30)
     name, authentication_status = authenticator.login('Login','main')
 
     if authentication_status:
         st.write('Welcome *%s*' % (name))
+        st.title('Some content')
     elif authentication_status == False:
         st.error('Username/password is incorrect')
     elif authentication_status == None:
         st.warning('Please enter your username and password')
+
+    # Alternatively you use st.session_state['name'] and
+    # st.session_state['authentication_status'] to access the name and
+    # authentication_status.
+
+    #authenticator.login('Login','main')
+
+    #if st.session_state['authentication_status']:
+    #    st.write('Welcome *%s*' % (st.session_state['name']))
+    #    st.title('Some content')
+    #elif st.session_state['authentication_status'] == False:
+    #    st.error('Username/password is incorrect')
+    #elif st.session_state['authentication_status'] == None:
+    #    st.warning('Please enter your username and password')
