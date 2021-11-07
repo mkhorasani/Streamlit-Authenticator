@@ -45,7 +45,7 @@ name, authentication_status = authenticator.login('Login','main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
-* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. Alternatively you may access them with st.session_state['name_var'], st.session_state['authenticated'].
+* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. Alternatively you may access the name and authentication status with *st.session_state['name_var']* and *st.session_state['authenticated']*.
 
 ```python
 if authentication_status:
