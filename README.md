@@ -32,7 +32,7 @@ passwords = ['123','456']
 hashed_passwords = stauth.hasher(passwords).generate()
 ```
 
-* Subsequently use the hashed passwords to create an authentication object. Here you will need to enter a name for the JWT cookie that will be stored on the client's browser and  used to reauthenticate the user without reentering their credentials. In addition you will need to provide any random key to be used to hash the cookie's signature. Finally you will need to specify the number of days to use the cookie for, if you do not require passwordless reauthentication, you may set this to 0.
+* Subsequently use the hashed passwords to create an authentication object. Here you will need to enter a name for the JWT cookie that will be stored on the client's browser and used to reauthenticate the user without re-entering their credentials. In addition, you will need to provide any random key to be used to hash the cookie's signature. Finally, you will need to specify the number of days to use the cookie for, if you do not require passwordless reauthentication, you may set this to 0.
 
 ```python
 authenticator = stauth.authenticate(names,usernames,hashed_passwords,
