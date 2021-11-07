@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.0.1",
     author="Mohammad Khorasani",
     author_email="khorasani.mohammad@gmail.com",
-    description="A secure authenticaton module to validate users' credentials in your Streamlit application.",
+    description="A secure authenticaton module to validate user credentials in a Streamlit application.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/mkhorasani/Streamlit-Authenticator",
