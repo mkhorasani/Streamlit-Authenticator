@@ -77,3 +77,6 @@ Or prompt an unverified user to enter a correct username and password.
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/incorrect_login.PNG)
 
 Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
+
+## Credits
+- Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit_Components](https://github.com/Mohamed-512/Extra-Streamlit-Components). 
