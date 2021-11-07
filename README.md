@@ -1,5 +1,5 @@
 # Streamlit-Authenticator
-A secure authenticaton module to validate users' credentials in your Streamlit application.
+A secure authenticaton module to validate user credentials in a Streamlit application.
 
 ## Installation
 
