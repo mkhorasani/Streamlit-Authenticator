@@ -11,7 +11,7 @@ pip install streamlit-authenticator
 
 ## Example
 
-Using streamlit-authenticator is as simple as importing the module and using it to verify your predefined users' credentials.
+Using Streamlit-Authenticator is as simple as importing the module and using it to verify your predefined users' credentials.
 
 ```python
 import streamlit as st
@@ -46,7 +46,7 @@ name, authentication_status = authenticator.login('Login','main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
-* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. Alternatively you may access the name and authentication status with **st.session_state['name']** and **st.session_state['authentication_status']**.
+* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content.
 
 ```python
 if authentication_status:
@@ -55,6 +55,18 @@ if authentication_status:
 elif authentication_status == False:
     st.error('Username/password is incorrect')
 elif authentication_status == None:
+    st.warning('Please enter your username and password')
+```
+
+* Should you require access to the persistent name and authentication status variables, you may retrieve them through Streamlit's session state using **st.session_state['name']** and **st.session_state['authentication_status']**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
+
+```python
+if st.session_state['authentication_status']:
+    st.write('Welcome *%s*' % (st.session_state['name']))
+    st.title('Some content')
+elif st.session_state['authentication_status'] == False:
+    st.error('Username/password is incorrect')
+elif st.session_state['authentication_status'] == None:
     st.warning('Please enter your username and password')
 ```
 
