@@ -79,4 +79,4 @@ Or prompt an unverified user to enter a correct username and password.
 Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
 
 ## Credits
-- Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit_Components](https://github.com/Mohamed-512/Extra-Streamlit-Components). 
+- Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components). 
