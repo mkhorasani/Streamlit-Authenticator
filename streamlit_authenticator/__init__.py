@@ -1,7 +1,6 @@
 import os
 import jwt
 import bcrypt
-import pandas as pd
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
