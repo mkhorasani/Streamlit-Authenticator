@@ -1,6 +1,4 @@
-# Streamlit-Authenticator
-[![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
-
+# Streamlit-Authenticator [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
 A secure authentication module to validate user credentials in a Streamlit application.
 
 ## Installation
