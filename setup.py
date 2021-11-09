@@ -23,6 +23,8 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=[
         "streamlit >= 0.86",
-        "extra-streamlit-components >= 0.1.52"
+        "extra-streamlit-components >= 0.1.52",
+        "bcrypt >= 3.1.7",
+        "PyJWT >=2.3.0",
     ],
 )
