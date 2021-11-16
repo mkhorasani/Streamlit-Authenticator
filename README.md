@@ -26,7 +26,7 @@ usernames = ['jsmith','rbriggs']
 passwords = ['123','456']
 ```
 
-* Then use the hasher module to convert the plain text passwords to hashed passwords.
+* Then use the hasher module to convert the plain text passwords to hashed passwords, and remove all plain text passwords from your source code.
 
 ```python
 hashed_passwords = stauth.hasher(passwords).generate()
