@@ -150,11 +150,15 @@ class authenticate:
                 self.token = cookie_manager.get(self.cookie_name)
                 self.token = self.token_decode()
 
-                if self.token['exp_date'] > datetime.utcnow().timestamp():
-                    st.session_state['name'] = self.token['name']
-                    st.session_state['authentication_status'] = True
-                else:
-                    st.session_state['authentication_status'] = None
+                if 'logout' not in st.session_state:
+                    st.session_state['logout'] = None
+
+                if st.session_state['logout'] != True:
+                    if self.token['exp_date'] > datetime.utcnow().timestamp():
+                        st.session_state['name'] = self.token['name']
+                        st.session_state['authentication_status'] = True
+                    else:
+                        st.session_state['authentication_status'] = None
             except:
                 st.session_state['authentication_status'] = None
 
@@ -193,10 +197,12 @@ class authenticate:
             if self.location == 'main':
                 if st.button('Logout'):
                     cookie_manager.delete(self.cookie_name)
+                    st.session_state['logout'] = True
                     st.session_state['name'] = None
                     st.session_state['authentication_status'] = None
             elif self.location == 'sidebar':
                 if st.sidebar.button('Logout'):
+                    st.session_state['logout'] = True
                     cookie_manager.delete(self.cookie_name)
                     st.session_state['name'] = None
                     st.session_state['authentication_status'] = None
