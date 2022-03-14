@@ -207,7 +207,7 @@ class authenticate:
                     st.session_state['name'] = None
                     st.session_state['authentication_status'] = None
 
-        return st.session_state['name'], st.session_state['authentication_status']
+        return st.session_state['name'], st.session_state['authentication_status'], location
 
 if not _RELEASE:
     names = ['John Smith','Rebecca Briggs']
@@ -218,16 +218,21 @@ if not _RELEASE:
 
     authenticator = authenticate(names,usernames,hashed_passwords,
     'some_cookie_name','some_signature_key',cookie_expiry_days=30)
-    name, authentication_status = authenticator.login('Login','main')
+    name, authentication_status, location = authenticator.login('Login','main')
 
     if authentication_status:
         st.write('Welcome *%s*' % (name))
         st.title('Some content')
     elif authentication_status == False:
-        st.error('Username/password is incorrect')
+        if location == 'main'
+            st.error('Username/password is incorrect')
+        elif location == 'sidebar':
+            st.sidebar.error('Username/password is incorrect')
     elif authentication_status == None:
-        st.warning('Please enter your username and password')
-
+        if location == 'main'
+            st.warning('Please enter your username and password')
+        elif location == 'sidebar':
+            st.sidebar.error('Username/password is incorrect')
     # Alternatively you use st.session_state['name'] and
     # st.session_state['authentication_status'] to access the name and
     # authentication_status.
