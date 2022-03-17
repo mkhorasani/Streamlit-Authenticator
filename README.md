@@ -58,7 +58,7 @@ elif authentication_status == None:
     st.warning('Please enter your username and password')
 ```
 
-* Should you require access to the persistent name and authentication status variables, you may retrieve them through Streamlit's session state using **st.session_state['name']** and **st.session_state['authentication_status']**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
+* Should you require access to the persistent name, authentication status and username variables, you may retrieve them through Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']** and **st.session_state['username']**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
 
 ```python
 if st.session_state['authentication_status']:
@@ -79,4 +79,4 @@ Or prompt an unverified user to enter a correct username and password.
 Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
 
 ## Credits
-- Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components). 
+- Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components).

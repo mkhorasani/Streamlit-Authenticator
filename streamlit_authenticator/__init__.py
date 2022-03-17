@@ -131,6 +131,8 @@ class Authenticate:
             Name of authenticated user.
         boolean
             The status of authentication, None: no credentials entered, False: incorrect credentials, True: correct credentials.
+        str
+            Username of authenticated user.
         """
 
         if location not in ['main','sidebar']:
