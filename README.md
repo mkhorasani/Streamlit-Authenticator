@@ -58,7 +58,7 @@ elif authentication_status == None:
     st.warning('Please enter your username and password')
 ```
 
-* Should you require access to the persistent name, authentication status and username variables, you may retrieve them through Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']** and **st.session_state['username']**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
+* Should you require access to the persistent name, authentication status, and username variables, you may retrieve them through Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
 
 ```python
 if st.session_state['authentication_status']:
