@@ -112,7 +112,7 @@ class Authenticate:
         """
         Returns
         -------
-        Boolean
+        boolean
             The validation state for the input password by comparing it to the hashed password on disk.
         """
         return bcrypt.checkpw(self.password.encode(),self.passwords[self.index].encode())
