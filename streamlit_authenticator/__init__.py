@@ -1,4 +1,3 @@
-import os
 import jwt
 import bcrypt
 import streamlit as st
@@ -9,7 +8,7 @@ import streamlit.components.v1 as components
 _RELEASE = True
 
 class Hasher:
-    def __init__(self,passwords):
+    def __init__(self, passwords):
         """Create a new instance of "Hasher".
         Parameters
         ----------
@@ -22,7 +21,7 @@ class Hasher:
         """
         self.passwords = passwords
 
-    def hash(self,password):
+    def hash(self, password):
         """
         Parameters
         ----------
@@ -49,7 +48,7 @@ class Hasher:
         return hashedpw
 
 class Authenticate:
-    def __init__(self,names,usernames,passwords,cookie_name,key,cookie_expiry_days=30):
+    def __init__(self, names, usernames, passwords, cookie_name, key, cookie_expiry_days=30):
         """Create a new instance of "Authenticate".
         Parameters
         ----------
@@ -88,7 +87,7 @@ class Authenticate:
         """
         return jwt.encode({'name':st.session_state['name'],
         'username':st.session_state['username'],
-        'exp_date':self.exp_date},self.key,algorithm='HS256')
+        'exp_date':self.exp_date}, self.key, algorithm='HS256')
 
     def token_decode(self):
         """
@@ -97,7 +96,7 @@ class Authenticate:
         str
             The decoded JWT cookie for passwordless reauthentication.
         """
-        return jwt.decode(self.token,self.key,algorithms=['HS256'])
+        return jwt.decode(self.token, self.key, algorithms=['HS256'])
 
     def exp_date(self):
         """
@@ -115,9 +114,9 @@ class Authenticate:
         boolean
             The validation state for the input password by comparing it to the hashed password on disk.
         """
-        return bcrypt.checkpw(self.password.encode(),self.passwords[self.index].encode())
+        return bcrypt.checkpw(self.password.encode(), self.passwords[self.index].encode())
 
-    def login(self,form_name,location='main'):
+    def login(self, form_name, location='main'):
         """Create a new instance of "authenticate".
         Parameters
         ----------
@@ -134,11 +133,10 @@ class Authenticate:
         str
             Username of authenticated user.
         """
-
-        if location not in ['main','sidebar']:
+        if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
 
-        cookie_manager = stx.CookieManager()
+        self.cookie_manager = stx.CookieManager()
 
         if 'name' not in st.session_state:
             st.session_state['name'] = None
@@ -148,8 +146,8 @@ class Authenticate:
             st.session_state['username'] = None
 
         if st.session_state['authentication_status'] != True:
-            try:
-                self.token = cookie_manager.get(self.cookie_name)
+            self.token = self.cookie_manager.get(self.cookie_name)
+            if self.token is not None:
                 self.token = self.token_decode()
 
                 if 'logout' not in st.session_state:
@@ -160,8 +158,6 @@ class Authenticate:
                         st.session_state['name'] = self.token['name']
                         st.session_state['authentication_status'] = True
                         st.session_state['username'] = self.token['username']
-            except:
-                pass
 
             if st.session_state['authentication_status'] != True:
                 if location == 'main':
@@ -172,11 +168,11 @@ class Authenticate:
                 login_form.subheader(form_name)
                 self.username = login_form.text_input('Username')
                 st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password',type='password')
+                self.password = login_form.text_input('Password', type='password')
 
                 if login_form.form_submit_button('Login'):
                     self.index = None
-                    for i in range(0,len(self.usernames)):
+                    for i in range(0, len(self.usernames)):
                         if self.usernames[i] == self.username:
                             self.index = i
                     if self.index != None:
@@ -185,7 +181,7 @@ class Authenticate:
                                 st.session_state['name'] = self.names[self.index]
                                 self.exp_date = self.exp_date()
                                 self.token = self.token_encode()
-                                cookie_manager.set(self.cookie_name, self.token,
+                                self.cookie_manager.set(self.cookie_name, self.token,
                                 expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                                 st.session_state['authentication_status'] = True
                             else:
@@ -195,36 +191,48 @@ class Authenticate:
                     else:
                         st.session_state['authentication_status'] = False
 
-        if st.session_state['authentication_status'] == True:
-            if location == 'main':
-                if st.button('Logout'):
-                    cookie_manager.delete(self.cookie_name)
-                    st.session_state['logout'] = True
-                    st.session_state['name'] = None
-                    st.session_state['username'] = None
-                    st.session_state['authentication_status'] = None
-            elif location == 'sidebar':
-                if st.sidebar.button('Logout'):
-                    cookie_manager.delete(self.cookie_name)
-                    st.session_state['logout'] = True
-                    st.session_state['name'] = None
-                    st.session_state['username'] = None
-                    st.session_state['authentication_status'] = None
-
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
 
+    def logout(self, button_name, location='main'):
+        """Creates a logout button.
+        Parameters
+        ----------
+        button_name: str
+            The rendered name of the logout button.
+        location: str
+            The location of the logout button i.e. main or sidebar.
+        """
+        if location not in ['main', 'sidebar']:
+            raise ValueError("Location must be one of 'main' or 'sidebar'")
+
+        if location == 'main':
+            if st.button(button_name):
+                self.cookie_manager.delete(self.cookie_name)
+                st.session_state['logout'] = True
+                st.session_state['name'] = None
+                st.session_state['username'] = None
+                st.session_state['authentication_status'] = None
+        elif location == 'sidebar':
+            if st.sidebar.button(button_name):
+                self.cookie_manager.delete(self.cookie_name)
+                st.session_state['logout'] = True
+                st.session_state['name'] = None
+                st.session_state['username'] = None
+                st.session_state['authentication_status'] = None
+
 if not _RELEASE:
-    names = ['John Smith','Rebecca Briggs']
-    usernames = ['jsmith','rbriggs']
-    passwords = ['123','456']
+    names = ['John Smith', 'Rebecca Briggs']
+    usernames = ['jsmith', 'rbriggs']
+    passwords = ['123', '456']
 
     hashed_passwords = Hasher(passwords).generate()
 
-    authenticator = Authenticate(names,usernames,hashed_passwords,
-    'some_cookie_name','some_signature_key',cookie_expiry_days=30)
-    name, authentication_status, username = authenticator.login('Login','main')
+    authenticator = Authenticate(names, usernames, hashed_passwords,
+    'some_cookie_name', 'some_signature_key', cookie_expiry_days=30)
+    name, authentication_status, username = authenticator.login('Login', 'main')
 
     if authentication_status:
+        authenticator.logout('Logout', 'main')
         st.write('Welcome *%s*' % (name))
         st.title('Some content')
     elif authentication_status == False:
@@ -236,7 +244,7 @@ if not _RELEASE:
     # st.session_state['authentication_status'] to access the name and
     # authentication_status.
 
-    #authenticator.login('Login','main')
+    #authenticator.login('Login', 'main')
 
     #if st.session_state['authentication_status']:
     #    st.write('Welcome *%s*' % (st.session_state['name']))
