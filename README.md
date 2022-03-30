@@ -63,6 +63,7 @@ elif authentication_status == None:
 
 ```python
 if st.session_state['authentication_status']:
+    authenticator.logout('Logout', 'main')
     st.write('Welcome *%s*' % (st.session_state['name']))
     st.title('Some content')
 elif st.session_state['authentication_status'] == False:
