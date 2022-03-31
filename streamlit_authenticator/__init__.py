@@ -70,6 +70,8 @@ class Authenticate:
             Name of authenticated user.
         boolean
             The status of authentication, None: no credentials entered, False: incorrect credentials, True: correct credentials.
+        str
+            Username of authenticated user.
         """
         self.names = names
         self.usernames = usernames
@@ -77,6 +79,16 @@ class Authenticate:
         self.cookie_name = cookie_name
         self.key = key
         self.cookie_expiry_days = cookie_expiry_days
+        self.cookie_manager = stx.CookieManager()
+
+        if 'name' not in st.session_state:
+            st.session_state['name'] = None
+        if 'authentication_status' not in st.session_state:
+            st.session_state['authentication_status'] = None
+        if 'username' not in st.session_state:
+            st.session_state['username'] = None
+        if 'logout' not in st.session_state:
+            st.session_state['logout'] = None
 
     def token_encode(self):
         """
@@ -136,23 +148,10 @@ class Authenticate:
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
 
-        self.cookie_manager = stx.CookieManager()
-
-        if 'name' not in st.session_state:
-            st.session_state['name'] = None
-        if 'authentication_status' not in st.session_state:
-            st.session_state['authentication_status'] = None
-        if 'username' not in st.session_state:
-            st.session_state['username'] = None
-
         if st.session_state['authentication_status'] != True:
             self.token = self.cookie_manager.get(self.cookie_name)
             if self.token is not None:
                 self.token = self.token_decode()
-
-                if 'logout' not in st.session_state:
-                    st.session_state['logout'] = None
-
                 if st.session_state['logout'] != True:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
                         st.session_state['name'] = self.token['name']
