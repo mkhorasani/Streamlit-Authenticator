@@ -235,10 +235,15 @@ if not _RELEASE:
         st.write('Welcome *%s*' % (name))
         st.title('Some content')
     elif authentication_status == False:
-        st.error('Username/password is incorrect')
+        if self.location == 'main'
+            st.error('Username/password is incorrect')
+        elif self.location == 'sidebar':
+            st.sidebar.error('Username/password is incorrect')
     elif authentication_status == None:
-        st.warning('Please enter your username and password')
-
+        if self.location == 'main'
+            st.warning('Please enter your username and password')
+        elif self.location == 'sidebar':
+            st.sidebar.error('Username/password is incorrect')
     # Alternatively you use st.session_state['name'] and
     # st.session_state['authentication_status'] to access the name and
     # authentication_status.
