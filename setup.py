@@ -26,5 +26,6 @@ setuptools.setup(
         "extra-streamlit-components >= 0.1.53",
         "bcrypt >= 3.1.7",
         "PyJWT >=2.3.0",
+        "PyYAML >= 5.3.1",
     ],
 )

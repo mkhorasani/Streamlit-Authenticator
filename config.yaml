@@ -1,0 +1,7 @@
+cookie:
+  name: 'some_cookie_name'
+  key: 'some_signature_key'
+credentials:
+  names: ['John Smith', 'Rebecca Briggs']
+  usernames: ['jsmith', 'rbriggs']
+  passwords: ['123', '456']

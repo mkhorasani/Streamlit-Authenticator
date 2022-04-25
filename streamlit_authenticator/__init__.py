@@ -1,6 +1,8 @@
 import jwt
+import yaml
 import bcrypt
 import streamlit as st
+from yaml.loader import SafeLoader
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 import streamlit.components.v1 as components
@@ -224,14 +226,20 @@ class Authenticate:
                 st.session_state['authentication_status'] = None
 
 if not _RELEASE:
-    names = ['John Smith', 'Rebecca Briggs']
-    usernames = ['jsmith', 'rbriggs']
-    passwords = ['123', '456']
+    with open('../config.yaml') as file:
+        config = yaml.load(file, Loader=SafeLoader)
 
-    hashed_passwords = Hasher(passwords).generate()
+    hashed_passwords = Hasher(config['credentials']['passwords']).generate()
 
-    authenticator = Authenticate(names, usernames, hashed_passwords,
-    'some_cookie_name', 'some_signature_key', cookie_expiry_days=30)
+    authenticator = Authenticate(
+        config['credentials']['names'], 
+        config['credentials']['usernames'], 
+        hashed_passwords,
+        config['cookie']['name'], 
+        config['cookie']['key'], 
+        cookie_expiry_days=30
+    )
+
     name, authentication_status, username = authenticator.login('Login', 'main')
 
     if authentication_status:
