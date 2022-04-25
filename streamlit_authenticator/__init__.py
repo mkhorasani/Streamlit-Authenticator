@@ -108,7 +108,10 @@ class Authenticate:
         str
             The decoded JWT cookie for passwordless reauthentication.
         """
-        return jwt.decode(self.token, self.key, algorithms=['HS256'])
+        try:
+            return jwt.decode(self.token, self.key, algorithms=['HS256'])
+        except:
+            return False
 
     def exp_date(self):
         """
@@ -148,15 +151,16 @@ class Authenticate:
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
 
-        if st.session_state['authentication_status'] != True:
+        if not st.session_state['authentication_status']:
             self.token = self.cookie_manager.get(self.cookie_name)
             if self.token is not None:
                 self.token = self.token_decode()
-                if st.session_state['logout'] != True:
-                    if self.token['exp_date'] > datetime.utcnow().timestamp():
-                        st.session_state['name'] = self.token['name']
-                        st.session_state['authentication_status'] = True
-                        st.session_state['username'] = self.token['username']
+                if self.token is not False:
+                    if not st.session_state['logout']:
+                        if self.token['exp_date'] > datetime.utcnow().timestamp():
+                            st.session_state['name'] = self.token['name']
+                            st.session_state['authentication_status'] = True
+                            st.session_state['username'] = self.token['username']
 
             if st.session_state['authentication_status'] != True:
                 if location == 'main':
@@ -174,7 +178,7 @@ class Authenticate:
                     for i in range(0, len(self.usernames)):
                         if self.usernames[i] == self.username:
                             self.index = i
-                    if self.index != None:
+                    if self.index is not None:
                         try:
                             if self.check_pw():
                                 st.session_state['name'] = self.names[self.index]
