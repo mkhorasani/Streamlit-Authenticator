@@ -20,7 +20,7 @@ import streamlit_authenticator as stauth
 
 ### 1. Hashing Passwords
 
-* Initially define your users' names, usernames, plain text passwords, and reauthentication cookie settings in a YAML configuration file.
+* Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0.
 
 ```python
 credentials:
@@ -33,7 +33,7 @@ cookie:
   expiry_days: 30
 ```
 
-* Then use the Hasher module to convert the plain text passwords to hashed passwords.
+* Then use the Hasher module to convert the plain text passwords into hashed passwords.
 
 ```python
 hashed_passwords = stauth.Hasher(['123', '456']).generate()
@@ -43,7 +43,7 @@ Finally replace the plain text passwords in the configuration file with the hash
 
 ### 2. Creating Login Widget
 
-* Subsequently import the configuration file into your script to create an authentication object. Here you will need to enter a name for the JWT cookie that will be stored on the client's browser and used to reauthenticate the user without re-entering their credentials. In addition, you will need to provide any random key to be used to hash the cookie's signature. Finally, you will need to specify the number of days to use the cookie for, if you do not require passwordless reauthentication, you may set this to 0.
+* Subsequently import the configuration file into your script and create an authentication object.
 
 ```python
 with open('../config.yaml') as file:
@@ -81,16 +81,16 @@ elif authentication_status == None:
     st.warning('Please enter your username and password')
 ```
 
-* Should you require access to the persistent name, authentication status, and username variables, you may retrieve them through Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
+* Should you require access to the persistent name, authentication status, and username variables, you may retrieve them through Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state["authentication_status"]:
     authenticator.logout('Logout', 'main')
     st.write(f'Welcome *{st.session_state["name"]}*')
     st.title('Some content')
-elif st.session_state['authentication_status'] == False:
+elif st.session_state["authentication_status"] == False:
     st.error('Username/password is incorrect')
-elif st.session_state['authentication_status'] == None:
+elif st.session_state["authentication_status"] == None:
     st.warning('Please enter your username and password')
 ```
 
