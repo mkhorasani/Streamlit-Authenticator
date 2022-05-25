@@ -160,9 +160,10 @@ class Authenticate:
                 if self.token is not False:
                     if not st.session_state['logout']:
                         if self.token['exp_date'] > datetime.utcnow().timestamp():
-                            st.session_state['name'] = self.token['name']
-                            st.session_state['authentication_status'] = True
-                            st.session_state['username'] = self.token['username']
+                            if 'name' and 'username' in self.token:
+                                st.session_state['name'] = self.token['name']
+                                st.session_state['username'] = self.token['username']
+                                st.session_state['authentication_status'] = True
 
             if st.session_state['authentication_status'] != True:
                 if location == 'main':
@@ -226,25 +227,26 @@ class Authenticate:
                 st.session_state['authentication_status'] = None
 
 if not _RELEASE:
+
+    #hashed_passwords = Hasher(['123', '456']).generate()
+
     with open('../config.yaml') as file:
         config = yaml.load(file, Loader=SafeLoader)
-
-    hashed_passwords = Hasher(config['credentials']['passwords']).generate()
 
     authenticator = Authenticate(
         config['credentials']['names'], 
         config['credentials']['usernames'], 
-        hashed_passwords,
+        config['credentials']['passwords'],
         config['cookie']['name'], 
         config['cookie']['key'], 
-        cookie_expiry_days=30
+        config['cookie']['expiry_days']
     )
 
     name, authentication_status, username = authenticator.login('Login', 'main')
 
     if authentication_status:
         authenticator.logout('Logout', 'main')
-        st.write('Welcome *%s*' % (name))
+        st.write(f'Welcome *{name}*')
         st.title('Some content')
     elif authentication_status == False:
         st.error('Username/password is incorrect')
@@ -255,12 +257,11 @@ if not _RELEASE:
     # st.session_state['authentication_status'] to access the name and
     # authentication_status.
 
-    #authenticator.login('Login', 'main')
-
-    #if st.session_state['authentication_status']:
-    #    st.write('Welcome *%s*' % (st.session_state['name']))
-    #    st.title('Some content')
-    #elif st.session_state['authentication_status'] == False:
-    #    st.error('Username/password is incorrect')
-    #elif st.session_state['authentication_status'] == None:
-    #    st.warning('Please enter your username and password')
+    # if st.session_state['authentication_status']:
+    #     authenticator.logout('Logout', 'main')
+    #     st.write(f'Welcome *{st.session_state["name"]}*')
+    #     st.title('Some content')
+    # elif st.session_state['authentication_status'] == False:
+    #     st.error('Username/password is incorrect')
+    # elif st.session_state['authentication_status'] == None:
+    #     st.warning('Please enter your username and password')

@@ -1,7 +1,9 @@
-cookie:
-  name: 'some_cookie_name'
-  key: 'some_signature_key'
 credentials:
   names: ['John Smith', 'Rebecca Briggs']
   usernames: ['jsmith', 'rbriggs']
-  passwords: ['123', '456']
+  passwords: ['$2b$12$RITgFvOneaLd7DvPS6UhZeRpZDPjnGvTKV.FCMNWRM92fz7ZapuC2',
+              '$2b$12$to1ADtwtCOFGMFNow7iJj.GjWWqy6FOEeeBjl/c.FmCZBSkf2bCr.']
+cookie:
+  name: 'some_cookie_name'
+  key: 'some_signature_key'
+  expiry_days: 30
