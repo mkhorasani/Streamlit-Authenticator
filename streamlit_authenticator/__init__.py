@@ -1,3 +1,6 @@
+import os
+import random
+import pickle
 import jwt
 import yaml
 import bcrypt
@@ -36,8 +39,13 @@ class Hasher:
         """
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-    def generate(self):
+    def generate(self, folder_path=None):
         """
+        Parameters
+        ----------
+        folder_path: str
+            The existing folder's path where the hashed passwords will be saved.
+            If None, the hashed passwords are not saved as a file.
         Returns
         -------
         list
@@ -47,6 +55,10 @@ class Hasher:
 
         for password in self.passwords:
             hashedpw.append(self.hash(password))
+        if folder_path and os.path.isdir(folder_path):
+            file_name = f"hashed_pw{random.randint(1000,9999)}.pkl"
+            with open(os.path.join(folder_path, file_name), "wb") as file:
+                pickle.dump(hashedpw, file)
         return hashedpw
 
 class Authenticate:
@@ -58,8 +70,10 @@ class Authenticate:
             The list of names of users.
         usernames: list
             The list of usernames in the same order as names.
-        passwords: list
+        passwords: list or str
             The list of hashed passwords in the same order as names.
+            This can also accepts the path to the .pkl file were the hashed passwords
+            have been previously saved using the `Hasher.generate` method.
         cookie_name: str
             The name of the JWT cookie stored on the client's browser for passwordless reauthentication.
         key: str
@@ -78,6 +92,9 @@ class Authenticate:
         self.names = names
         self.usernames = usernames
         self.passwords = passwords
+        if type(passwords) == str and os.path.isfile(passwords):
+            with open(passwords, "rb") as file:
+                self.passwords = pickle.load(file)
         self.cookie_name = cookie_name
         self.key = key
         self.cookie_expiry_days = cookie_expiry_days
