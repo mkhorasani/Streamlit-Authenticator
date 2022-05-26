@@ -39,7 +39,7 @@ cookie:
 hashed_passwords = stauth.Hasher(['123', '456']).generate()
 ```
 
-Finally replace the plain text passwords in the configuration file with the hashed passwords.
+* Finally replace the plain text passwords in the configuration file with the hashed passwords.
 
 ### 2. Creating Login Widget
 
