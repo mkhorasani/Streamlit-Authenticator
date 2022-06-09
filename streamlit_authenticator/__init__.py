@@ -134,7 +134,7 @@ class Authenticate:
         return bcrypt.checkpw(self.password.encode(), self.passwords[self.index].encode())
 
     def login(self, form_name, location='main'):
-        """Create a new instance of "authenticate".
+        """Create a login widget.
         Parameters
         ----------
         form_name: str
