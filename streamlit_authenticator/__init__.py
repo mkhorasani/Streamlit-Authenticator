@@ -227,7 +227,6 @@ class Authenticate:
                 st.session_state['authentication_status'] = None
 
 if not _RELEASE:
-
     #hashed_passwords = Hasher(['123', '456']).generate()
 
     with open('../config.yaml') as file:
