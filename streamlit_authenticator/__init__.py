@@ -10,8 +10,10 @@ import streamlit.components.v1 as components
 _RELEASE = True
 
 class Hasher:
-    def __init__(self, passwords):
-        """Create a new instance of "Hasher".
+    def __init__(self, passwords: list):
+        """
+        Create a new instance of "Hasher".
+
         Parameters
         ----------
         passwords: list
@@ -23,8 +25,10 @@ class Hasher:
         """
         self.passwords = passwords
 
-    def hash(self, password):
+    def hash(self, password: str) -> str:
         """
+        Hashes the plain text password.
+
         Parameters
         ----------
         password: str
@@ -36,8 +40,10 @@ class Hasher:
         """
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-    def generate(self):
+    def generate(self) -> list:
         """
+        Hashes the list of plain text passwords.
+
         Returns
         -------
         list
@@ -50,8 +56,10 @@ class Hasher:
         return hashedpw
 
 class Authenticate:
-    def __init__(self, names, usernames, passwords, cookie_name, key, cookie_expiry_days=30):
-        """Create a new instance of "Authenticate".
+    def __init__(self, names: list, usernames: list, passwords: list, cookie_name: str, key: str, cookie_expiry_days: int=30):
+        """
+        Create a new instance of "Authenticate".
+
         Parameters
         ----------
         names: list
@@ -92,8 +100,10 @@ class Authenticate:
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
 
-    def token_encode(self):
+    def token_encode(self) -> str:
         """
+        Encodes the contents of the reauthentication cookie.
+
         Returns
         -------
         str
@@ -103,8 +113,10 @@ class Authenticate:
         'username':st.session_state['username'],
         'exp_date':self.exp_date}, self.key, algorithm='HS256')
 
-    def token_decode(self):
+    def token_decode(self) -> str:
         """
+        Decodes the contents of the reauthentication cookie.
+
         Returns
         -------
         str
@@ -115,8 +127,10 @@ class Authenticate:
         except:
             return False
 
-    def set_exp_date(self):
+    def set_exp_date(self) -> str:
         """
+        Creates the reauthentication cookie's expiry date.
+
         Returns
         -------
         str
@@ -124,17 +138,60 @@ class Authenticate:
         """
         return (datetime.utcnow() + timedelta(days=self.cookie_expiry_days)).timestamp()
 
-    def check_pw(self):
+    def check_pw(self) -> bool:
         """
+        Checks the validity of the entered password.
+
         Returns
         -------
         boolean
-            The validation state for the input password by comparing it to the hashed password on disk.
+            The validation state for the entered password by comparing it to the hashed password on disk.
         """
         return bcrypt.checkpw(self.password.encode(), self.passwords[self.index].encode())
 
-    def login(self, form_name, location='main'):
-        """Create a login widget.
+    def check_cookie(self):
+        """
+        Checks the validity of the reauthentication cookie.
+        """
+        self.token = self.cookie_manager.get(self.cookie_name)
+        if self.token is not None:
+            self.token = self.token_decode()
+            if self.token is not False:
+                if not st.session_state['logout']:
+                    if self.token['exp_date'] > datetime.utcnow().timestamp():
+                        if 'name' and 'username' in self.token:
+                            st.session_state['name'] = self.token['name']
+                            st.session_state['username'] = self.token['username']
+                            st.session_state['authentication_status'] = True
+
+    def check_credentials(self):
+        """
+        Checks the validity of the entered credentials.
+        """
+        self.index = None
+        for i in range(0, len(self.usernames)):
+            if self.usernames[i] == self.username:
+                self.index = i
+        if self.index is not None:
+            try:
+                if self.check_pw():
+                    st.session_state['name'] = self.names[self.index]
+                    self.exp_date = self.set_exp_date()
+                    self.token = self.token_encode()
+                    self.cookie_manager.set(self.cookie_name, self.token,
+                    expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                    st.session_state['authentication_status'] = True
+                else:
+                    st.session_state['authentication_status'] = False
+            except Exception as e:
+                print(e)
+        else:
+            st.session_state['authentication_status'] = False
+
+    def login(self, form_name: str, location: str='main') -> tuple:
+        """
+        Create a login widget.
+
         Parameters
         ----------
         form_name: str
@@ -144,26 +201,17 @@ class Authenticate:
         Returns
         -------
         str
-            Name of authenticated user.
+            Name of the authenticated user.
         boolean
             The status of authentication, None: no credentials entered, False: incorrect credentials, True: correct credentials.
         str
-            Username of authenticated user.
+            Username of the authenticated user.
         """
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
 
         if not st.session_state['authentication_status']:
-            self.token = self.cookie_manager.get(self.cookie_name)
-            if self.token is not None:
-                self.token = self.token_decode()
-                if self.token is not False:
-                    if not st.session_state['logout']:
-                        if self.token['exp_date'] > datetime.utcnow().timestamp():
-                            if 'name' and 'username' in self.token:
-                                st.session_state['name'] = self.token['name']
-                                st.session_state['username'] = self.token['username']
-                                st.session_state['authentication_status'] = True
+            self.check_cookie()
 
             if st.session_state['authentication_status'] != True:
                 if location == 'main':
@@ -177,30 +225,14 @@ class Authenticate:
                 self.password = login_form.text_input('Password', type='password')
 
                 if login_form.form_submit_button('Login'):
-                    self.index = None
-                    for i in range(0, len(self.usernames)):
-                        if self.usernames[i] == self.username:
-                            self.index = i
-                    if self.index is not None:
-                        try:
-                            if self.check_pw():
-                                st.session_state['name'] = self.names[self.index]
-                                self.exp_date = self.set_exp_date()
-                                self.token = self.token_encode()
-                                self.cookie_manager.set(self.cookie_name, self.token,
-                                expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                                st.session_state['authentication_status'] = True
-                            else:
-                                st.session_state['authentication_status'] = False
-                        except Exception as e:
-                            print(e)
-                    else:
-                        st.session_state['authentication_status'] = False
+                    self.check_credentials()
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
 
-    def logout(self, button_name, location='main'):
-        """Creates a logout button.
+    def logout(self, button_name: str, location: str='main'):
+        """
+        Creates a logout button.
+
         Parameters
         ----------
         button_name: str
