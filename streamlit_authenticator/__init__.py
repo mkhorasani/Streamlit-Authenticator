@@ -115,7 +115,7 @@ class Authenticate:
         except:
             return False
 
-    def exp_date(self):
+    def set_exp_date(self):
         """
         Returns
         -------
@@ -185,7 +185,7 @@ class Authenticate:
                         try:
                             if self.check_pw():
                                 st.session_state['name'] = self.names[self.index]
-                                self.exp_date = self.exp_date()
+                                self.exp_date = self.set_exp_date()
                                 self.token = self.token_encode()
                                 self.cookie_manager.set(self.cookie_name, self.token,
                                 expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
