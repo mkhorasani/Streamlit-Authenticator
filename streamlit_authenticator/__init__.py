@@ -18,10 +18,6 @@ class Hasher:
         ----------
         passwords: list
             The list of plain text passwords to be hashed.
-        Returns
-        -------
-        list
-            The list of hashed passwords.
         """
         self.passwords = passwords
 
@@ -74,14 +70,6 @@ class Authenticate:
             The key to be used for hashing the signature of the JWT cookie.
         cookie_expiry_days: int
             The number of days before the cookie expires on the client's browser.
-        Returns
-        -------
-        str
-            Name of authenticated user.
-        boolean
-            The status of authentication, None: no credentials entered, False: incorrect credentials, True: correct credentials.
-        str
-            Username of authenticated user.
         """
         self.names = names
         self.usernames = usernames
@@ -144,7 +132,7 @@ class Authenticate:
 
         Returns
         -------
-        boolean
+        bool
             The validation state for the entered password by comparing it to the hashed password on disk.
         """
         return bcrypt.checkpw(self.password.encode(), self.passwords[self.index].encode())
@@ -164,9 +152,19 @@ class Authenticate:
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
 
-    def check_credentials(self):
+    def check_credentials(self, inplace: bool=True) -> bool:
         """
         Checks the validity of the entered credentials.
+
+        Parameters
+        ----------
+        inplace: bool
+            Inplace setting, True: authentication status will be stored in session state, 
+            False: authentication status will be returned as bool.
+        Returns
+        -------
+        bool
+            Validity of entered credentials.
         """
         self.index = None
         for i in range(0, len(self.usernames)):
@@ -175,22 +173,31 @@ class Authenticate:
         if self.index is not None:
             try:
                 if self.check_pw():
-                    st.session_state['name'] = self.names[self.index]
-                    self.exp_date = self.set_exp_date()
-                    self.token = self.token_encode()
-                    self.cookie_manager.set(self.cookie_name, self.token,
-                    expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                    st.session_state['authentication_status'] = True
+                    if inplace:
+                        st.session_state['name'] = self.names[self.index]
+                        self.exp_date = self.set_exp_date()
+                        self.token = self.token_encode()
+                        self.cookie_manager.set(self.cookie_name, self.token,
+                        expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                        st.session_state['authentication_status'] = True
+                    else:
+                        return True
                 else:
-                    st.session_state['authentication_status'] = False
+                    if inplace:
+                        st.session_state['authentication_status'] = False
+                    else:
+                        return False
             except Exception as e:
                 print(e)
         else:
-            st.session_state['authentication_status'] = False
+            if inplace:
+                st.session_state['authentication_status'] = False
+            else:
+                return False
 
     def login(self, form_name: str, location: str='main') -> tuple:
         """
-        Create a login widget.
+        Creates a login widget.
 
         Parameters
         ----------
@@ -202,17 +209,16 @@ class Authenticate:
         -------
         str
             Name of the authenticated user.
-        boolean
-            The status of authentication, None: no credentials entered, False: incorrect credentials, True: correct credentials.
+        bool
+            The status of authentication, None: no credentials entered, 
+            False: incorrect credentials, True: correct credentials.
         str
             Username of the authenticated user.
         """
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-
         if not st.session_state['authentication_status']:
             self.check_cookie()
-
             if st.session_state['authentication_status'] != True:
                 if location == 'main':
                     login_form = st.form('Login')
@@ -242,7 +248,6 @@ class Authenticate:
         """
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-
         if location == 'main':
             if st.button(button_name):
                 self.cookie_manager.delete(self.cookie_name)
@@ -258,9 +263,47 @@ class Authenticate:
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
 
+    def modify_password(self, form_name: str, location: str='main') -> tuple:
+        """
+        Creates password modification widget.
+
+        Parameters
+        ----------
+        form_name: str
+            The rendered name of the password modification form.
+        location: str
+            The location of the password modification form i.e. main or sidebar.
+        Returns
+        -------
+        str
+            Username associated with modified password.
+        str
+            Modified user's new hashed password.
+        """
+        if location not in ['main', 'sidebar']:
+            raise ValueError("Location must be one of 'main' or 'sidebar'")
+        if location == 'main':
+            modify_password_form = st.form('Modify password')
+        elif location == 'sidebar':
+            modify_password_form = st.sidebar.form('Modify password')
+        
+        modify_password_form.subheader(form_name)
+        self.username = modify_password_form.text_input('Username')
+        self.password = modify_password_form.text_input('Current password', type='password')
+        new_password = modify_password_form.text_input('New password', type='password')
+
+        if modify_password_form.form_submit_button('Modify'):
+            if self.check_credentials(inplace=False):
+                if len(new_password) > 0:
+                    modify_password_form.success('Password modified successfully')
+                    return self.username, Hasher([new_password]).generate()[0]
+                else:
+                    modify_password_form.warning('Please enter a new password')
+            else:
+                modify_password_form.error('Username/password is incorrect')
+            
 if not _RELEASE:
     #hashed_passwords = Hasher(['123', '456']).generate()
-
     with open('../config.yaml') as file:
         config = yaml.load(file, Loader=SafeLoader)
 
