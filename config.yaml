@@ -1,9 +1,25 @@
-credentials:
-  names: ['John Smith', 'Rebecca Briggs']
-  usernames: ['jsmith', 'rbriggs']
-  passwords: ['$2b$12$RITgFvOneaLd7DvPS6UhZeRpZDPjnGvTKV.FCMNWRM92fz7ZapuC2',
-              '$2b$12$to1ADtwtCOFGMFNow7iJj.GjWWqy6FOEeeBjl/c.FmCZBSkf2bCr.']
 cookie:
-  name: 'some_cookie_name'
-  key: 'some_signature_key'
   expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  usernames:
+    dbaldwin:
+      email: dbaldwin@gmail.com
+      name: David Baldwin
+      password: $2b$12$E9/bCaN/r8sN/FV2l8NpgOgspUBAp7UAVU6BgsXJzp/pW8gQWCprC
+    jsmith:
+      email: jsmith@gmail.com
+      name: John Smith
+      password: $2b$12$kOhDMjVmP5CTaByYEexG4OIMyPknVsxLHKdlltN8NBtKZ.kCNEZz.
+    rbriggs:
+      email: rbriggs@gmail.com
+      name: Rebecca Briggs
+      password: $2b$12$to1ADtwtCOFGMFNow7iJj.GjWWqy6FOEeeBjl/c.FmCZBSkf2bCr.
+    rcouper:
+      email: rcouper@gmail.com
+      name: Ross Couper
+      password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu
+register:
+  emails:
+  - melsby@gmail.com
