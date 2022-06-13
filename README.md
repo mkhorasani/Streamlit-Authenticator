@@ -18,7 +18,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 ```
 
-### 1. Hashing Passwords
+### 1. Hashing passwords
 
 * Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0.
 
@@ -41,7 +41,7 @@ hashed_passwords = stauth.Hasher(['123', '456']).generate()
 
 * Finally replace the plain text passwords in the configuration file with the hashed passwords.
 
-### 2. Creating Login Widget
+### 2. Creating login widget
 
 * Subsequently import the configuration file into your script and create an authentication object.
 
@@ -66,7 +66,7 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
 
-### 3. Authenticating Users
+### 3. Authenticating users
 
 * You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body).
 
