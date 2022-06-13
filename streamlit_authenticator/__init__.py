@@ -177,8 +177,9 @@ class Authenticate:
                         st.session_state['name'] = self.names[self.index]
                         self.exp_date = self.set_exp_date()
                         self.token = self.token_encode()
-                        self.cookie_manager.set(self.cookie_name, self.token,
-                        expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                        if self.cookie_expiry_days > 0:
+                            self.cookie_manager.set(self.cookie_name, self.token,
+                            expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                         st.session_state['authentication_status'] = True
                     else:
                         return True
