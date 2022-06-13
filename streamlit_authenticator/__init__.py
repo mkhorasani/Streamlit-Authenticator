@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 import streamlit.components.v1 as components
 
-_RELEASE = False
+_RELEASE = True
 
 class Hasher:
     def __init__(self, passwords: list):
