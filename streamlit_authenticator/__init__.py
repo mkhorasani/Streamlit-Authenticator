@@ -99,8 +99,8 @@ class Authenticate:
             The JWT cookie for passwordless reauthentication.
         """
         return jwt.encode({'name':st.session_state['name'],
-        'username':st.session_state['username'],
-        'exp_date':self.exp_date}, self.key, algorithm='HS256')
+            'username':st.session_state['username'],
+            'exp_date':self.exp_date}, self.key, algorithm='HS256')
 
 
     def token_decode(self) -> str:
@@ -137,9 +137,10 @@ class Authenticate:
         Returns
         -------
         bool
-            The validation state for the entered password by comparing it to the hashed password on disk.
+            The validity of the entered password by comparing it to the hashed password on disk.
         """
-        return bcrypt.checkpw(self.password.encode(), self.credentials['usernames'][self.username]['password'].encode())
+        return bcrypt.checkpw(self.password.encode(), 
+            self.credentials['usernames'][self.username]['password'].encode())
 
 
     def check_cookie(self):
@@ -236,7 +237,8 @@ class Authenticate:
                 if login_form.form_submit_button('Login'):
                     self.check_credentials()
 
-        return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
+        return st.session_state['name'], st.session_state['authentication_status'], 
+            st.session_state['username']
 
 
     def logout(self, button_name: str, location: str='main'):
