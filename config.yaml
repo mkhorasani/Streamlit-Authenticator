@@ -20,6 +20,6 @@ credentials:
       email: rcouper@gmail.com
       name: Ross Couper
       password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu
-register:
+preauthorized:
   emails:
   - melsby@gmail.com
