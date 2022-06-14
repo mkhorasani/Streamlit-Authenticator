@@ -399,7 +399,7 @@ class Authenticate:
                     status = self._register_credentials()
                     register_status[status](status)
                 else:
-                    register_user_form.error('Email not allowed to register')
+                    register_user_form.error('User not authorized to register')
             else:
                 status = self._register_credentials()
                 register_status[status](status)
