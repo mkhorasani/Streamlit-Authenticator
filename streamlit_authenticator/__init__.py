@@ -55,7 +55,8 @@ class Hasher:
 
 
 class Authenticate:
-    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, register: list=None):
+    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, 
+        register: list=None):
         """
         Create a new instance of "Authenticate".
 
