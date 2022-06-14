@@ -56,7 +56,7 @@ class Hasher:
 
 class Authenticate:
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, 
-        register: list=None):
+        preauthorized: list=None):
         """
         Create a new instance of "Authenticate".
 
@@ -70,14 +70,14 @@ class Authenticate:
             The key to be used for hashing the signature of the JWT cookie.
         cookie_expiry_days: int
             The number of days before the cookie expires on the client's browser.
-        register: list
-            The list of emails of unregistered users allowed to register.
+        preauthorized: list
+            The list of emails of unregistered users authorized to register.
         """
         self.credentials = credentials
         self.cookie_name = cookie_name
         self.key = key
         self.cookie_expiry_days = cookie_expiry_days
-        self.register = register
+        self.preauthorized = preauthorized
         self.cookie_manager = stx.CookieManager()
 
         if 'name' not in st.session_state:
@@ -346,7 +346,7 @@ class Authenticate:
                     self.credentials['usernames'][self.new_username] = {'name': self.new_name, 
                         'password': Hasher([self.new_password]).generate()[0], 'email': self.registered_email}
                     if self.preauthorization:
-                        self.register['emails'].remove(self.registered_email)
+                        self.preauthorized['emails'].remove(self.registered_email)
                     return 'User registered successfully'
                 else:
                     return 'Passwords do not match'
@@ -374,7 +374,7 @@ class Authenticate:
         dict
             Credentials dictionary with registered user.
         """
-        if not self.register:
+        if not self.preauthorized:
             raise ValueError("Register argument must not be None")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
@@ -398,7 +398,7 @@ class Authenticate:
 
         if register_user_form.form_submit_button('Register'):
             if self.preauthorization:
-                if self.registered_email in self.register['emails']:
+                if self.registered_email in self.preauthorized['emails']:
                     status = self._register_credentials()
                     register_status[status](status)
                 else:
