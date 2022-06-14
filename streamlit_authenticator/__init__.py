@@ -383,7 +383,7 @@ class Authenticate:
         register_status = {'User registered successfully': register_user_form.success, 
             'Passwords do not match': register_user_form.warning, 
             'Username already taken': register_user_form.warning, 
-            'Please enter a new username, name and password': register_user_form.warning}
+            'Please enter a new username, name, and password': register_user_form.warning}
 
         register_user_form.subheader(form_name)
         self.registered_email = register_user_form.text_input('Email')
