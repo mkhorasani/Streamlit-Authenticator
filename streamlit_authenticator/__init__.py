@@ -21,7 +21,6 @@ class Hasher:
         """
         self.passwords = passwords
 
-
     def hash(self, password: str) -> str:
         """
         Hashes the plain text password.
@@ -37,7 +36,6 @@ class Hasher:
         """
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-
     def generate(self) -> list:
         """
         Hashes the list of plain text passwords.
@@ -52,7 +50,6 @@ class Hasher:
         for password in self.passwords:
             hashedpw.append(self.hash(password))
         return hashedpw
-
 
 class Authenticate:
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, 
@@ -89,7 +86,6 @@ class Authenticate:
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
 
-
     def token_encode(self) -> str:
         """
         Encodes the contents of the reauthentication cookie.
@@ -102,7 +98,6 @@ class Authenticate:
         return jwt.encode({'name':st.session_state['name'],
             'username':st.session_state['username'],
             'exp_date':self.exp_date}, self.key, algorithm='HS256')
-
 
     def token_decode(self) -> str:
         """
@@ -118,7 +113,6 @@ class Authenticate:
         except:
             return False
 
-
     def set_exp_date(self) -> str:
         """
         Creates the reauthentication cookie's expiry date.
@@ -129,7 +123,6 @@ class Authenticate:
             The JWT cookie's expiry timestamp in Unix epoch.
         """
         return (datetime.utcnow() + timedelta(days=self.cookie_expiry_days)).timestamp()
-
 
     def check_pw(self) -> bool:
         """
@@ -142,7 +135,6 @@ class Authenticate:
         """
         return bcrypt.checkpw(self.password.encode(), 
             self.credentials['usernames'][self.username]['password'].encode())
-
 
     def check_cookie(self):
         """
@@ -158,7 +150,6 @@ class Authenticate:
                             st.session_state['name'] = self.token['name']
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
-
 
     def check_credentials(self, inplace: bool=True) -> bool:
         """
@@ -198,7 +189,6 @@ class Authenticate:
                 st.session_state['authentication_status'] = False
             else:
                 return False
-
 
     def login(self, form_name: str, location: str='main') -> tuple:
         """
@@ -241,7 +231,6 @@ class Authenticate:
         return st.session_state['name'], st.session_state['authentication_status'], 
             st.session_state['username']
 
-
     def logout(self, button_name: str, location: str='main'):
         """
         Creates a logout button.
@@ -270,7 +259,6 @@ class Authenticate:
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
 
-
     def _reset_credentials(self):
         """
         Updates credentials dictionary with user's reset hashed password.
@@ -291,7 +279,6 @@ class Authenticate:
                 return 'Please enter a new password'
         else:
             return 'Username/password is incorrect'
-
 
     def reset_password(self, form_name: str, location: str='main') -> tuple:
         """
@@ -330,7 +317,6 @@ class Authenticate:
             status = self._reset_credentials()
             reset_status[status](status)
     
-
     def _register_credentials(self):
         """
         Updates credentials dictionary with new user's information.
@@ -354,7 +340,6 @@ class Authenticate:
                 return 'Username already taken'
         else:
             return 'Please enter a new username, name, and password'
-
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True):
         """
