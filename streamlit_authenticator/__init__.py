@@ -350,7 +350,7 @@ class Authenticate:
             else:
                 return 'Username already taken'
         else:
-            return 'Please enter a new username, name and password'
+            return 'Please enter a new username, name, and password'
 
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True):
