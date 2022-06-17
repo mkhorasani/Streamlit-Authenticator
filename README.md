@@ -64,7 +64,7 @@ authenticator = stauth.Authenticate(
 ```python
 name, authentication_status, username = authenticator.login('Login', 'main')
 ```
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/login_form.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.PNG)
 
 ### 3. Authenticating users
 
@@ -94,11 +94,11 @@ elif st.session_state["authentication_status"] == None:
     st.warning('Please enter your username and password')
 ```
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/logged_in.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.PNG)
 
 Or prompt an unverified user to enter a correct username and password.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/incorrect_login.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.PNG)
 
 Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
 
