@@ -186,8 +186,6 @@ class Authenticate:
                     self._check_credentials()
                 if st.session_state['authentication_status'] == False:
                     login_form.error('Username/password is incorrect')
-                if st.session_state['authentication_status'] == None:
-                    login_form.warning('Please enter your username and password')
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
 
@@ -354,17 +352,11 @@ class Authenticate:
 
     def _set_password(self):
         """
-        Updates credentials dictionary with user's reset hashed password.
-
-        Returns
-        -------
-        str
-            The status of resetting the password.
+        Updates credentials dictionary with user's hashed random password.
         """
         if self.username in self.credentials['usernames']:
             self.random_password = generate_random_pw()
             self.credentials['usernames'][self.username]['password'] = Hasher([self.random_password]).generate()[0]
-            return self.random_password
 
     def forgot_password(self, form_name: str, location: str='main') -> str:
         """
