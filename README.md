@@ -141,7 +141,7 @@ except Exception as e:
 
 ### 6. Creating a forgot password widget
 
-* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password of the user which should then be transferred to the them securely.
+* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password of the user which should then be transferred to them securely.
 
 ```python
 try:
