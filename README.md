@@ -28,11 +28,11 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       name: John Smith
-      password: $2b$12$SjN8UmqjSBdOZYuQ1OW3x.CgMEHTJ2Q8pqpVQdDOF4Z5P3CMHjTWK
+      password: '123' # To be replaced with hashed password
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: $2b$12$to1ADtwtCOFGMFNow7iJj.GjWWqy6FOEeeBjl/c.FmCZBSkf2bCr.
+      password: '456' # To be replaced with hashed password
 cookie:
   expiry_days: 30
   key: some_signature_key
@@ -104,11 +104,11 @@ elif st.session_state["authentication_status"] == None:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.PNG)
 
-Or prompt an unverified user to enter a correct username and password.
+* Or prompt an unverified user to enter a correct username and password.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.PNG)
 
-Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
+* Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
 
 ### 4. Creating a password reset widget
 
