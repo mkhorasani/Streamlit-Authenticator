@@ -127,7 +127,7 @@ if authentication_status:
 
 ### 5. Creating a new user registration widget
 
-* You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to preauthorized, set the **preauthorization** argument to True and add their email to the **preauthorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **preauthorized** list in configuration file. Alternatively, to allow anyone to sign up set the **preauthorization** argument to False.
+* You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to be preauthorized, set the **preauthorization** argument to True and add their email to the **preauthorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **preauthorized** list in the configuration file. Alternatively, to allow anyone to sign up, set the **preauthorization** argument to False.
 
 ```python
 try:
@@ -141,7 +141,7 @@ except Exception as e:
 
 ### 6. Creating a forgot password widget
 
-* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new plain text password of the user which should then be transferred to the them securely.
+* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password of the user which should then be transferred to the them securely.
 
 ```python
 try:
