@@ -6,7 +6,7 @@ import streamlit.components.v1 as components
 from hasher import Hasher
 from authenticate import Authenticate
 
-_RELEASE = False
+_RELEASE = True
 
 if not _RELEASE:
     # hashed_passwords = Hasher(['123', '456']).generate()
