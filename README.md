@@ -20,17 +20,26 @@ import streamlit_authenticator as stauth
 
 ### 1. Hashing passwords
 
-* Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0.
+* Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
 
 ```python
 credentials:
-  names: ['John Smith', 'Rebecca Briggs']
-  usernames: ['jsmith', 'rbriggs']
-  passwords: ['123', '456'] # To be replaced with hashed passwords
+  usernames:
+    jsmith:
+      email: jsmith@gmail.com
+      name: John Smith
+      password: $2b$12$SjN8UmqjSBdOZYuQ1OW3x.CgMEHTJ2Q8pqpVQdDOF4Z5P3CMHjTWK
+    rbriggs:
+      email: rbriggs@gmail.com
+      name: Rebecca Briggs
+      password: $2b$12$to1ADtwtCOFGMFNow7iJj.GjWWqy6FOEeeBjl/c.FmCZBSkf2bCr.
 cookie:
-  name: 'some_cookie_name'
-  key: 'some_signature_key'
   expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+preauthorized:
+  emails:
+  - melsby@gmail.com
 ```
 
 * Then use the Hasher module to convert the plain text passwords into hashed passwords.
@@ -41,7 +50,7 @@ hashed_passwords = stauth.Hasher(['123', '456']).generate()
 
 * Finally replace the plain text passwords in the configuration file with the hashed passwords.
 
-### 2. Creating login widget
+### 2. Creating a login widget
 
 * Subsequently import the configuration file into your script and create an authentication object.
 
@@ -49,13 +58,12 @@ hashed_passwords = stauth.Hasher(['123', '456']).generate()
 with open('../config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
-authenticator = stauth.Authenticate(
-    config['credentials']['names'],
-    config['credentials']['usernames'],
-    config['credentials']['passwords'],
+authenticator = Authenticate(
+    config['credentials'],
     config['cookie']['name'],
     config['cookie']['key'],
-    config['cookie']['expiry_days']
+    config['cookie']['expiry_days'],
+    config['preauthorized']
 )
 ```
 
@@ -101,6 +109,95 @@ Or prompt an unverified user to enter a correct username and password.
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.PNG)
 
 Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
+
+### 4. Creating a password reset widget
+
+* You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
+
+```python
+if authentication_status:
+    try:
+        if authenticator.reset_password(username, 'Reset password'):
+            st.success('Password modified successfully')
+    except Exception as e:
+        st.error(e)
+```
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.PNG)
+
+### 5. Creating a new user registration widget
+
+* You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to preauthorized, set the **preauthorization** argument to True and add their email to the **preauthorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **preauthorized** list in configuration file. Alternatively, to allow anyone to sign up set the **preauthorization** argument to False.
+
+```python
+try:
+    if authenticator.register_user('Register user', preauthorization=False):
+        st.success('User registered successfully')
+except Exception as e:
+    st.error(e)
+```
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.PNG)
+
+### 6. Creating a forgot password widget
+
+* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new plain text password of the user which should then be transferred to the them securely.
+
+```python
+try:
+    username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+    if username_forgot_pw:
+        st.success('New password sent securely')
+        # Random password to be transferred to user securely
+    elif username_forgot_pw == False:
+        st.error('Username not found')
+except Exception as e:
+    st.error(e)
+```
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.PNG)
+
+### 7. Creating a forgot username widget
+
+* You may use the **forgot_username** widget to allow a user to retrieve their forgotten username. The widget will return the username and email of the user which should then be transferred to them securely.
+
+```python
+try:
+    username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
+    if username_forgot_username:
+        st.success('Username sent securely')
+        # Username to be transferred to user securely
+    elif username_forgot_username == False:
+        st.error('Email not found')
+except Exception as e:
+    st.error(e)
+```
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.PNG)
+
+### 8. Creating an update user details widget
+
+* You may use the **update_user_details** widget to allow a logged in user to update their name and/or email. The widget will automatically save the updated details in both the configuration file and reauthentication cookie.
+
+```python
+if authentication_status:
+    try:
+        if authenticator.update_user_details(username, 'Update user details'):
+            st.success('Entries updated successfully')
+    except Exception as e:
+        st.error(e)
+```
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.PNG)
+
+### 9. Updating the configuration file
+
+* Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
+
+```python
+with open('../config.yaml', 'w') as file:
+    yaml.dump(config, file, default_flow_style=False)
+```
 
 ## Credits
 - Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components).

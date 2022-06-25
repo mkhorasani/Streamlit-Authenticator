@@ -1,6 +1,9 @@
 import bcrypt
 
 class Hasher:
+    """
+    This class will hash plain text passwords.
+    """
     def __init__(self, passwords: list):
         """
         Create a new instance of "Hasher".
