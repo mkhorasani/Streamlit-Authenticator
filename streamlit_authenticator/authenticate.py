@@ -4,10 +4,10 @@ import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 
-from hasher import Hasher
-from utils import generate_random_pw
+from .hasher import Hasher
+from .utils import generate_random_pw
 
-from exceptions import CredentialsError, ResetError, RegisterError, ForgotError, UpdateError
+from .exceptions import CredentialsError, ResetError, RegisterError, ForgotError, UpdateError
 
 class Authenticate:
     """
