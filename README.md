@@ -28,11 +28,11 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       name: John Smith
-      password: '123' # To be replaced with hashed password
+      password: 123 # To be replaced with hashed password
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: '456' # To be replaced with hashed password
+      password: 456 # To be replaced with hashed password
 cookie:
   expiry_days: 30
   key: some_signature_key
