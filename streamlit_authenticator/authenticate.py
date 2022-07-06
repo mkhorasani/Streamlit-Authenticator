@@ -46,6 +46,8 @@ class Authenticate:
             st.session_state['authentication_status'] = None
         if 'username' not in st.session_state:
             st.session_state['username'] = None
+        if 'group' not in st.session_state:
+            st.session_state['group'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
 
@@ -58,9 +60,10 @@ class Authenticate:
         str
             The JWT cookie for passwordless reauthentication.
         """
-        return jwt.encode({'name':st.session_state['name'],
-            'username':st.session_state['username'],
-            'exp_date':self.exp_date}, self.key, algorithm='HS256')
+        return jwt.encode({'name': st.session_state['name'],
+                           'username': st.session_state['username'],
+                           'group': st.session_state['group'],
+                           'exp_date': self.exp_date}, self.key, algorithm='HS256')
 
     def _token_decode(self) -> str:
         """
@@ -112,6 +115,10 @@ class Authenticate:
                         if 'name' and 'username' in self.token:
                             st.session_state['name'] = self.token['name']
                             st.session_state['username'] = self.token['username']
+                            try:
+                                st.session_state['group'] = self.token['group']
+                            except KeyError:
+                                st.session_state['group'] = None
                             st.session_state['authentication_status'] = True
     
     def _check_credentials(self, inplace: bool=True) -> bool:
@@ -133,6 +140,7 @@ class Authenticate:
                 if self._check_pw():
                     if inplace:
                         st.session_state['name'] = self.credentials['usernames'][self.username]['name']
+                        st.session_state['group'] = self.credentials['usernames'][self.username]['group']
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
                         self.cookie_manager.set(self.cookie_name, self.token,
@@ -191,7 +199,7 @@ class Authenticate:
                 if login_form.form_submit_button('Login'):
                     self._check_credentials()
 
-        return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
+        return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username'], st.session_state['group']
 
     def logout(self, button_name: str, location: str='main'):
         """
@@ -211,6 +219,7 @@ class Authenticate:
                 self.cookie_manager.delete(self.cookie_name)
                 st.session_state['logout'] = True
                 st.session_state['name'] = None
+                st.session_state['group'] = None
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
         elif location == 'sidebar':
@@ -218,6 +227,7 @@ class Authenticate:
                 self.cookie_manager.delete(self.cookie_name)
                 st.session_state['logout'] = True
                 st.session_state['name'] = None
+                st.session_state['group'] = None
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
 
