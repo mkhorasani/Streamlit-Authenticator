@@ -295,7 +295,7 @@ class Authenticate:
         email: str
             The email of the new user.
         preauthorization: bool
-            The pre-authorization requirement, True: user must be pre-authorized to register, 
+            The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         """
         self.credentials['usernames'][username] = {'name': name, 
@@ -314,7 +314,7 @@ class Authenticate:
         location: str
             The location of the password reset form i.e. main or sidebar.
         preauthorization: bool
-            The pre-authorization requirement, True: user must be pre-authorized to register, 
+            The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         Returns
         -------
@@ -322,7 +322,7 @@ class Authenticate:
             The status of registering the new user, True: user registered successfully.
         """
         if not self.preauthorized:
-            raise ValueError("Pre-authorization argument must not be None")
+            raise ValueError("preauthorization argument must not be None")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -346,7 +346,7 @@ class Authenticate:
                                 self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                                 return True
                             else:
-                                raise RegisterError('User not pre-authorized to register')
+                                raise RegisterError('User not preauthorized to register')
                         else:
                             self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                             return True
