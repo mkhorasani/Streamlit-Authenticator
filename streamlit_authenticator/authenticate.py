@@ -321,8 +321,9 @@ class Authenticate:
         bool
             The status of registering the new user, True: user registered successfully.
         """
-        if not self.preauthorized:
-            raise ValueError("preauthorization argument must not be None")
+        if preauthorization:
+            if not self.preauthorized:
+                raise ValueError("preauthorization argument must not be None")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
