@@ -7,7 +7,7 @@ import extra_streamlit_components as stx
 from .hasher import Hasher
 from .utils import generate_random_pw
 
-from .exceptions import CredentialsError, ResetError, RegisterError, ForgotError, UpdateError
+from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
     """
@@ -185,7 +185,7 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
             self._check_cookie()
-            if st.session_state['authentication_status'] != True:
+            if not st.session_state['authentication_status']:
                 if location == 'main':
                     login_form = st.form('Login')
                 elif location == 'sidebar':
@@ -305,7 +305,7 @@ class Authenticate:
         email: str
             The email of the new user.
         preauthorization: bool
-            The pre-authorization requirement, True: user must be pre-authorized to register, 
+            The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         """
         self.credentials['usernames'][username] = {'name': name, 
@@ -324,15 +324,16 @@ class Authenticate:
         location: str
             The location of the password reset form i.e. main or sidebar.
         preauthorization: bool
-            The pre-authorization requirement, True: user must be pre-authorized to register, 
+            The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         Returns
         -------
         bool
             The status of registering the new user, True: user registered successfully.
         """
-        if not self.preauthorized:
-            raise ValueError("Pre-authorization argument must not be None")
+        if preauthorization:
+            if not self.preauthorized:
+                raise ValueError("preauthorization argument must not be None")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -356,7 +357,7 @@ class Authenticate:
                                 self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                                 return True
                             else:
-                                raise RegisterError('User not pre-authorized to register')
+                                raise RegisterError('User not preauthorized to register')
                         else:
                             self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                             return True
