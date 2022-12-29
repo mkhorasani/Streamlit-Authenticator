@@ -1,8 +1,9 @@
+from datetime import datetime, timedelta
+from typing import Optional
 import jwt
 import bcrypt
 import streamlit as st
-from datetime import datetime, timedelta
-import extra_streamlit_components as stx
+import extra_streamlit_components as stx # type: ignore
 
 from .hasher import Hasher
 from .utils import generate_random_pw
@@ -11,11 +12,12 @@ from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError
 
 class Authenticate:
     """
-    This class will create login, logout, register user, reset password, forgot password, 
+    This class will create login, logout, register user, reset password, forgot password,
     forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, 
-        preauthorized: list=None):
+    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30,
+        preauthorized: Optional[dict[str, list[str]]]=None):
+
         """
         Create a new instance of "Authenticate".
 
@@ -24,7 +26,8 @@ class Authenticate:
         credentials: dict
             The dictionary of usernames, names, passwords, and emails.
         cookie_name: str
-            The name of the JWT cookie stored on the client's browser for passwordless reauthentication.
+            The name of the JWT cookie stored on the client's browser for passwordless
+                reauthentication.
         key: str
             The key to be used for hashing the signature of the JWT cookie.
         cookie_expiry_days: int
@@ -96,7 +99,7 @@ class Authenticate:
         bool
             The validity of the entered password by comparing it to the hashed password on disk.
         """
-        return bcrypt.checkpw(self.password.encode(), 
+        return bcrypt.checkpw(self.password.encode(),
             self.credentials['usernames'][self.username]['password'].encode())
 
     def _check_cookie(self):
@@ -113,7 +116,7 @@ class Authenticate:
                             st.session_state['name'] = self.token['name']
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
-    
+
     def _check_credentials(self, inplace: bool=True) -> bool:
         """
         Checks the validity of the entered credentials.
@@ -121,7 +124,7 @@ class Authenticate:
         Parameters
         ----------
         inplace: bool
-            Inplace setting, True: authentication status will be stored in session state, 
+            Inplace setting, True: authentication status will be stored in session state,
             False: authentication status will be returned as bool.
         Returns
         -------
@@ -168,7 +171,7 @@ class Authenticate:
         str
             Name of the authenticated user.
         bool
-            The status of authentication, None: no credentials entered, 
+            The status of authentication, None: no credentials entered,
             False: incorrect credentials, True: correct credentials.
         str
             Username of the authenticated user.
@@ -257,7 +260,7 @@ class Authenticate:
             reset_password_form = st.form('Reset password')
         elif location == 'sidebar':
             reset_password_form = st.sidebar.form('Reset password')
-        
+
         reset_password_form.subheader(form_name)
         self.username = username.lower()
         self.password = reset_password_form.text_input('Current password', type='password')
@@ -268,7 +271,7 @@ class Authenticate:
             if self._check_credentials(inplace=False):
                 if len(new_password) > 0:
                     if new_password == new_password_repeat:
-                        if self.password != new_password: 
+                        if self.password != new_password:
                             self._update_password(self.username, new_password)
                             return True
                         else:
@@ -279,8 +282,8 @@ class Authenticate:
                     raise ResetError('No new password provided')
             else:
                 raise CredentialsError
-    
-    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool):
+
+    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool) -> bool:
         """
         Adds to credentials dictionary the new user's information.
 
@@ -295,13 +298,31 @@ class Authenticate:
         email: str
             The email of the new user.
         preauthorization: bool
-            The preauthorization requirement, True: user must be preauthorized to register, 
+            The preauthorization requirement, True: user must be preauthorized to register,
             False: any user can register.
         """
-        self.credentials['usernames'][username] = {'name': name, 
+        self.credentials['usernames'][username] = {'name': name,
             'password': Hasher([password]).generate()[0], 'email': email}
         if preauthorization:
-            self.preauthorized['emails'].remove(email)
+            if len(self.preauthorized['domains']) > 0:
+                if email.split('@')[1] not in self.preauthorized['domains']:
+                    domain_acceped = False
+                else:
+                    domain_acceped = True
+            else:
+                domain_acceped = False
+            if email not in self.preauthorized['emails']:
+                email_acceped = False
+            else:
+                email_acceped = True
+                self.preauthorized['emails'].remove(email)
+            if domain_acceped or email_acceped:
+                return True
+            else:
+                if not domain_acceped:
+                    raise RegisterError('Domain not accepted')
+                elif not email_acceped:
+                    raise RegisterError('Email not accepted')
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
         """
@@ -314,7 +335,7 @@ class Authenticate:
         location: str
             The location of the password reset form i.e. main or sidebar.
         preauthorization: bool
-            The preauthorization requirement, True: user must be preauthorized to register, 
+            The preauthorization requirement, True: user must be preauthorized to register,
             False: any user can register.
         Returns
         -------
@@ -342,15 +363,7 @@ class Authenticate:
             if len(new_email) and len(new_username) and len(new_name) and len(new_password) > 0:
                 if new_username not in self.credentials['usernames']:
                     if new_password == new_password_repeat:
-                        if preauthorization:
-                            if new_email in self.preauthorized['emails']:
-                                self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
-                                return True
-                            else:
-                                raise RegisterError('User not preauthorized to register')
-                        else:
-                            self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
-                            return True
+                        return self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                     else:
                         raise RegisterError('Passwords do not match')
                 else:
@@ -506,7 +519,7 @@ class Authenticate:
             update_user_details_form = st.form('Update user details')
         elif location == 'sidebar':
             update_user_details_form = st.sidebar.form('Update user details')
-        
+
         update_user_details_form.subheader(form_name)
         self.username = username.lower()
         field = update_user_details_form.selectbox('Field', ['Name', 'Email']).lower()
