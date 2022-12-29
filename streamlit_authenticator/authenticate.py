@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Callable, Any
 import jwt
 import bcrypt
 import streamlit as st
@@ -51,6 +51,7 @@ class Authenticate:
             st.session_state['username'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
+
 
     def _token_encode(self) -> str:
         """
@@ -155,6 +156,75 @@ class Authenticate:
                 st.session_state['authentication_status'] = False
             else:
                 return False
+    def full_widget(
+        self,
+        forgotten_username_cb: Optional[Callable[[str], Any]] = None,
+        forgotten_password_cb: Optional[Callable[[str], Any]] = None):
+        """This will easily allow users to create all the widget on the main display utilizing tabs.
+        Now users can scroll through the tabs to find the frames they want to use.
+
+        Args:
+            forgotten_username_cb (Optional[Callable[[str], None]], optional): This is the
+                callback function that the username
+        """
+        location = "main"
+        authentication_status: bool = False
+        (login, reset_password, register, forgotten_password,
+            forgotten_username, update_information) = st.tabs(
+            ['Login', 'Reset Password', 'Register', 'Forgot Password',
+             'Forgot Username', 'Update Information'])
+        with login:
+            _, authentication_status, username = self.login('Login', location)
+        with reset_password:
+            if authentication_status:
+                try:
+                    if self.reset_password(username, 'Reset password'):
+                        st.success('Password modified successfully')
+                except (ResetError, CredentialsError) as exp:
+                    st.error(exp)
+            else:
+                st.warning('Please login to update your details')
+        with register:
+            if not authentication_status:
+                try:
+                    if self.register_user('Register user', preauthorization=False):
+                        st.success('User registered successfully')
+                except RegisterError as exp:
+                    st.error(exp)
+        with forgotten_password:
+            if not authentication_status:
+                try:
+                    username_forgot_pw, _, forgotten_password= self.forgot_password('Forgot password')
+                    if username_forgot_pw:
+                        st.success('New password sent securely')
+                        forgotten_password_cb(forgotten_password)
+                        # Random password to be transferred to user securely
+                    elif not username_forgot_pw:
+                        st.error('Username not found')
+                        st.session_state['forgotten_username'] = forgotten_username
+                except ForgotError as exp:
+                    st.error(exp)
+        with forgotten_username:
+            if not authentication_status:
+                try:
+                    username_forgot_username, _ = self.forgot_username('Forgot username')
+                    if username_forgot_username:
+                        st.success('Username sent securely')
+                        forgotten_username_cb(username_forgot_username)
+                    elif not username_forgot_username:
+                        st.error('Email not found')
+                except (ValueError, ForgotError) as exp:
+                    st.error(exp)
+        with update_information:
+            if authentication_status:
+                try:
+                    if self.update_user_details(username, 'Update user details'):
+                        st.success('Entries updated successfully')
+                except (UpdateError, ValueError) as exp:
+                    st.error(exp)
+            else:
+                st.warning('Please login to update your details')
+
 
     def login(self, form_name: str, location: str='main') -> tuple:
         """
