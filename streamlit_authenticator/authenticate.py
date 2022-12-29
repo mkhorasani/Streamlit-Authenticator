@@ -159,7 +159,8 @@ class Authenticate:
     def full_widget(
         self,
         forgotten_username_cb: Optional[Callable[[str], Any]] = None,
-        forgotten_password_cb: Optional[Callable[[str], Any]] = None):
+        forgotten_password_cb: Optional[Callable[[str], Any]] = None,
+        preauthorized: Optional[bool] = False,):
         """This will easily allow users to create all the widget on the main display utilizing tabs.
         Now users can scroll through the tabs to find the frames they want to use.
 
@@ -187,7 +188,7 @@ class Authenticate:
         with register:
             if not authentication_status:
                 try:
-                    if self.register_user('Register user', preauthorization=False):
+                    if self.register_user('Register user', preauthorization=preauthorized):
                         st.success('User registered successfully')
                 except RegisterError as exp:
                     st.error(exp)
@@ -393,6 +394,7 @@ class Authenticate:
                     raise RegisterError('Domain not accepted')
                 elif not email_acceped:
                     raise RegisterError('Email not accepted')
+        return True
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
         """
