@@ -156,7 +156,7 @@ class Authenticate:
                 st.session_state['authentication_status'] = False
             else:
                 return False
-    def full_widget(
+    def full_tab(
         self,
         forgotten_username_cb: Optional[Callable[[str], Any]] = None,
         forgotten_password_cb: Optional[Callable[[str], Any]] = None,

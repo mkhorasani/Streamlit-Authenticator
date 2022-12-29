@@ -1,12 +1,12 @@
-# Streamlit-Authenticator [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator) 
+# Streamlit-Authenticator [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
 <!--- [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/khorasani) --->
 **A secure authentication module to validate user credentials in a Streamlit application.**
 
-<a href="https://amzn.to/3eQwEEn"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450"> 
- 
+<a href="https://amzn.to/3eQwEEn"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450">
+
 ###### _To learn more please refer to my book [Web Application Development with Streamlit](https://amzn.to/3eQwEEn)._
 
-  
+
 ## Installation
 
 Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/streamlit-authenticator/):
@@ -205,5 +205,47 @@ with open('../config.yaml', 'w') as file:
     yaml.dump(config, file, default_flow_style=False)
 ```
 
+# Speedy User Start
+Users can utilize the following guide as a quick start:
+
+```python
+import streamlit as st
+import streamlit_authenticator as stauth
+
+deta_store = stauth.DetaDataStore(
+    st.secrets["DETA_PROJECT_KEY"],
+    st.secrets["COOKIE_KEY"],
+    "project_name",
+)
+cookies, credentials, preauthorized = deta_store.get_config()
+if "example.com" not in preauthorized["domains"]:
+    preauthorized["domains"].append("example.com")
+    deta_store.put_cred_and_preauthorized(credentials, preauthorized)
+authenticator = stauth.Authenticate(
+    credentials,
+    cookies["name"],
+    cookies["encryption_key"],
+    cookies["expiry_days"],
+    preauthorized,
+)
+
+def forgot(_input: str):
+    st.write(_input)
+
+authenticator.full_tab(forgot, forgot, True)
+while "authentication_status" not in st.session_state:
+    time.sleep(0.5)
+
+deta_store.put_cred_and_preauthorized(credentials, preauthorized)
+
+if st.session_state["authentication_status"] is False:
+    st.error("Username/password is incorrect")
+elif st.session_state["authentication_status"] is None:
+    st.warning("Please enter your username and password")
+elif st.session_state["authentication_status"]:
+    authenticator.logout("Logout", "main")
+    st.write(f'Welcome *{st.session_state["name"]}*')
+
+```
 ## Credits
 - Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components).
