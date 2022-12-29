@@ -265,7 +265,7 @@ class Authenticate:
                 if login_form.form_submit_button('Login'):
                     self._check_credentials()
 
-        return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
+        return st.session_state.get("name", ""), st.session_state.get('authentication_status', ""), st.session_state.get('username', "")
 
     def logout(self, button_name: str, location: str='main'):
         """
