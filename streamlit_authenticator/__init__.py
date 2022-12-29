@@ -5,6 +5,7 @@ import streamlit.components.v1 as components
 
 from .hasher import Hasher
 from .authenticate import Authenticate
+from .data_store import DetaDataStore
 
 _RELEASE = True
 
@@ -18,8 +19,8 @@ if not _RELEASE:
     # Creating the authenticator object
     authenticator = Authenticate(
         config['credentials'],
-        config['cookie']['name'], 
-        config['cookie']['key'], 
+        config['cookie']['name'],
+        config['cookie']['key'],
         config['cookie']['expiry_days'],
         config['preauthorized']
     )
@@ -84,8 +85,8 @@ if not _RELEASE:
     with open('../config.yaml', 'w') as file:
         yaml.dump(config, file, default_flow_style=False)
 
-    # Alternatively you may use st.session_state['name'], st.session_state['authentication_status'], 
-    # and st.session_state['username'] to access the name, authentication_status, and username. 
+    # Alternatively you may use st.session_state['name'], st.session_state['authentication_status'],
+    # and st.session_state['username'] to access the name, authentication_status, and username.
 
     # if st.session_state['authentication_status']:
     #     authenticator.logout('Logout', 'main')

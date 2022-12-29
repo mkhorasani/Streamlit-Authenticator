@@ -27,5 +27,6 @@ setuptools.setup(
         "PyYAML >= 5.3.1",
         "streamlit >= 0.86",
         "extra-streamlit-components >= 0.1.55"
+        "deta >= 0.1.1"
     ],
 )
