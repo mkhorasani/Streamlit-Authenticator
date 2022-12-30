@@ -62,7 +62,7 @@ hashed_passwords = stauth.Hasher(['123', '456']).generate()
 
 ```python
 with open('../config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
+    config = yaml.load(file, Loader=yaml.SafeLoader)
 
 authenticator = stauth.Authenticate(
     config['credentials'],
