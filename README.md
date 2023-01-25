@@ -173,7 +173,7 @@ try:
     if username_forgot_username:
         st.success('Username sent securely')
         # Username to be transferred to user securely
-    elif:
+    else:
         st.error('Email not found')
 except Exception as e:
     st.error(e)
