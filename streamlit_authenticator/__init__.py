@@ -30,9 +30,9 @@ if not _RELEASE:
         authenticator.logout('Logout', 'main')
         st.write(f'Welcome *{name}*')
         st.title('Some content')
-    elif authentication_status == False:
+    elif authentication_status is False:
         st.error('Username/password is incorrect')
-    elif authentication_status == None:
+    elif authentication_status is None:
         st.warning('Please enter your username and password')
 
     # Creating a password reset widget
@@ -56,7 +56,7 @@ if not _RELEASE:
         if username_forgot_pw:
             st.success('New password sent securely')
             # Random password to be transferred to user securely
-        elif username_forgot_pw == False:
+        else:
             st.error('Username not found')
     except Exception as e:
         st.error(e)
@@ -67,7 +67,7 @@ if not _RELEASE:
         if username_forgot_username:
             st.success('Username sent securely')
             # Username to be transferred to user securely
-        elif username_forgot_username == False:
+        else:
             st.error('Email not found')
     except Exception as e:
         st.error(e)
@@ -91,7 +91,7 @@ if not _RELEASE:
     #     authenticator.logout('Logout', 'main')
     #     st.write(f'Welcome *{st.session_state["name"]}*')
     #     st.title('Some content')
-    # elif st.session_state['authentication_status'] == False:
+    # elif st.session_state['authentication_status'] is False:
     #     st.error('Username/password is incorrect')
-    # elif st.session_state['authentication_status'] == None:
+    # elif st.session_state['authentication_status'] is None:
     #     st.warning('Please enter your username and password')
