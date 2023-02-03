@@ -11,11 +11,11 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       name: John Smith
-      password: $2b$12$kOhDMjVmP5CTaByYEexG4OIMyPknVsxLHKdlltN8NBtKZ.kCNEZz.
+      password: $2b$12$veUHDUOxMPpYTgIivZbUqufvgGlv3zX5uZ5np7dmGdmtOB0Z1e2q6
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: $2b$12$to1ADtwtCOFGMFNow7iJj.GjWWqy6FOEeeBjl/c.FmCZBSkf2bCr.
+      password: $2b$12$uNaTgvGPG9rMbzOJHYaPQePw0DUfp1qHBrSq6l4O304qani6pKFpm
     rcouper:
       email: rcouper@gmail.com
       name: Ross Couper

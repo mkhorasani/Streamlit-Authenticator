@@ -34,14 +34,14 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       name: John Smith
-      password: 123 # To be replaced with hashed password
+      password: abc # To be replaced with hashed password
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: 456 # To be replaced with hashed password
+      password: def # To be replaced with hashed password
 cookie:
   expiry_days: 30
-  key: some_signature_key
+  key: some_signature_key # Must be string
   name: some_cookie_name
 preauthorized:
   emails:
@@ -51,7 +51,7 @@ preauthorized:
 * Then use the Hasher module to convert the plain text passwords into hashed passwords.
 
 ```python
-hashed_passwords = stauth.Hasher(['123', '456']).generate()
+hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
 ```
 
 * Finally replace the plain text passwords in the configuration file with the hashed passwords.

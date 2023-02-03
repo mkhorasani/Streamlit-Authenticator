@@ -9,7 +9,7 @@ from .authenticate import Authenticate
 _RELEASE = True
 
 if not _RELEASE:
-    # hashed_passwords = Hasher(['123', '456']).generate()
+    # hashed_passwords = Hasher(['abc', 'def']).generate()
 
     # Loading config file
     with open('../config.yaml') as file:
