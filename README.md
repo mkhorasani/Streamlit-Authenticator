@@ -61,6 +61,8 @@ hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
 * Subsequently import the configuration file into your script and create an authentication object.
 
 ```python
+from yaml.loader import SafeLoader
+
 with open('../config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
