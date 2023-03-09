@@ -3,11 +3,11 @@ import bcrypt
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
-
+import re
 from .hasher import Hasher
 from .utils import generate_random_pw
 
-from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
+from .exceptions import CredentialsError, ResetError, RegisterError, ForgotError, UpdateError
 
 class Authenticate:
     """
@@ -177,7 +177,7 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
             self._check_cookie()
-            if not st.session_state['authentication_status']:
+            if st.session_state['authentication_status'] != True:
                 if location == 'main':
                     login_form = st.form('Login')
                 elif location == 'sidebar':
@@ -295,13 +295,51 @@ class Authenticate:
         email: str
             The email of the new user.
         preauthorization: bool
-            The preauthorization requirement, True: user must be preauthorized to register, 
+            The pre-authorization requirement, True: user must be pre-authorized to register, 
             False: any user can register.
         """
         self.credentials['usernames'][username] = {'name': name, 
             'password': Hasher([password]).generate()[0], 'email': email}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
+
+    
+
+    def valid_username(self,username):
+        """
+        Validates whether a given username is in the correct format.
+        Parameters
+        ----------
+        username : str
+            Username to validate.
+
+        Returns
+        -------
+        bool
+            True if the username is valid, False otherwise.
+        """
+
+        # Username should only contain letters, numbers, underscores, and hyphens
+        # Username should be between 4 and 20 characters long
+        pattern = r'^[a-zA-Z0-9_-]{4,20}$'
+        return bool(re.match(pattern, username))
+ 
+
+    def valid_email(self,email):
+        """
+        Validates whether a given email address is in the correct format.
+        Parameters
+        ----------
+        email : str
+            Email address to validate.
+
+        Returns
+        -------
+        bool
+            True if the email address is valid, False otherwise.
+        """
+        return bool(re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email))
+
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
         """
@@ -314,16 +352,15 @@ class Authenticate:
         location: str
             The location of the password reset form i.e. main or sidebar.
         preauthorization: bool
-            The preauthorization requirement, True: user must be preauthorized to register, 
+            The pre-authorization requirement, True: user must be pre-authorized to register, 
             False: any user can register.
         Returns
         -------
         bool
             The status of registering the new user, True: user registered successfully.
         """
-        if preauthorization:
-            if not self.preauthorized:
-                raise ValueError("preauthorization argument must not be None")
+        if not self.preauthorized:
+            raise ValueError("Pre-authorization argument must not be None")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -340,21 +377,27 @@ class Authenticate:
 
         if register_user_form.form_submit_button('Register'):
             if len(new_email) and len(new_username) and len(new_name) and len(new_password) > 0:
-                if new_username not in self.credentials['usernames']:
-                    if new_password == new_password_repeat:
-                        if preauthorization:
-                            if new_email in self.preauthorized['emails']:
-                                self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
-                                return True
+                if self.valid_email(new_email):
+                    if self.valid_username(new_username):
+                        if new_username not in self.credentials['usernames']:
+                            if new_password == new_password_repeat:
+                                if preauthorization:
+                                    if new_email in self.preauthorized['emails']:
+                                        self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
+                                        return True
+                                    else:
+                                        raise RegisterError('User not pre-authorized to register')
+                                else:
+                                    self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
+                                    return True
                             else:
-                                raise RegisterError('User not preauthorized to register')
+                                raise RegisterError('Passwords do not match')
                         else:
-                            self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
-                            return True
+                            raise RegisterError('Username already taken')
                     else:
-                        raise RegisterError('Passwords do not match')
+                        raise RegisterError('Username must be between 4 and 20 characters long and only contain letters, numbers, underscores, and hyphens')           
                 else:
-                    raise RegisterError('Username already taken')
+                        raise RegisterError('Invalid email address')
             else:
                 raise RegisterError('Please enter an email, username, name, and password')
 
