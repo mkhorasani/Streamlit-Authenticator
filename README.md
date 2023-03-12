@@ -1,11 +1,12 @@
 # Streamlit-Authenticator [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
+
 <!--- [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/khorasani) --->
+
 **A secure authentication module to validate user credentials in a Streamlit application.**
 
 <a href="https://amzn.to/3eQwEEn"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450">
 
 ###### _To learn more please refer to my book [Web Application Development with Streamlit](https://amzn.to/3eQwEEn)._
-
 
 ## Installation
 
@@ -26,7 +27,7 @@ import streamlit_authenticator as stauth
 
 ### 1. Hashing passwords
 
-* Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
+- Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
 
 ```python
 credentials:
@@ -48,17 +49,17 @@ preauthorized:
   - melsby@gmail.com
 ```
 
-* Then use the Hasher module to convert the plain text passwords into hashed passwords.
+- Then use the Hasher module to convert the plain text passwords into hashed passwords.
 
 ```python
 hashed_passwords = stauth.Hasher(['123', '456']).generate()
 ```
 
-* Finally replace the plain text passwords in the configuration file with the hashed passwords.
+- Finally replace the plain text passwords in the configuration file with the hashed passwords.
 
 ### 2. Creating a login widget
 
-* Subsequently import the configuration file into your script and create an authentication object.
+- Subsequently import the configuration file into your script and create an authentication object.
 
 ```python
 with open('../config.yaml') as file:
@@ -73,16 +74,17 @@ authenticator = stauth.Authenticate(
 )
 ```
 
-* Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
+- Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
 
 ```python
 name, authentication_status, username = authenticator.login('Login', 'main')
 ```
+
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.PNG)
 
 ### 3. Authenticating users
 
-* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body).
+- You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body).
 
 ```python
 if authentication_status:
@@ -95,7 +97,7 @@ elif authentication_status == None:
     st.warning('Please enter your username and password')
 ```
 
-* Should you require access to the persistent name, authentication status, and username variables, you may retrieve them through Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
+- Should you require access to the persistent name, authentication status, and username variables, you may retrieve them through Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
 
 ```python
 if st.session_state["authentication_status"]:
@@ -110,15 +112,15 @@ elif st.session_state["authentication_status"] == None:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.PNG)
 
-* Or prompt an unverified user to enter a correct username and password.
+- Or prompt an unverified user to enter a correct username and password.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.PNG)
 
-* Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
+- Please note that logging out will revert the authentication status to **None** and will delete the associated reauthentication cookie as well.
 
 ### 4. Creating a password reset widget
 
-* You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
+- You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
 ```python
 if authentication_status:
@@ -133,7 +135,7 @@ if authentication_status:
 
 ### 5. Creating a new user registration widget
 
-* You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to be preauthorized, set the **preauthorization** argument to True and add their email to the **preauthorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **preauthorized** list in the configuration file. Alternatively, to allow anyone to sign up, set the **preauthorization** argument to False.
+- You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to be preauthorized, set the **preauthorization** argument to True and add their email to the **preauthorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **preauthorized** list in the configuration file. Alternatively, to allow anyone to sign up, set the **preauthorization** argument to False.
 
 ```python
 try:
@@ -147,7 +149,7 @@ except Exception as e:
 
 ### 6. Creating a forgot password widget
 
-* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password of the user which should then be transferred to them securely.
+- You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password of the user which should then be transferred to them securely.
 
 ```python
 try:
@@ -165,7 +167,7 @@ except Exception as e:
 
 ### 7. Creating a forgot username widget
 
-* You may use the **forgot_username** widget to allow a user to retrieve their forgotten username. The widget will return the username and email of the user which should then be transferred to them securely.
+- You may use the **forgot_username** widget to allow a user to retrieve their forgotten username. The widget will return the username and email of the user which should then be transferred to them securely.
 
 ```python
 try:
@@ -183,7 +185,7 @@ except Exception as e:
 
 ### 8. Creating an update user details widget
 
-* You may use the **update_user_details** widget to allow a logged in user to update their name and/or email. The widget will automatically save the updated details in both the configuration file and reauthentication cookie.
+- You may use the **update_user_details** widget to allow a logged in user to update their name and/or email. The widget will automatically save the updated details in both the configuration file and reauthentication cookie.
 
 ```python
 if authentication_status:
@@ -198,14 +200,15 @@ if authentication_status:
 
 ### 9. Updating the configuration file
 
-* Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
+- Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
 ```python
 with open('../config.yaml', 'w') as file:
     yaml.dump(config, file, default_flow_style=False)
 ```
 
-# Speedy User Start
+## Speedy User Start
+
 Users can utilize the following guide as a quick start:
 
 ```python
@@ -247,5 +250,59 @@ elif st.session_state["authentication_status"]:
     st.write(f'Welcome *{st.session_state["name"]}*')
 
 ```
+
+### 1. Creating a Deta DataStore object
+
+- You may use the **DetaDataStore** class to create a Deta DataStore object. This object will be used to retrieve the configuration file from the Deta DataStore and to save the updated configuration file back to the Deta DataStore.
+
+```python
+deta_store = stauth.DetaDataStore(
+    st.secrets["DETA_PROJECT_KEY"],
+    st.secrets["COOKIE_KEY"],
+    "project_name",
+)
+```
+
+The **DetaDataStore** class takes three arguments:
+
+- **deta_project_key**: The Deta project key.
+- **cookie_key**: The key used to encrypt the reauthentication cookie.
+- **project_name**: The name of the project.
+
+### 2. Retrieving the configuration file
+
+- You may use the **get_config** method to retrieve the configuration file from the Deta DataStore.
+
+```python
+cookies, credentials, preauthorized = deta_store.get_config()
+```
+
+### 3. Updating the configuration file
+
+- You may use the **put_cred_and_preauthorized** method to update the configuration file in the Deta DataStore.
+
+```python
+deta_store.put_cred_and_preauthorized(credentials, preauthorized)
+```
+
+### 4. Creating an Authenticate object
+
+- You may use the **Authenticate** class to create an Authenticate object. This object will be used to create the authentication widgets.
+
+```python
+authenticator = stauth.Authenticate(
+    credentials,
+    cookies["name"],
+    cookies["encryption_key"],
+    cookies["expiry_days"],
+    preauthorized,
+)
+```
+
+![](/graphics/collection/main_page_log_in.jpeg)
+![](/graphics/collection/main_page_reset_password.jpeg)
+![](/graphics/collection/main_page_register_user.jpeg)
+
 ## Credits
+
 - Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components).

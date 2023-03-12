@@ -1,6 +1,3 @@
-"""
-Drivers to store sensitive data in Deta instead of a local file.
-"""
 from deta import Deta
 
 class DetaDataStore:
@@ -9,11 +6,9 @@ class DetaDataStore:
         """Creates a Deta Base and stores the cookie, credentials, and  data in it.
 
         Args:
-            deta_project_key (str): _description_
-            cookie_key (str): _description_
+            deta_project_key (str): The Deta project key
+            cookie_key (str): The cookie encryption key
 
-        Returns:
-            tuple: _description_
         """
         deta = Deta(deta_project_key)
         self.db = deta.Base("user_credentials")

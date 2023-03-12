@@ -3,11 +3,9 @@ from typing import Optional, Callable, Any
 import jwt
 import bcrypt
 import streamlit as st
-import extra_streamlit_components as stx # type: ignore
-
-from .hasher import Hasher
 from .utils import generate_random_pw
-
+from .hasher import Hasher
+import extra_streamlit_components as stx # type: ignore
 from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
