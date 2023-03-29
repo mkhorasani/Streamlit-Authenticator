@@ -134,7 +134,7 @@ if authentication_status:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.PNG)
 
-* Please remember to update the config file (as shown in step 9) after you use this widget.
+_Please remember to update the config file (as shown in step 9) after you use this widget._
 
 ### 5. Creating a new user registration widget
 
@@ -150,7 +150,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.PNG)
 
-* Please remember to update the config file (as shown in step 9) after you use this widget.
+_Please remember to update the config file (as shown in step 9) after you use this widget._
 
 ### 6. Creating a forgot password widget
 
@@ -170,7 +170,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.PNG)
 
-* Please remember to update the config file (as shown in step 9) after you use this widget.
+_Please remember to update the config file (as shown in step 9) after you use this widget._
 
 ### 7. Creating a forgot username widget
 
@@ -205,7 +205,7 @@ if authentication_status:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.PNG)
 
-* Please remember to update the config file (as shown in step 9) after you use this widget.
+_Please remember to update the config file (as shown in step 9) after you use this widget._
 
 ### 9. Updating the configuration file
 
