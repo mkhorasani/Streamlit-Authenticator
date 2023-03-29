@@ -134,6 +134,8 @@ if authentication_status:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.PNG)
 
+* Please remember to update the config file (as shown in step 9) after you use this widget.
+
 ### 5. Creating a new user registration widget
 
 * You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to be preauthorized, set the **preauthorization** argument to True and add their email to the **preauthorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **preauthorized** list in the configuration file. Alternatively, to allow anyone to sign up, set the **preauthorization** argument to False.
@@ -147,6 +149,8 @@ except Exception as e:
 ```
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.PNG)
+
+* Please remember to update the config file (as shown in step 9) after you use this widget.
 
 ### 6. Creating a forgot password widget
 
@@ -165,6 +169,8 @@ except Exception as e:
 ```
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.PNG)
+
+* Please remember to update the config file (as shown in step 9) after you use this widget.
 
 ### 7. Creating a forgot username widget
 
@@ -198,6 +204,8 @@ if authentication_status:
 ```
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.PNG)
+
+* Please remember to update the config file (as shown in step 9) after you use this widget.
 
 ### 9. Updating the configuration file
 
