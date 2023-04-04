@@ -76,12 +76,14 @@ authenticator = stauth.Authenticate(
 )
 ```
 
-* Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
+* Then finally render the login module as follows. Here, you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body). You can also optionally include a logo image to be displayed in the form.
 
 ```python
-name, authentication_status, username = authenticator.login('Login', 'main')
+name, authentication_status, username = authenticator.login('Login', 'main', logo='path/to/logo.png', logo_width=300)
 ```
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.PNG)
+The logo can be a URL, file path or bytes object.
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form_updated.PNG)
 
 ### 3. Authenticating users
 

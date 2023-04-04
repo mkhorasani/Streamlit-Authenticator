@@ -3,11 +3,12 @@ import bcrypt
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
+from typing import Union
 
 from .hasher import Hasher
 from .utils import generate_random_pw
 
-from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
+from .exceptions import CredentialsError, ResetError, RegisterError, ForgotError, UpdateError
 
 class Authenticate:
     """
@@ -153,7 +154,7 @@ class Authenticate:
             else:
                 return False
 
-    def login(self, form_name: str, location: str='main') -> tuple:
+    def login(self, form_name: str, location: str='main', logo: Union[bytes, str] = None, logo_width: int = 300) -> tuple:
         """
         Creates a login widget.
 
@@ -163,6 +164,10 @@ class Authenticate:
             The rendered name of the login form.
         location: str
             The location of the login form i.e. main or sidebar.
+        logo: bytes or str, optional
+            The logo to display in the login form. Can be a URL, file path or bytes object.
+        logo_width: int, optional
+            The width of the logo to be displayed.
         Returns
         -------
         str
@@ -177,7 +182,8 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
             self._check_cookie()
-            if not st.session_state['authentication_status']:
+            if st.session_state['authentication_status'] != True:
+                self._display_logo(logo, location, logo_width)
                 if location == 'main':
                     login_form = st.form('Login')
                 elif location == 'sidebar':
@@ -192,6 +198,20 @@ class Authenticate:
                     self._check_credentials()
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
+
+
+    def _display_logo(self, logo: Union[bytes, str], location: str, logo_width: int):
+        if logo is not None:
+            if isinstance(logo, bytes):
+                st.image(logo, width=logo_width, output_format='PNG')
+            else:
+                st.image(logo, width=logo_width, output_format='PNG')
+        else:
+            pass
+            
+        if location == 'sidebar':
+            st.sidebar.image(logo, width=logo_width, output_format='PNG')
+
 
     def logout(self, button_name: str, location: str='main'):
         """
@@ -295,7 +315,7 @@ class Authenticate:
         email: str
             The email of the new user.
         preauthorization: bool
-            The preauthorization requirement, True: user must be preauthorized to register, 
+            The pre-authorization requirement, True: user must be pre-authorized to register, 
             False: any user can register.
         """
         self.credentials['usernames'][username] = {'name': name, 
@@ -314,16 +334,15 @@ class Authenticate:
         location: str
             The location of the password reset form i.e. main or sidebar.
         preauthorization: bool
-            The preauthorization requirement, True: user must be preauthorized to register, 
+            The pre-authorization requirement, True: user must be pre-authorized to register, 
             False: any user can register.
         Returns
         -------
         bool
             The status of registering the new user, True: user registered successfully.
         """
-        if preauthorization:
-            if not self.preauthorized:
-                raise ValueError("preauthorization argument must not be None")
+        if not self.preauthorized:
+            raise ValueError("Pre-authorization argument must not be None")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -347,7 +366,7 @@ class Authenticate:
                                 self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                                 return True
                             else:
-                                raise RegisterError('User not preauthorized to register')
+                                raise RegisterError('User not pre-authorized to register')
                         else:
                             self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                             return True
