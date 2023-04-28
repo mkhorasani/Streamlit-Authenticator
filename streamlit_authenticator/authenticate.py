@@ -6,6 +6,7 @@ import extra_streamlit_components as stx
 
 from .hasher import Hasher
 from .utils import generate_random_pw
+from .validator import Validator
 
 from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
@@ -15,7 +16,7 @@ class Authenticate:
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, 
-        preauthorized: list=None):
+        preauthorized: list=None, validator: Validator=None):
         """
         Create a new instance of "Authenticate".
 
@@ -39,6 +40,7 @@ class Authenticate:
         self.cookie_expiry_days = cookie_expiry_days
         self.preauthorized = preauthorized
         self.cookie_manager = stx.CookieManager()
+        self.validator = validator if validator is not None else Validator()
 
         if 'name' not in st.session_state:
             st.session_state['name'] = None
@@ -298,6 +300,13 @@ class Authenticate:
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         """
+        if not self.validator.validate_username(username):
+            raise RegisterError('Username is not valid')
+        if not self.validator.validate_name(name):
+            raise RegisterError('Name is not valid')
+        if not self.validator.validate_email(email):
+            raise RegisterError('Email is not valid')
+
         self.credentials['usernames'][username] = {'name': name, 
             'password': Hasher([password]).generate()[0], 'email': email}
         if preauthorization:
