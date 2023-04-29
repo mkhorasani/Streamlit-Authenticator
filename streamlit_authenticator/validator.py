@@ -1,6 +1,5 @@
 import re
 
-
 class Validator:
     def validate_username(self, username: str) -> bool:
         """
