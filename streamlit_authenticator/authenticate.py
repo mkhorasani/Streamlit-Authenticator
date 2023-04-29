@@ -5,8 +5,8 @@ from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 
 from .hasher import Hasher
-from .utils import generate_random_pw
 from .validator import Validator
+from .utils import generate_random_pw
 
 from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
