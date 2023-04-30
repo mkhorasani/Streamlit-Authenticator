@@ -1,12 +1,12 @@
-# Streamlit-Authenticator [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator) 
+# Streamlit-Authenticator [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
 <!--- [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/khorasani) --->
 **A secure authentication module to validate user credentials in a Streamlit application.**
 
-<a href="https://amzn.to/3eQwEEn"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450"> 
- 
+<a href="https://amzn.to/3eQwEEn"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450">
+
 ###### _To learn more please refer to my book [Web Application Development with Streamlit](https://amzn.to/3eQwEEn)._
 
-  
+
 ## Installation
 
 Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/streamlit-authenticator/):
@@ -85,11 +85,11 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 
 ### 3. Authenticating users
 
-* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body).
+* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body). The optional **key** parameter for the logout widget should be used with multipage applications to prevent Streamlit from throwing duplicate key errors.
 
 ```python
 if authentication_status:
-    authenticator.logout('Logout', 'main')
+    authenticator.logout('Logout', 'main', key='unique_key')
     st.write(f'Welcome *{name}*')
     st.title('Some content')
 elif authentication_status is False:
