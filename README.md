@@ -85,11 +85,11 @@ name, authentication_status, username = authenticator.login('Login', 'main')
 
 ### 3. Authenticating users
 
-* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body).
+* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body).  The optional `key=` parameter to `authenticator.logout()` is provided for multipage streamlit apps that place logout buttons on multiple pages, as streamlit may complaining about duplicate keys.
 
 ```python
 if authentication_status:
-    authenticator.logout('Logout', 'main')
+    authenticator.logout('Logout', 'main', key='my_unique_key')
     st.write(f'Welcome *{name}*')
     st.title('Some content')
 elif authentication_status is False:
