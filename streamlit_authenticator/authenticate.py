@@ -308,7 +308,7 @@ class Authenticate:
             raise RegisterError('Email is not valid')
 
         self.credentials['usernames'][username] = {'name': name, 
-            'password': Hasher([password]).generate()[0], 'email': email}
+            'password': Hasher([password]).generate()[0], 'email': email, 'group' : 'default'}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
@@ -366,6 +366,80 @@ class Authenticate:
                     raise RegisterError('Username already taken')
             else:
                 raise RegisterError('Please enter an email, username, name, and password')
+
+    def _change_group_credential(self, username: str, group: str) -> None:
+        """
+        Updates a users group value to a desired name.
+            Different groups can then be used to manage permissions using conditionals
+
+        Parameters
+        ----------
+        username : str
+            Username of user to change group for.
+        group : str
+            New group name that should be assigned to the user.
+        """
+        self.credentials['usernames'][username]["group"] = group
+
+    def change_group(self, form_name: str, location : str='main') -> bool:
+        """
+        Creates streamlit elements that allow for easy modification of user groups
+
+        Parameters
+        ----------
+        form_name : str
+            name of section that will allow for group editing
+        location : str, optional
+            location of where these elements should appear, by default 'main'
+
+        Returns
+        -------
+        bool
+            whether the group modification is successful
+        """
+
+        if location not in ['main', 'sidebar']:
+            raise ValueError("Location must be one of 'main' or 'sidebar'")
+        if location == 'main':
+            change_group_form = st.form('Change Group')
+        elif location == 'sidebar':
+            change_group_form = st.sidebar.form('Change Group')
+        change_group_form.subheader(form_name)
+
+        users = list(self.credentials['usernames'].keys())
+        if len(users) == 0:
+            return False
+        user_groups = []
+        for user in users:
+            user_groups.append(self.credentials["usernames"][user]["group"])
+        select_user = change_group_form.selectbox("Users", users)
+        selected_group = user_groups[users.index(select_user)]
+        change_group_form.write(f"{select_user} is currently in the group {selected_group}")
+
+        unique_user_groups_set = set(user_groups)
+        unique_user_groups = list(unique_user_groups_set)
+
+        unique_user_groups.append("CREATE NEW GROUP")
+        select_group = change_group_form.selectbox("Group", unique_user_groups, index= unique_user_groups.index(selected_group))
+
+        placeholder_button = change_group_form.form_submit_button()
+        if select_group == "CREATE NEW GROUP":
+            confirm_button = placeholder_button.form_submit_button("Press to change group")
+            new_group_input = change_group_form.text_input("New Group Name")
+            if len(new_group_input.strip()) > 0:
+                select_group = new_group_input.strip().lower()
+                confirm_button = placeholder_button.form_submit_button("Press to change group")
+        elif select_group != selected_group:
+            confirm_button = placeholder_button.form_submit_button("Press to change group")
+        else:
+            confirm_button = placeholder_button.form_submit_button("Press to change group")
+        if confirm_button:
+            self._change_group_credential(select_user, select_group)
+            confirm_button = placeholder_button.form_submit_button  ("Press to change group")
+
+
+
+
 
     def _set_random_password(self, username: str) -> str:
         """
