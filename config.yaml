@@ -6,23 +6,23 @@ credentials:
   usernames:
     dbaldwin:
       email: dbaldwin@gmail.com
+      group: default
       name: David Baldwin
-      group: admin
       password: $2b$12$E9/bCaN/r8sN/FV2l8NpgOgspUBAp7UAVU6BgsXJzp/pW8gQWCprC
     jsmith:
       email: jsmith@gmail.com
+      group: admin
       name: John Smith
-      group: default
       password: $2b$12$veUHDUOxMPpYTgIivZbUqufvgGlv3zX5uZ5np7dmGdmtOB0Z1e2q6
     rbriggs:
       email: rbriggs@gmail.com
+      group: admin
       name: Rebecca Briggs
-      group: default
       password: $2b$12$uNaTgvGPG9rMbzOJHYaPQePw0DUfp1qHBrSq6l4O304qani6pKFpm
     rcouper:
       email: rcouper@gmail.com
-      name: Ross Couper
       group: default
+      name: Ross Couper
       password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu
 preauthorized:
   emails:
