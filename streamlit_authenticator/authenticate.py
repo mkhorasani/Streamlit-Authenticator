@@ -400,44 +400,71 @@ class Authenticate:
 
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if location == 'main':
-            change_group_form = st.form('Change Group')
-        elif location == 'sidebar':
-            change_group_form = st.sidebar.form('Change Group')
-        change_group_form.subheader(form_name)
-
+        
         users = list(self.credentials['usernames'].keys())
         if len(users) == 0:
             return False
         user_groups = []
         for user in users:
             user_groups.append(self.credentials["usernames"][user]["group"])
-        select_user = change_group_form.selectbox("Users", users)
-        selected_group = user_groups[users.index(select_user)]
-        change_group_form.write(f"{select_user} is currently in the group {selected_group}")
-
-        unique_user_groups_set = set(user_groups)
-        unique_user_groups = list(unique_user_groups_set)
-
-        unique_user_groups.append("CREATE NEW GROUP")
-        select_group = change_group_form.selectbox("Group", unique_user_groups, index= unique_user_groups.index(selected_group))
-
-        placeholder_button = change_group_form.form_submit_button()
-        if select_group == "CREATE NEW GROUP":
-            confirm_button = placeholder_button.form_submit_button("Press to change group")
-            new_group_input = change_group_form.text_input("New Group Name")
-            if len(new_group_input.strip()) > 0:
-                select_group = new_group_input.strip().lower()
-                confirm_button = placeholder_button.form_submit_button("Press to change group")
-        elif select_group != selected_group:
-            confirm_button = placeholder_button.form_submit_button("Press to change group")
-        else:
-            confirm_button = placeholder_button.form_submit_button("Press to change group")
-        if confirm_button:
-            self._change_group_credential(select_user, select_group)
-            confirm_button = placeholder_button.form_submit_button  ("Press to change group")
 
 
+        if location == 'main':
+            st.title(form_name)
+            select_user = st.selectbox("Users", users)
+            selected_group = user_groups[users.index(select_user)]
+            st.write(f"{select_user} is currently in the group {selected_group}")
+
+            unique_user_groups_set = set(user_groups)
+            unique_user_groups = list(unique_user_groups_set)
+
+            unique_user_groups.append("CREATE NEW GROUP")
+            select_group = st.selectbox("Group", unique_user_groups, index= unique_user_groups.index(selected_group))
+
+            placeholder_button = st.empty()
+            if select_group == "CREATE NEW GROUP":
+                confirm_button = placeholder_button.button("Press to change group", disabled=True, key=3)
+                new_group_input = st.text_input("New Group Name")
+                if len(new_group_input.strip()) > 0:
+                    select_group = new_group_input.strip().lower()
+                    confirm_button = placeholder_button.button("Press to change group", disabled=False, key=4)
+            elif selected_group != select_group:
+                confirm_button = placeholder_button.button("Press to change group", disabled=False, key=1)
+            else:
+                confirm_button = placeholder_button.button("Press to change group", disabled=True, key=0)
+            if confirm_button:
+                self._change_group_credential(select_user, select_group)
+                confirm_button = placeholder_button.button("Press to change group", disabled=True, key=2)
+                return True
+        elif location == 'sidebar':
+            st.sidebar.title(form_name)
+            select_user = st.sidebar.selectbox("Users", users)
+            selected_group = user_groups[users.index(select_user)]
+            st.sidebar.write(f"{select_user} is currently in the group {selected_group}")
+
+            unique_user_groups_set = set(user_groups)
+            unique_user_groups = list(unique_user_groups_set)
+
+            unique_user_groups.append("CREATE NEW GROUP")
+            select_group = st.sidebar.selectbox("Group", unique_user_groups, index= unique_user_groups.index(selected_group))
+
+            placeholder_button = st.sidebar.empty()
+            if select_group == "CREATE NEW GROUP":
+                confirm_button = placeholder_button.button("Press to change group", disabled=True, key=3)
+                new_group_input = st.sidebar.text_input("New Group Name")
+                if len(new_group_input.strip()) > 0:
+                    select_group = new_group_input.strip().lower()
+                    confirm_button = placeholder_button.button("Press to change group", disabled=False, key=4)
+            elif selected_group != select_group:
+                confirm_button = placeholder_button.button("Press to change group", disabled=False, key=1)
+            else:
+                confirm_button = placeholder_button.button("Press to change group", disabled=True, key=0)
+            if confirm_button:
+                self._change_group_credential(select_user, select_group)
+                confirm_button = placeholder_button.button("Press to change group", disabled=True, key=2)
+                return True
+        return False
+            
 
 
 
