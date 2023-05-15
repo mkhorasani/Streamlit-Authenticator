@@ -15,7 +15,7 @@ class Authenticate:
     This class will create login, logout, register user, reset password, forgot password, 
     forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: int=30, 
+    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: float=30.0, 
         preauthorized: list=None, validator: Validator=None):
         """
         Create a new instance of "Authenticate".
@@ -28,7 +28,7 @@ class Authenticate:
             The name of the JWT cookie stored on the client's browser for passwordless reauthentication.
         key: str
             The key to be used for hashing the signature of the JWT cookie.
-        cookie_expiry_days: int
+        cookie_expiry_days: float
             The number of days before the cookie expires on the client's browser.
         preauthorized: list
             The list of emails of unregistered users authorized to register.
