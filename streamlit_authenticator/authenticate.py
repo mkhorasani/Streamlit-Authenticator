@@ -32,6 +32,8 @@ class Authenticate:
             The number of days before the cookie expires on the client's browser.
         preauthorized: list
             The list of emails of unregistered users authorized to register.
+        validator: Validator
+            A Validator object that checks the validity of the username, name, and email fields.
         """
         self.credentials = credentials
         self.credentials['usernames'] = {key.lower(): value for key, value in credentials['usernames'].items()}
