@@ -1,0 +1,25 @@
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  usernames:
+    dbaldwin:
+      email: dbaldwin@gmail.com
+      name: David Baldwin
+      password: db123
+    jsmith:
+      email: jsmith@gmail.com
+      name: John Smith
+      password: js123
+    rbriggs:
+      email: rbriggs@gmail.com
+      name: Rebecca Briggs
+      password: rb123
+    rcouper:
+      email: rcouper@gmail.com
+      name: Ross Couper
+      password: rc123
+preauthorized:
+  emails:
+  - melsby@gmail.com

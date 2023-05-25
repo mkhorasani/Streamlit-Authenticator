@@ -1,2 +1,5 @@
 streamlit_authenticator/__pycache__
 /test
+
+.venv
+config.yaml

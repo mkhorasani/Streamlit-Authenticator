@@ -26,7 +26,7 @@ import streamlit_authenticator as stauth
 
 ### 1. Hashing passwords
 
-* Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
+* Initially create a YAML configuration file called `config.source.yaml` and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
 
 ```python
 credentials:
@@ -48,10 +48,10 @@ preauthorized:
   - melsby@gmail.com
 ```
 
-* Then use the Hasher module to convert the plain text passwords into hashed passwords.
+* Then run `apply-hash.py` to convert the plain text passwords into hashed passwords. The output file will be `config.yaml`.
 
-```python
-hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
+```bash
+python apply-hash.py 
 ```
 
 * Finally replace the plain text passwords in the configuration file with the hashed passwords.
