@@ -70,9 +70,12 @@ authenticator = stauth.Authenticate(
     config['cookie']['name'],
     config['cookie']['key'],
     config['cookie']['expiry_days'],
-    config['preauthorized']
+    config['preauthorized'],
+    language='en-US'
 )
 ```
+
+* Specify language. If not informed, or translation not exists, language will fallback to en-US. Take a look at `streamlit_authenticator/locale`. Translate it to your language and submit a PR or open a Github issue.
 
 * Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
 
