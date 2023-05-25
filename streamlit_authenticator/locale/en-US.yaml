@@ -1,0 +1,33 @@
+login_title: Login
+username: Username
+password: Password
+login_submit: Login
+email: Email
+name: Name
+current_password: Current password
+new_password: New password
+repeat_password: Repeat password
+reset_password: Reset password
+error_location_main_sidebar: Location must be one of 'main' or 'sidebar'
+error_same_password: New and current passwords are the same
+error_passwords_not_match: Passwords do not match
+error_no_new_password: No new password provided
+error_username_not_valid: Username is not valid
+error_name_not_valid: Name is not valid
+error_email_not_valid: Email is not valid
+error_preauthorization_not_none: preauthorization argument must not be None
+register_title: Register user
+register_button: Register
+error_user_not_preauthorized: User not preauthorized to register
+error_username_not_available: Username already taken
+error_missing_fields: Please enter an email, username, name, and password
+forgot_password: Forgot password
+reset_submit: Submit
+error_username_not_provided: Username not provided
+forgot_username_title: Forgot username
+submit: Submit
+error_email_not_provided: Email not provided
+update_user_title: Update user details
+new_value: New value
+error_values_are_the_same: New and current values are the same
+error_new_value_not_provided: New value not provided

@@ -1,27 +1,34 @@
+import time
 import yaml
 import streamlit as st
 from yaml.loader import SafeLoader
-import streamlit.components.v1 as components
-
-from streamlit_authenticator.hasher import Hasher
 from streamlit_authenticator.authenticate import Authenticate
+from streamlit_authenticator.i18n import Translator
 
-if __name__ == "__main__":
-    # Loading config file
+
+@st.cache_data
+def load_config():
     with open("config.yaml") as file:
-        config = yaml.load(file, Loader=SafeLoader)
+        return yaml.load(file, Loader=SafeLoader)
 
-    # Creating the authenticator object
-    authenticator = Authenticate(
+
+def create_authenticator(config):
+    return Authenticate(
         config["credentials"],
         config["cookie"]["name"],
         config["cookie"]["key"],
         config["cookie"]["expiry_days"],
         config["preauthorized"],
+        language=config["language"],
     )
 
+
+if __name__ == "__main__":
+    config = load_config()
+    authenticator = create_authenticator(config)
+
     # creating a login widget
-    name, authentication_status, username = authenticator.login("Login", "main")
+    name, authentication_status, username = authenticator.login("Login", "sidebar")
     if authentication_status:
         authenticator.logout("Logout", "main")
         st.write(f"Welcome *{name}*")
@@ -82,9 +89,9 @@ if __name__ == "__main__":
         except Exception as e:
             st.error(e)
 
-    # Saving config file
-    with open("config.yaml", "w") as file:
-        yaml.dump(config, file, default_flow_style=False)
+    # # Saving config file
+    # with open("config.yaml", "w") as file:
+    #     yaml.dump(config, file, default_flow_style=False)
 
     # Alternatively you may use st.session_state['name'], st.session_state['authentication_status'],
     # and st.session_state['username'] to access the name, authentication_status, and username.
