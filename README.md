@@ -54,8 +54,6 @@ preauthorized:
 python apply-hash.py 
 ```
 
-* Finally replace the plain text passwords in the configuration file with the hashed passwords.
-
 ### 2. Creating a login widget
 
 * Subsequently import the configuration file into your script and create an authentication object.
