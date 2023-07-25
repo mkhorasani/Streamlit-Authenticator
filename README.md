@@ -26,7 +26,7 @@ import streamlit_authenticator as stauth
 
 ### 1. Hashing passwords
 
-* Initially create a YAML configuration file and define your users' credentials (names, usernames, and plain text passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
+* Initially create a YAML configuration file and define your users' credentials (names, usernames, and placeholders for the hashed passwords). In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0. Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
 
 ```python
 credentials:
@@ -34,11 +34,11 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       name: John Smith
-      password: abc # To be replaced with hashed password
+      password: # Placeholder for hashed password for 'abc'
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: def # To be replaced with hashed password
+      password: # Placeholder for hashed password for 'def'
 cookie:
   expiry_days: 30
   key: some_signature_key # Must be string
