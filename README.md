@@ -160,8 +160,8 @@ _Please remember to update the config file (as shown in step 9) after you use th
 try:
     username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password('Forgot password')
     if username_of_forgotten_password:
-        st.success('New password sent securely')
-        # Random password to be transferred to user securely
+        st.success('New password to be sent securely')
+        # Random password should be transferred to user securely
     else:
         st.error('Username not found')
 except Exception as e:
@@ -180,8 +180,8 @@ _Please remember to update the config file (as shown in step 9) after you use th
 try:
     username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username('Forgot username')
     if username_of_forgotten_username:
-        st.success('Username sent securely')
-        # Username to be transferred to user securely
+        st.success('Username to be sent securely')
+        # Username should be transferred to user securely
     else:
         st.error('Email not found')
 except Exception as e:
