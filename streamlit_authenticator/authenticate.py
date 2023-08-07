@@ -316,7 +316,7 @@ class Authenticate:
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
         """
-        Creates a password reset widget.
+        Creates a register user widget for new user sign up.
 
         Parameters
         ----------
