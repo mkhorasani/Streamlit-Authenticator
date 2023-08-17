@@ -316,14 +316,14 @@ class Authenticate:
 
     def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
         """
-        Creates a password reset widget.
+        Creates a register new user widget.
 
         Parameters
         ----------
         form_name: str
-            The rendered name of the password reset form.
+            The rendered name of the register new user form.
         location: str
-            The location of the password reset form i.e. main or sidebar.
+            The location of the register new user form i.e. main or sidebar.
         preauthorization: bool
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
