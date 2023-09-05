@@ -79,26 +79,13 @@ authenticator = stauth.Authenticate(
 * Then finally render the login module as follows. Here you will need to provide a name for the login form, and specify where the form should be located i.e. main body or sidebar (will default to main body).
 
 ```python
-name, authentication_status, username = authenticator.login('Login', 'main')
+authenticator.login('Login', 'main')
 ```
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.PNG)
 
 ### 3. Authenticating users
 
-* You can then use the returned name and authentication status to allow your verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body). The optional **key** parameter for the logout widget should be used with multipage applications to prevent Streamlit from throwing duplicate key errors.
-
-```python
-if authentication_status:
-    authenticator.logout('Logout', 'main', key='unique_key')
-    st.write(f'Welcome *{name}*')
-    st.title('Some content')
-elif authentication_status is False:
-    st.error('Username/password is incorrect')
-elif authentication_status is None:
-    st.warning('Please enter your username and password')
-```
-
-* Should you require access to the persistent name, authentication status, and username variables, you may retrieve them through Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]**. This way you can use Streamlit-Authenticator to authenticate users across multiple pages.
+* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]** to allow the verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body). The optional **key** parameter for the logout widget should be used with multipage applications to prevent Streamlit from throwing duplicate key errors.
 
 ```python
 if st.session_state["authentication_status"]:
