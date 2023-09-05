@@ -85,7 +85,8 @@ authenticator.login('Login', 'main')
 
 ### 3. Authenticating users
 
-* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]** to allow the verified user to proceed to any restricted content. In addition, you have the ability to add an optional logout button at any location on your main body or sidebar (will default to main body). The optional **key** parameter for the logout widget should be used with multipage applications to prevent Streamlit from throwing duplicate key errors.
+* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]** to allow a verified user to proceed to any restricted content.
+* In addition, you may include an optional logout button at any location on your main body or sidebar (will default to main body). The optional **key** parameter for the logout widget should be used with multipage applications to prevent Streamlit from throwing duplicate key errors.
 
 ```python
 if st.session_state["authentication_status"]:
