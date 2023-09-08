@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="streamlit-authenticator",
-    version="0.2.2",
+    version="0.2.3",
     author="Mohammad Khorasani",
     author_email="khorasani.mohammad@gmail.com",
     description="A secure authentication module to validate user credentials in a Streamlit application.",
@@ -25,7 +25,7 @@ setuptools.setup(
         "PyJWT >=2.3.0",
         "bcrypt >= 3.1.7",
         "PyYAML >= 5.3.1",
-        "streamlit >= 0.86",
-        "extra-streamlit-components >= 0.1.55"
+        "streamlit >= 1.18.0",
+        "extra-streamlit-components >= 0.1.60"
     ],
 )

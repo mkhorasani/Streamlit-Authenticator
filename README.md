@@ -112,9 +112,9 @@ elif st.session_state["authentication_status"] is None:
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
 ```python
-if authentication_status:
+if st.session_state["authentication_status"]:
     try:
-        if authenticator.reset_password(username, 'Reset password'):
+        if authenticator.reset_password(st.session_state["username"], 'Reset password'):
             st.success('Password modified successfully')
     except Exception as e:
         st.error(e)
@@ -183,9 +183,9 @@ except Exception as e:
 * You may use the **update_user_details** widget to allow a logged in user to update their name and/or email. The widget will automatically save the updated details in both the configuration file and reauthentication cookie.
 
 ```python
-if authentication_status:
+if st.session_state["authentication_status"]:
     try:
-        if authenticator.update_user_details(username, 'Update user details'):
+        if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
             st.success('Entries updated successfully')
     except Exception as e:
         st.error(e)
