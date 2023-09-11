@@ -238,7 +238,7 @@ class Authenticate:
         """
         self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
 
-    def reset_password(self, username: str, form_name: str, location: str='main') -> bool:
+    def reset_password(self, username: str, form_name: str, button_name: str = 'Reset', location: str='main') -> bool:
         """
         Creates a password reset widget.
 
@@ -248,6 +248,8 @@ class Authenticate:
             The username of the user to reset the password for.
         form_name: str
             The rendered name of the password reset form.
+        button_name: str
+            The text in button.
         location: str
             The location of the password reset form i.e. main or sidebar.
         Returns
@@ -261,18 +263,18 @@ class Authenticate:
             reset_password_form = st.form('Reset password')
         elif location == 'sidebar':
             reset_password_form = st.sidebar.form('Reset password')
-        
+
         reset_password_form.subheader(form_name)
         self.username = username.lower()
         self.password = reset_password_form.text_input('Current password', type='password')
         new_password = reset_password_form.text_input('New password', type='password')
         new_password_repeat = reset_password_form.text_input('Repeat password', type='password')
 
-        if reset_password_form.form_submit_button('Reset'):
+        if reset_password_form.form_submit_button(button_name):
             if self._check_credentials(inplace=False):
                 if len(new_password) > 0:
                     if new_password == new_password_repeat:
-                        if self.password != new_password: 
+                        if self.password != new_password:
                             self._update_password(self.username, new_password)
                             return True
                         else:
