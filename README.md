@@ -34,11 +34,11 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       name: John Smith
-      password: # Placeholder for hashed password for 'abc'
+      password: # Placeholder for hashed password of 'abc'
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: # Placeholder for hashed password for 'def'
+      password: # Placeholder for hashed password of 'def'
 cookie:
   expiry_days: 30
   key: some_signature_key # Must be string
@@ -54,7 +54,7 @@ preauthorized:
 hashed_passwords = stauth.Hasher(['abc', 'def']).generate()
 ```
 
-* Finally replace the plain text passwords in the configuration file with the hashed passwords.
+* Finally place the hashed passwords in the corresponding placeholders in the configuration file.
 
 ### 2. Creating a login widget
 
