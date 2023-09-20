@@ -157,7 +157,7 @@ class Authenticate:
             else:
                 return False
 
-    def login(self, form_name: str, location: str='main') -> tuple:
+    def login(self, form_name: str, location: str='main', username_text: str="Username", password_text: str="Password", login_text: str="Login") -> tuple:
         """
         Creates a login widget.
 
@@ -167,6 +167,12 @@ class Authenticate:
             The rendered name of the login form.
         location: str
             The location of the login form i.e. main or sidebar.
+        username_text: str
+            The rendered name of the username input.
+        password_text: str
+            The rendered name of the password input.
+        login_text: str
+            The rendered name of the login buttom.
         Returns
         -------
         str
@@ -188,11 +194,11 @@ class Authenticate:
                     login_form = st.sidebar.form('Login')
 
                 login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
+                self.username = login_form.text_input(username_text).lower()
                 st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
+                self.password = login_form.text_input(password_text, type='password')
 
-                if login_form.form_submit_button('Login'):
+                if login_form.form_submit_button(login_text):
                     self._check_credentials()
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
