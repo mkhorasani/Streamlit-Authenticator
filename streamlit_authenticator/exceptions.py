@@ -2,8 +2,13 @@ class CredentialsError(Exception):
     """
     Exception raised for incorrect credentials.
     """
-    def __init__(self):
-        super().__init__('Username/password is incorrect')
+    def __init__(self, credential_type: str=''):
+        if credential_type == 'username':
+            super().__init__('Username is incorrect')
+        elif credential_type == 'password':
+            super().__init__('Password is incorrect')
+        else:
+            super().__init__('Username/password is incorrect')
 
 class ResetError(Exception):
     """

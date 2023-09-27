@@ -282,7 +282,7 @@ class Authenticate:
                 else:
                     raise ResetError('No new password provided')
             else:
-                raise CredentialsError
+                raise CredentialsError('password')
     
     def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool):
         """
