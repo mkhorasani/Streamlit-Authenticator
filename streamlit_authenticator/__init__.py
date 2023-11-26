@@ -3,27 +3,35 @@ import streamlit as st
 from yaml.loader import SafeLoader
 import streamlit.components.v1 as components
 
-from .hasher import Hasher
-from .authenticate import Authenticate
+from hasher import Hasher
+from cloud import Cloud
+from authenticate import Authenticate
 
-_RELEASE = True
+_RELEASE = False
 
 if not _RELEASE:
-    # hashed_passwords = Hasher(['abc', 'def']).generate()
+    # hashed_passwords = Hasher(passwords=['abc', 'def']).generate()
+    # config = Hasher(config_dict=config).hash_config()
 
     # Loading config file
-    with open('../config.yaml') as file:
-        config = yaml.load(file, Loader=SafeLoader)
+    # with open('../config.yaml') as file:
+    #     config = yaml.load(file, Loader=SafeLoader)
 
-    # Creating the authenticator object
+    # # Creating the authenticator object
+    # authenticator = Authenticate(
+    #     config['credentials'],
+    #     config['cookie']['name'], 
+    #     config['cookie']['key'], 
+    #     config['cookie']['expiry_days'],
+    #     config['preauthorized']
+    # )
+
     authenticator = Authenticate(
-        config['credentials'],
-        config['cookie']['name'], 
-        config['cookie']['key'], 
-        config['cookie']['expiry_days'],
-        config['preauthorized']
+        file_path='C:/Users/Mohammad Khorasani/Desktop/Streamlit-Authenticator/config.yaml'
+        #API_key='232234242'
     )
-
+    authenticator.save_config()
+    
     # creating a login widget
     authenticator.login('Login', 'main')
     if st.session_state["authentication_status"]:
@@ -81,5 +89,5 @@ if not _RELEASE:
             st.error(e)
 
     # Saving config file
-    with open('../config.yaml', 'w') as file:
-        yaml.dump(config, file, default_flow_style=False)
+    # with open('../config.yaml', 'w') as file:
+    #     yaml.dump(config, file, default_flow_style=False)

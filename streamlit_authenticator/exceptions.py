@@ -1,3 +1,10 @@
+class CloudError(Exception):
+    """
+    Exception raised for server-side errors.
+    """
+    def __init__(self, error_type: str=''):
+        super().__init__(error_type)
+
 class CredentialsError(Exception):
     """
     Exception raised for incorrect credentials.
@@ -52,6 +59,19 @@ class ForgotError(Exception):
 class UpdateError(Exception):
     """
     Exceptions raised for the update user details widget.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+class HasherError(Exception):
+    """
+    Exceptions raised for the Hasher module.
 
     Attributes
     ----------

@@ -1,22 +1,25 @@
 import jwt
+import yaml
 import bcrypt
 import streamlit as st
+from yaml.loader import SafeLoader
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 
-from .hasher import Hasher
-from .validator import Validator
-from .utils import generate_random_pw
+from cloud  import Cloud
+from hasher import Hasher
+from validator import Validator
+from utils import generate_random_pw
 
-from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
+from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
     forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: float=30.0, 
-        preauthorized: list=None, validator: Validator=None):
+    def __init__(self, credentials: dict=None, cookie_name: str=None, key: str=None, cookie_expiry_days: float=30.0, 
+        preauthorized: list=None, validator: Validator=None, file_path: str=None, API_key: str=None):
         """
         Create a new instance of "Authenticate".
 
@@ -34,13 +37,40 @@ class Authenticate:
             The list of emails of unregistered users authorized to register.
         validator: Validator
             A Validator object that checks the validity of the username, name, and email fields.
+        file_path: str
+            The path to the config file.
+        API_key: str
+            The API key that enables connection to the cloud to read and write the config file.
         """
-        self.credentials = credentials
-        self.credentials['usernames'] = {key.lower(): value for key, value in credentials['usernames'].items()}
-        self.cookie_name = cookie_name
-        self.key = key
-        self.cookie_expiry_days = cookie_expiry_days
-        self.preauthorized = preauthorized
+        self.file_path = file_path
+        self.API_key = API_key
+
+        if file_path:
+            with open(self.file_path) as file:
+                self.config_file = yaml.load(file, Loader=SafeLoader)
+            self.credentials = self.config_file['credentials']
+            self.credentials['usernames'] = {key.lower(): value for key, value in self.credentials['usernames'].items()}
+            self.cookie_name = self.config_file['cookie']['name']
+            self.key = self.config_file['cookie']['key']
+            self.cookie_expiry_days = self.config_file['cookie']['expiry_days']
+            self.preauthorized = self.config_file['preauthorized']
+        elif API_key:
+            self.cloud_connection = Cloud(self.API_key)
+            self.config_dict = self.cloud_connection.read_config_from_cloud()
+            self.credentials = self.config_dict['credentials']
+            self.credentials['usernames'] = {key.lower(): value for key, value in self.credentials['usernames'].items()}
+            self.cookie_name = self.config_dict['cookie']['name']
+            self.key = self.config_dict['cookie']['key']
+            self.cookie_expiry_days = self.config_dict['cookie']['expiry_days']
+            self.preauthorized = self.config_dict['preauthorized']
+        else:
+            self.credentials = credentials
+            self.credentials['usernames'] = {key.lower(): value for key, value in self.credentials['usernames'].items()}
+            self.cookie_name = cookie_name
+            self.key = key
+            self.cookie_expiry_days = cookie_expiry_days
+            self.preauthorized = preauthorized
+
         self.cookie_manager = stx.CookieManager()
         self.validator = validator if validator is not None else Validator()
 
@@ -538,3 +568,14 @@ class Authenticate:
                     raise UpdateError('New and current values are the same')
             if len(new_value) == 0:
                 raise UpdateError('New value not provided')
+    
+    def save_config(self):
+        """
+        Saves the contents of the config file/dict to the specified file/cloud.
+
+        """     
+        if self.file_path:
+            with open(self.file_path, 'w') as file:
+                yaml.dump(self.config_file, file, default_flow_style=False)     
+        if self.API_key:
+            self.cloud_connection.write_config_to_cloud(config_dict=self.config_dict)
