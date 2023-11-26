@@ -10,15 +10,18 @@ class Cloud:
     """
     This class will read and write the config file to the cloud.
     """
-    def __init__(_self, API_key: str):
+    def __init__(_self, email: str, API_key: str):
         """
         Create a new instance of "Cloud".
 
         Parameters
         ----------
+        email: str
+            The registered email that enables connection to the cloud
         API_key: str
-            The API key that enables connection to the cloud.
+            The API key associated with the email.
         """
+        _self.email = email
         _self.API_key = API_key
         _self.github_file_url = 'https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_variables/main/variables'
         _self.variable_name_to_read = 'server_address'
@@ -69,7 +72,7 @@ class Cloud:
             elif config_dict:
                 config = config_dict  
             url = _self.url + 'write_data'
-            headers = {'Authorization': f'Bearer {_self.API_key}'}
+            headers = {'Authorization': f'Bearer {_self.email} {_self.API_key}'}
             response = requests.post(url, headers=headers, json=config)
         except:
             raise CloudError('Failed to connect to the cloud')
@@ -90,7 +93,7 @@ class Cloud:
         """
         try:
             url = _self.url + 'get_data'
-            headers = {'Authorization': f'Bearer {_self.API_key}'}
+            headers = {'Authorization': f'Bearer {_self.email} {_self.API_key}'}
             response = requests.get(url, headers=headers)
             data = response.json()
         except:

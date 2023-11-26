@@ -28,7 +28,7 @@ if not _RELEASE:
 
     authenticator = Authenticate(
         file_path='C:/Users/Mohammad Khorasani/Desktop/Streamlit-Authenticator/config.yaml'
-        #API_key='232234242'
+        # cloud = {'email': None, 'API_key': None}
     )
     authenticator.save_config()
     
