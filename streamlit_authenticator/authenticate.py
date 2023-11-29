@@ -19,7 +19,7 @@ class Authenticate:
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict=None, cookie_name: str=None, key: str=None, cookie_expiry_days: float=30.0, 
-        preauthorized: list=None, validator: Validator=None, file_path: str=None, cloud: dict=None):
+        preauthorized: list=None, validator: Validator=None, file_path: str=None, cloud_credentials: dict=None):
         """
         Create a new instance of "Authenticate".
 
@@ -43,7 +43,7 @@ class Authenticate:
             The dictionary containing the registered email and API key that enables connection to the cloud.
         """
         self.file_path = file_path
-        self.cloud = cloud
+        self.cloud_credentials = cloud_credentials
 
         if file_path:
             with open(self.file_path) as file:
@@ -54,10 +54,8 @@ class Authenticate:
             self.key = self.config_file['cookie']['key']
             self.cookie_expiry_days = self.config_file['cookie']['expiry_days']
             self.preauthorized = self.config_file['preauthorized']
-        elif cloud:
-            email = self.cloud['email']
-            API_key = self.cloud['API_key']
-            self.cloud_connection = Cloud(email, API_key)
+        elif cloud_credentials:
+            self.cloud_connection = Cloud(self.cloud_credentials)
             self.config_dict = self.cloud_connection.read_config_from_cloud()
             self.credentials = self.config_dict['credentials']
             self.credentials['usernames'] = {key.lower(): value for key, value in self.credentials['usernames'].items()}
@@ -579,5 +577,5 @@ class Authenticate:
         if self.file_path:
             with open(self.file_path, 'w') as file:
                 yaml.dump(self.config_file, file, default_flow_style=False)     
-        if self.cloud:
+        if self.cloud_credentials:
             self.cloud_connection.write_config_to_cloud(config_dict=self.config_dict)
