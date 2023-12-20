@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "StreamlitAuth"
-version = "0.0.0"
+version = "0.0.1"
 description = 'User login and authentication for Streamlit apps'
 readme = 'README.md'
 authors = [
@@ -15,10 +15,10 @@ license = {file = 'LICENSE'}
 requires-python = '>=3.6'
 dependencies = [
     "PyJWT >=2.3.0",
-    "bcrypt",
+    "bcrypt >= 3.1.7",
     "PyYAML >= 5.3.1",
     "streamlit >= 1.18.0",
-    "extra-streamlit-components"
+    "extra-streamlit-components >= 0.1.60"
 ]
 keywords = ['Python', 'Streamlit', 'Authentication', 'Components']
 classifiers = [
