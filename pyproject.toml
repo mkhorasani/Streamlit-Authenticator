@@ -37,4 +37,4 @@ classifiers = [
 'test repository' = 'https://github.com/msquaredds/StreamlitAuth'
 
 [tool.setuptools]
-py-modules = ['streamlit_authenticator']
+py-modules = ['StreamlitAuth']
