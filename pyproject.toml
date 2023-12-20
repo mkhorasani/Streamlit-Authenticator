@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "StreamlitAuth"
+dynamic = [
+    'version'
+]
+description = 'User login and authentication for Streamlit apps'
+readme = 'README.md'
+authors = [
+    {name = 'Mohammad Khorasani', email='khorasani.mohammad@gmail.com'},
+    {name = 'Alex Melesko', email='alex.melesko@msquaredds.com'}
+]
+license = {file = 'LICENSE'}
+requires-python = '>=3.6'
+dependencies = [
+    "PyJWT >=2.3.0",
+    "bcrypt >= 3.1.7",
+    "PyYAML >= 5.3.1",
+    "streamlit >= 1.18.0",
+    "extra-streamlit-components >= 0.1.60"
+]
+keywords = ['Python', 'Streamlit', 'Authentication', 'Components']
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Build Tools",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+'base repository' = 'https://github.com/mkhorasani/Streamlit-Authenticator'
+'test repository' = 'https://github.com/msquaredds/StreamlitAuth'
+
+[tool.setuptools]
+py-modules = ['streamlit_authenticator']
