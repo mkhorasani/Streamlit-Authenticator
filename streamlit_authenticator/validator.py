@@ -1,10 +1,12 @@
 import re
 
+
 class Validator:
     """
-    This class will check the validity of the entered username, name, and email for a 
+    This class will check the validity of the entered username, name, and email for a
     newly registered user.
     """
+
     def validate_username(self, username: str) -> bool:
         """
         Checks the validity of the entered username.
@@ -24,7 +26,7 @@ class Validator:
     def validate_name(self, name: str) -> bool:
         """
         Checks the validity of the entered name.
-        
+
         Parameters
         ----------
         name: str

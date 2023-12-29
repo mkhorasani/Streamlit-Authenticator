@@ -2,13 +2,15 @@ class CredentialsError(Exception):
     """
     Exception raised for incorrect credentials.
     """
-    def __init__(self, credential_type: str=''):
-        if credential_type == 'username':
-            super().__init__('Username is incorrect')
-        elif credential_type == 'password':
-            super().__init__('Password is incorrect')
+
+    def __init__(self, credential_type: str = ""):
+        if credential_type == "username":
+            super().__init__("Username is incorrect")
+        elif credential_type == "password":
+            super().__init__("Password is incorrect")
         else:
-            super().__init__('Username/password is incorrect')
+            super().__init__("Username/password is incorrect")
+
 
 class ResetError(Exception):
     """
@@ -19,9 +21,11 @@ class ResetError(Exception):
     message: str
         The custom error message to display.
     """
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
+
 
 class RegisterError(Exception):
     """
@@ -32,9 +36,11 @@ class RegisterError(Exception):
     message: str
         The custom error message to display.
     """
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
+
 
 class ForgotError(Exception):
     """
@@ -45,9 +51,11 @@ class ForgotError(Exception):
     message: str
         The custom error message to display.
     """
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
+
 
 class UpdateError(Exception):
     """
@@ -58,6 +66,7 @@ class UpdateError(Exception):
     message: str
         The custom error message to display.
     """
+
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
