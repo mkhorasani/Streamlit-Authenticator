@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "streamlit-authenticator"
+version = "0.2.3"
+description = "A secure authentication module to validate user credentials in a Streamlit application."
+authors = ["Mohammad Khorasani <khorasani.mohammad@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/mkhorasani/Streamlit-Authenticator"
+keywords = ["Python", "Streamlit", "Authentication", "Components"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+PyJWT = "^2.3.0"
+bcrypt = "^3.1.7"
+streamlit = "^1.18.0"
+extra-streamlit-components = "^0.1.60"
+pyyaml = "^6.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.9"
+
+[tool.poetry.group.dev]
+optional = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
