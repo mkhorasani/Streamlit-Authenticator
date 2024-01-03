@@ -17,6 +17,12 @@ if not _RELEASE:
     # with open('../config.yaml') as file:
     #     config = yaml.load(file, Loader=SafeLoader)
 
+    # authenticator_cloud = Cloud('khorasani.mohammad@gmail.com',
+    #                             '6s9vulbjzuklyn3i2fvqfkqvtrprd2yo')
+    
+    # authenticator_cloud.write_config_to_cloud(config_dict=config)
+    # st.write(authenticator_cloud.read_config_from_cloud())
+    
     # # Creating the authenticator object
     # authenticator = Authenticate(
     #     config['credentials'],
@@ -27,10 +33,9 @@ if not _RELEASE:
     # )
 
     authenticator = Authenticate(
-        file_path='C:/Users/Mohammad Khorasani/Desktop/Streamlit-Authenticator/config.yaml'
-        # cloud = {'email': None, 'API_key': None}
+        #file_path='C:/Users/Mohammad Khorasani/Desktop/Streamlit-Authenticator/config.yaml'
+        cloud_credentials = {'email': 'khorasani.mohammad@gmail.com', 'API_key': '6s9vulbjzuklyn3i2fvqfkqvtrprd2yo'}
     )
-    authenticator.save_config()
     
     # creating a login widget
     authenticator.login('Login', 'main')
@@ -91,3 +96,5 @@ if not _RELEASE:
     # Saving config file
     # with open('../config.yaml', 'w') as file:
     #     yaml.dump(config, file, default_flow_style=False)
+    
+    authenticator.save_config()
