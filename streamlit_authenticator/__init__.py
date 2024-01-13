@@ -3,10 +3,10 @@ import streamlit as st
 from yaml.loader import SafeLoader
 import streamlit.components.v1 as components
 
-from .hasher import Hasher
-from .authenticate import Authenticate
+from hasher import Hasher
+from authenticate import Authenticate
 
-_RELEASE = True
+_RELEASE = False
 
 if not _RELEASE:
     # hashed_passwords = Hasher(['abc', 'def']).generate()
@@ -25,7 +25,7 @@ if not _RELEASE:
     )
 
     # creating a login widget
-    authenticator.login('Login', 'main')
+    authenticator.login(location='main')
     if st.session_state["authentication_status"]:
         authenticator.logout('Logout', 'main')
         st.write(f'Welcome *{st.session_state["name"]}*')
@@ -38,21 +38,21 @@ if not _RELEASE:
     # Creating a password reset widget
     if st.session_state["authentication_status"]:
         try:
-            if authenticator.reset_password(st.session_state["username"], 'Reset password'):
+            if authenticator.reset_password(st.session_state["username"]):
                 st.success('Password modified successfully')
         except Exception as e:
             st.error(e)
 
     # Creating a new user registration widget
     try:
-        if authenticator.register_user('Register user', preauthorization=False):
+        if authenticator.register_user(preauthorization=False):
             st.success('User registered successfully')
     except Exception as e:
         st.error(e)
 
     # Creating a forgot password widget
     try:
-        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password()
         if username_forgot_pw:
             st.success('New password sent securely')
             # Random password to be transferred to user securely
@@ -63,7 +63,7 @@ if not _RELEASE:
 
     # Creating a forgot username widget
     try:
-        username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
+        username_forgot_username, email_forgot_username = authenticator.forgot_username()
         if username_forgot_username:
             st.success('Username sent securely')
             # Username to be transferred to user securely
@@ -75,7 +75,7 @@ if not _RELEASE:
     # Creating an update user details widget
     if st.session_state["authentication_status"]:
         try:
-            if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
+            if authenticator.update_user_details(st.session_state["username"]):
                 st.success('Entries updated successfully')
         except Exception as e:
             st.error(e)

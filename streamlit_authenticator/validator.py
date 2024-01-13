@@ -49,4 +49,4 @@ class Validator:
         bool
             Validity of entered email.
         """
-        return "@" in email and 2 < len(email) < 320
+        return "@" in email and 2 < len(email) < 320 and len(email.split('@')[1]) > 2 and '.' in email.split('@')[1] and len(email.split('@')[1].split('.')[1]) > 0

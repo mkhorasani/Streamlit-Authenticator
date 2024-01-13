@@ -1,14 +1,15 @@
 import jwt
+import json
 import bcrypt
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 
-from .hasher import Hasher
-from .validator import Validator
-from .utils import generate_random_pw
+from hasher import Hasher
+from validator import Validator
+from utils import generate_random_pw
 
-from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
+from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
     """
@@ -52,6 +53,8 @@ class Authenticate:
             st.session_state['username'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
+        if 'failed_login_attempts' not in st.session_state:
+            st.session_state['failed_login_attempts'] = {}
 
     def _token_encode(self) -> str:
         """
@@ -118,6 +121,17 @@ class Authenticate:
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
     
+    def _record_failed_login_attempts(self, reset: bool=False):
+        """
+        Records the number of failed login attempts for a given username.
+        """
+        if self.username not in st.session_state['failed_login_attempts']:
+            st.session_state['failed_login_attempts'][self.username] = 0
+        if reset:
+            st.session_state['failed_login_attempts'][self.username] = 0
+        else:
+            st.session_state['failed_login_attempts'][self.username] += 1
+            
     def _check_credentials(self, inplace: bool=True) -> bool:
         """
         Checks the validity of the entered credentials.
@@ -144,11 +158,13 @@ class Authenticate:
                         st.session_state['authentication_status'] = True
                     else:
                         return True
+                    self._record_failed_login_attempts(reset=True)
                 else:
                     if inplace:
                         st.session_state['authentication_status'] = False
                     else:
                         return False
+                    self._record_failed_login_attempts()
             except Exception as e:
                 print(e)
         else:
@@ -156,15 +172,17 @@ class Authenticate:
                 st.session_state['authentication_status'] = False
             else:
                 return False
+            self._record_failed_login_attempts()
 
-    def login(self, form_name: str, location: str='main') -> tuple:
+    def login(self, fields: dict={'Form name':'Login', 'Username':'Username', 'Password':'Password',
+                                  'Login':'Login'}, location: str='main') -> tuple:
         """
         Creates a login widget.
 
         Parameters
         ----------
-        form_name: str
-            The rendered name of the login form.
+        fields: dict
+            The rendered names of the fields/buttons.
         location: str
             The location of the login form i.e. main or sidebar.
         Returns
@@ -186,18 +204,17 @@ class Authenticate:
                     login_form = st.form('Login')
                 elif location == 'sidebar':
                     login_form = st.sidebar.form('Login')
-
-                login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
+                login_form.subheader('Login' if 'Form name' not in fields else fields['Form name'])
+                self.username = login_form.text_input('Username' if 'Username' not in fields else fields['Username']).lower()
                 st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
+                self.password = login_form.text_input('Password' if 'Password' not in fields else fields['Password'], type='password')
 
-                if login_form.form_submit_button('Login'):
+                if login_form.form_submit_button('Login' if 'Login' not in fields else fields['Login']):
                     self._check_credentials()
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
 
-    def logout(self, button_name: str, location: str='main', key: str=None):
+    def logout(self, button_name: str='Logout', location: str='main', key: str=None):
         """
         Creates a logout button.
 
@@ -206,10 +223,10 @@ class Authenticate:
         button_name: str
             The rendered name of the logout button.
         location: str
-            The location of the logout button i.e. main or sidebar.
+            The location of the logout button i.e. main or sidebar or unrendered.
         """
-        if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+        if location not in ['main', 'sidebar','unrendered']:
+            raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
         if location == 'main':
             if st.button(button_name, key):
                 self.cookie_manager.delete(self.cookie_name)
@@ -224,6 +241,13 @@ class Authenticate:
                 st.session_state['name'] = None
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
+        elif location == 'unrendered':
+            if st.session_state['authentication_status']:
+                self.cookie_manager.delete(self.cookie_name)
+                st.session_state['logout'] = True
+                st.session_state['name'] = None
+                st.session_state['username'] = None
+                st.session_state['authentication_status'] = None            
 
     def _update_password(self, username: str, password: str):
         """
@@ -238,7 +262,12 @@ class Authenticate:
         """
         self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
 
-    def reset_password(self, username: str, form_name: str, location: str='main') -> bool:
+    def reset_password(self, username: str, fields: dict={'Form name':'Reset password', 
+                                                          'Current password':'Current password', 
+                                                          'New password':'New password',
+                                                          'Repeat password':'Repeat password',
+                                                          'Reset':'Reset'}, 
+                                                          location: str='main') -> bool:
         """
         Creates a password reset widget.
 
@@ -246,8 +275,8 @@ class Authenticate:
         ----------
         username: str
             The username of the user to reset the password for.
-        form_name: str
-            The rendered name of the password reset form.
+        fields: dict
+            The rendered names of the fields/buttons.
         location: str
             The location of the password reset form i.e. main or sidebar.
         Returns
@@ -262,29 +291,30 @@ class Authenticate:
         elif location == 'sidebar':
             reset_password_form = st.sidebar.form('Reset password')
         
-        reset_password_form.subheader(form_name)
+        reset_password_form.subheader('Reset password' if 'Form name' not in fields else fields['Form name'])
         self.username = username.lower()
-        self.password = reset_password_form.text_input('Current password', type='password')
-        new_password = reset_password_form.text_input('New password', type='password')
-        new_password_repeat = reset_password_form.text_input('Repeat password', type='password')
+        self.password = reset_password_form.text_input('Current password' if 'Current password' not in fields else fields['Current password'], 
+                                                       type='password')
+        new_password = reset_password_form.text_input('New password' if 'New password' not in fields else fields['New password'], 
+                                                      type='password')
+        new_password_repeat = reset_password_form.text_input('Repeat password' if 'Repeat password' not in fields else fields['Repeat password'], 
+                                                             type='password')
 
-        if reset_password_form.form_submit_button('Reset'):
+        if reset_password_form.form_submit_button('Reset' if 'Reset' not in fields else fields['Reset']):
             if self._check_credentials(inplace=False):
-                if len(new_password) > 0:
-                    if new_password == new_password_repeat:
-                        if self.password != new_password: 
-                            self._update_password(self.username, new_password)
-                            return True
-                        else:
-                            raise ResetError('New and current passwords are the same')
-                    else:
-                        raise ResetError('Passwords do not match')
-                else:
+                if len(new_password) == 0:
                     raise ResetError('No new password provided')
+                if new_password != new_password_repeat:
+                    raise ResetError('Passwords do not match')
+                if self.password != new_password: 
+                    self._update_password(self.username, new_password)
+                    return True
+                else:
+                    raise ResetError('New and current passwords are the same')                                            
             else:
                 raise CredentialsError('password')
     
-    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool):
+    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool, domains: list):
         """
         Adds to credentials dictionary the new user's information.
 
@@ -301,32 +331,48 @@ class Authenticate:
         preauthorization: bool
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
+        domains: list
+            The required list of domains a new email must belong to, list: the required list of domains
+            None: any domain is allowed
         """
-        if not self.validator.validate_username(username):
-            raise RegisterError('Username is not valid')
-        if not self.validator.validate_name(name):
-            raise RegisterError('Name is not valid')
         if not self.validator.validate_email(email):
             raise RegisterError('Email is not valid')
+        if email in json.dumps(self.credentials['usernames']):
+            raise RegisterError('Email already taken')
+        if domains:
+            if email.split('@')[1] not in ' '.join(domains):
+                raise RegisterError('Email not allowed to register')
+        if not self.validator.validate_username(username):
+            raise RegisterError('Username is not valid')
+        if username in self.credentials['usernames']:
+            raise RegisterError('Username already taken')
+        if not self.validator.validate_name(name):
+            raise RegisterError('Name is not valid')
 
         self.credentials['usernames'][username] = {'name': name, 
-            'password': Hasher([password]).generate()[0], 'email': email}
+            'password': Hasher([password]).generate()[0], 'email': email, 'meta': None}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
-    def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
+    def register_user(self, fields: dict={'Form name':'Register User', 'Email':'Email', 'Username':'Username', 
+                                          'Password':'Password', 'Repeat Password':'Repeat password',
+                                          'Register':'Register'}, location: str='main', 
+                                          preauthorization=True, domains: list=None) -> bool:
         """
         Creates a register new user widget.
 
         Parameters
         ----------
-        form_name: str
-            The rendered name of the register new user form.
+        fields: dict
+            The rendered names of the fields/buttons.
         location: str
             The location of the register new user form i.e. main or sidebar.
         preauthorization: bool
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
+        domains: list
+            The required list of domains a new email must belong to, list: the required list of domains
+            None: any domain is allowed
         Returns
         -------
         bool
@@ -342,32 +388,27 @@ class Authenticate:
         elif location == 'sidebar':
             register_user_form = st.sidebar.form('Register user')
 
-        register_user_form.subheader(form_name)
-        new_email = register_user_form.text_input('Email')
-        new_username = register_user_form.text_input('Username').lower()
-        new_name = register_user_form.text_input('Name')
-        new_password = register_user_form.text_input('Password', type='password')
-        new_password_repeat = register_user_form.text_input('Repeat password', type='password')
-
-        if register_user_form.form_submit_button('Register'):
-            if len(new_email) and len(new_username) and len(new_name) and len(new_password) > 0:
-                if new_username not in self.credentials['usernames']:
-                    if new_password == new_password_repeat:
-                        if preauthorization:
-                            if new_email in self.preauthorized['emails']:
-                                self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
-                                return True
-                            else:
-                                raise RegisterError('User not preauthorized to register')
-                        else:
-                            self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
-                            return True
-                    else:
-                        raise RegisterError('Passwords do not match')
+        register_user_form.subheader('Register User' if 'Form name' not in fields else fields['Form name'])
+        new_email = register_user_form.text_input('Email' if 'Email' not in fields else fields['Email'])
+        new_username = register_user_form.text_input('Username' if 'Username' not in fields else fields['Username']).lower()
+        new_name = register_user_form.text_input('Name' if 'Name' not in fields else fields['Name'])
+        new_password = register_user_form.text_input('Password' if 'Password' not in fields else fields['Password'], type='password')
+        new_password_repeat = register_user_form.text_input('Repeat password' if 'Repeat password' not in fields else fields['Repeat password'], type='password')
+        
+        if register_user_form.form_submit_button('Register' if 'Register' not in fields else fields['Register']):
+            if len(new_password) == 0 or len(new_password_repeat) == 0:
+                raise RegisterError('Password/repeat password fields cannot be empty')
+            if new_password != new_password_repeat:
+                raise RegisterError('Passwords do not match')
+            if preauthorization:
+                if new_email in self.preauthorized['emails']:
+                    self._register_credentials(new_username, new_name, new_password, new_email, preauthorization, domains)
+                    return True
                 else:
-                    raise RegisterError('Username already taken')
+                    raise RegisterError('User not preauthorized to register')
             else:
-                raise RegisterError('Please enter an email, username, name, and password')
+                self._register_credentials(new_username, new_name, new_password, new_email, preauthorization, domains)
+                return True                                                               
 
     def _set_random_password(self, username: str) -> str:
         """
@@ -386,14 +427,15 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def forgot_password(self, form_name: str, location: str='main') -> tuple:
+    def forgot_password(self, fields: dict={'Form name':'Forgot password', 'Username':'Username', 'Submit':'Submit'},
+                         location: str='main') -> tuple:
         """
         Creates a forgot password widget.
 
         Parameters
         ----------
-        form_name: str
-            The rendered name of the forgot password form.
+        fields: dict
+            The rendered names of the fields/buttons.
         location: str
             The location of the forgot password form i.e. main or sidebar.
         Returns
@@ -412,10 +454,10 @@ class Authenticate:
         elif location == 'sidebar':
             forgot_password_form = st.sidebar.form('Forgot password')
 
-        forgot_password_form.subheader(form_name)
-        username = forgot_password_form.text_input('Username').lower()
+        forgot_password_form.subheader('Forget password' if 'Form name' not in fields else fields['Form name'])
+        username = forgot_password_form.text_input('Username' if 'Username' not in fields else fields['Username']).lower()
 
-        if forgot_password_form.form_submit_button('Submit'):
+        if forgot_password_form.form_submit_button('Submit' if 'Submit' not in fields else fields['Submit']):
             if len(username) > 0:
                 if username in self.credentials['usernames']:
                     return username, self.credentials['usernames'][username]['email'], self._set_random_password(username)
@@ -445,14 +487,15 @@ class Authenticate:
                 return username
         return False
 
-    def forgot_username(self, form_name: str, location: str='main') -> tuple:
+    def forgot_username(self, fields: dict={'Form name':'Forgot username', 'Email':'Email', 'Submit':'Submit'}, 
+                        location: str='main') -> tuple:
         """
         Creates a forgot username widget.
 
         Parameters
         ----------
-        form_name: str
-            The rendered name of the forgot username form.
+        fields: dict
+            The rendered names of the fields/buttons.
         location: str
             The location of the forgot username form i.e. main or sidebar.
         Returns
@@ -469,10 +512,10 @@ class Authenticate:
         elif location == 'sidebar':
             forgot_username_form = st.sidebar.form('Forgot username')
 
-        forgot_username_form.subheader(form_name)
-        email = forgot_username_form.text_input('Email')
+        forgot_username_form.subheader('Forget username' if 'Form name' not in fields else fields['Form name'])
+        email = forgot_username_form.text_input('Email' if 'Email' not in fields else fields['Email'])
 
-        if forgot_username_form.form_submit_button('Submit'):
+        if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields else fields['Submit']):
             if len(email) > 0:
                 return self._get_username('email', email), email
             else:
@@ -494,7 +537,10 @@ class Authenticate:
         """
         self.credentials['usernames'][username][key] = value
 
-    def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
+    def update_user_details(self, username: str, fields: dict={'Form name':'Update user details',
+                                                               'Field':'Field', 'New value':'New value', 
+                                                               'Update':'Update', 'Name':'Name', 'Email':'Email'}, 
+                                                               location: str='main') -> bool:
         """
         Creates a update user details widget.
 
@@ -502,8 +548,8 @@ class Authenticate:
         ----------
         username: str
             The username of the user to update user details for.
-        form_name: str
-            The rendered name of the update user details form.
+        fields: dict
+            The rendered names of the fields/buttons.
         location: str
             The location of the update user details form i.e. main or sidebar.
         Returns
@@ -518,13 +564,29 @@ class Authenticate:
         elif location == 'sidebar':
             update_user_details_form = st.sidebar.form('Update user details')
         
-        update_user_details_form.subheader(form_name)
+        update_user_details_form.subheader('Form name' if 'Form name' not in fields else fields['Form name'])
         self.username = username.lower()
-        field = update_user_details_form.selectbox('Field', ['Name', 'Email']).lower()
-        new_value = update_user_details_form.text_input('New value')
+        update_user_details_form_fields = ['Name' if 'Name' not in fields else fields['Name'],
+                                           'Email' if 'Email' not in fields else fields['Email']]
+        field = update_user_details_form.selectbox('Field' if 'Field' not in fields else fields['Field'], 
+                                                   update_user_details_form_fields)
+        new_value = update_user_details_form.text_input('New value' if 'New value' not in fields else fields['New value'])
 
-        if update_user_details_form.form_submit_button('Update'):
+        if update_user_details_form_fields.index(field) == 0:
+            field = 'name'
+        elif update_user_details_form_fields.index(field) == 1:
+            field = 'email'
+
+        if update_user_details_form.form_submit_button('Update' if 'Update' not in fields else fields['Update']):
             if len(new_value) > 0:
+                if field == 'name':
+                    if not self.validator.validate_name(new_value):
+                        raise UpdateError('Name is not valid')
+                if field == 'email':
+                    if not self.validator.validate_email(new_value):
+                        raise UpdateError('Email is not valid')
+                    if new_value in json.dumps(self.credentials['usernames']):
+                        raise UpdateError('Email already taken')
                 if new_value != self.credentials['usernames'][self.username][field]:
                     self._update_entry(self.username, field, new_value)
                     if field == 'name':
