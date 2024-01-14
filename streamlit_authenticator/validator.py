@@ -49,4 +49,5 @@ class Validator:
         bool
             Validity of entered email.
         """
-        return "@" in email and 2 < len(email) < 320 and len(email.split('@')[1]) > 2 and '.' in email.split('@')[1] and len(email.split('@')[1].split('.')[1]) > 0
+        pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+        return "@" in email and 2 < len(email) < 320 and bool(re.match(pattern, email))
