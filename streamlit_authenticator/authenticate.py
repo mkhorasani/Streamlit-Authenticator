@@ -9,7 +9,7 @@ from hasher import Hasher
 from validator import Validator
 from utils import generate_random_pw
 
-from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
+from exceptions import CredentialsError, ForgotError, LoginError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
     """
@@ -44,7 +44,7 @@ class Authenticate:
         self.preauthorized = preauthorized
         self.cookie_manager = stx.CookieManager()
         self.validator = validator if validator is not None else Validator()
-
+        
         if 'name' not in st.session_state:
             st.session_state['name'] = None
         if 'authentication_status' not in st.session_state:
@@ -146,6 +146,9 @@ class Authenticate:
         bool
             Validity of entered credentials.
         """
+        if isinstance(self.max_concurrent_users, int):
+            if self._count_concurrent_users() > self.max_concurrent_users - 1:
+                raise(LoginError('Maximum number of concurrent users exceeded'))
         if self.username in self.credentials['usernames']:
             try:
                 if self._check_pw():
@@ -159,6 +162,10 @@ class Authenticate:
                     else:
                         return True
                     self._record_failed_login_attempts(reset=True)
+                    if 'meta' not in self.credentials['usernames'][self.username]:
+                        self.credentials['usernames'][self.username]['meta'] = {'logged_in': True}
+                    else:
+                        self.credentials['usernames'][self.username]['meta']['logged_in'] = True
                 else:
                     if inplace:
                         st.session_state['authentication_status'] = False
@@ -174,8 +181,23 @@ class Authenticate:
                 return False
             self._record_failed_login_attempts()
 
+    def _count_concurrent_users(self):
+        """
+        Counts the number of users logged in concurrently.
+
+        Returns
+        -------
+        int
+            Number of users logged in concurrently.
+        """
+        concurrent_users = 0
+        for username, _ in self.credentials['usernames'].items():
+            if self.credentials['usernames'][username]['meta']['logged_in']:
+                concurrent_users += 1
+        return concurrent_users
+
     def login(self, fields: dict={'Form name':'Login', 'Username':'Username', 'Password':'Password',
-                                  'Login':'Login'}, location: str='main') -> tuple:
+                                  'Login':'Login'}, location: str='main', max_concurrent_users: int=None) -> tuple:
         """
         Creates a login widget.
 
@@ -185,6 +207,8 @@ class Authenticate:
             The rendered names of the fields/buttons.
         location: str
             The location of the login form i.e. main or sidebar.
+        max_concurrent_users: int
+            The number of maximum users allowed to login concurrently.
         Returns
         -------
         str
@@ -195,6 +219,8 @@ class Authenticate:
         str
             Username of the authenticated user.
         """
+        self.max_concurrent_users = max_concurrent_users
+
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
@@ -214,6 +240,17 @@ class Authenticate:
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
 
+    def _generate_logout(self):
+        """
+        Clears cookie and session state variables associated with the logged in user.
+        """
+        self.cookie_manager.delete(self.cookie_name)
+        self.credentials['usernames'][st.session_state['username']]['meta']['logged_in'] = False
+        st.session_state['logout'] = True
+        st.session_state['name'] = None
+        st.session_state['username'] = None
+        st.session_state['authentication_status'] = None
+
     def logout(self, button_name: str='Logout', location: str='main', key: str=None):
         """
         Creates a logout button.
@@ -229,25 +266,13 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
         if location == 'main':
             if st.button(button_name, key):
-                self.cookie_manager.delete(self.cookie_name)
-                st.session_state['logout'] = True
-                st.session_state['name'] = None
-                st.session_state['username'] = None
-                st.session_state['authentication_status'] = None
+                self._generate_logout()
         elif location == 'sidebar':
             if st.sidebar.button(button_name, key):
-                self.cookie_manager.delete(self.cookie_name)
-                st.session_state['logout'] = True
-                st.session_state['name'] = None
-                st.session_state['username'] = None
-                st.session_state['authentication_status'] = None
+                self._generate_logout()
         elif location == 'unrendered':
             if st.session_state['authentication_status']:
-                self.cookie_manager.delete(self.cookie_name)
-                st.session_state['logout'] = True
-                st.session_state['name'] = None
-                st.session_state['username'] = None
-                st.session_state['authentication_status'] = None            
+                self._generate_logout()
 
     def _update_password(self, username: str, password: str):
         """

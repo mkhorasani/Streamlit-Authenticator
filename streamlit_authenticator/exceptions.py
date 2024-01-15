@@ -10,9 +10,22 @@ class CredentialsError(Exception):
         else:
             super().__init__('Username/password is incorrect')
 
-class ResetError(Exception):
+class ForgotError(Exception):
     """
-    Exceptions raised for the password reset widget.
+    Exceptions raised for the forgotten username/password widgets.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+class LoginError(Exception):
+    """
+    Exceptions raised for the Login widget.
 
     Attributes
     ----------
@@ -36,9 +49,9 @@ class RegisterError(Exception):
         self.message = message
         super().__init__(self.message)
 
-class ForgotError(Exception):
+class ResetError(Exception):
     """
-    Exceptions raised for the forgotten username/password widgets.
+    Exceptions raised for the password reset widget.
 
     Attributes
     ----------
