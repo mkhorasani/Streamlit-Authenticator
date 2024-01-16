@@ -120,6 +120,10 @@ class Authenticate:
                             st.session_state['name'] = self.token['name']
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
+                            if 'meta' not in self.credentials['usernames'][self.username]:
+                                self.credentials['usernames'][self.username]['meta'] = {'logged_in': True}
+                            else:
+                                self.credentials['usernames'][self.username]['meta']['logged_in'] = True
     
     def _record_failed_login_attempts(self, reset: bool=False):
         """
@@ -240,12 +244,14 @@ class Authenticate:
 
         return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
 
-    def _generate_logout(self):
+    def _implement_logout(self):
         """
         Clears cookie and session state variables associated with the logged in user.
         """
         self.cookie_manager.delete(self.cookie_name)
-        self.credentials['usernames'][st.session_state['username']]['meta']['logged_in'] = False
+        if 'meta' in self.credentials['usernames'][st.session_state['username']]:
+            if 'logged_in' in self.credentials['usernames'][st.session_state['username']]['meta']:
+                self.credentials['usernames'][st.session_state['username']]['meta']['logged_in'] = False
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
@@ -272,7 +278,7 @@ class Authenticate:
                 self._generate_logout()
         elif location == 'unrendered':
             if st.session_state['authentication_status']:
-                self._generate_logout()
+                self._implement_logout()
 
     def _update_password(self, username: str, password: str):
         """
