@@ -272,10 +272,10 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
         if location == 'main':
             if st.button(button_name, key):
-                self._generate_logout()
+                self._implement_logout()
         elif location == 'sidebar':
             if st.sidebar.button(button_name, key):
-                self._generate_logout()
+                self._implement_logout()
         elif location == 'unrendered':
             if st.session_state['authentication_status']:
                 self._implement_logout()
