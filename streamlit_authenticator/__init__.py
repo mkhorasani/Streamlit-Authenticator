@@ -21,12 +21,13 @@ if not _RELEASE:
         config['cookie']['name'], 
         config['cookie']['key'], 
         config['cookie']['expiry_days'],
+        config['cookie']['domain'],
         config['preauthorized']
     )
 
     # creating a login widget
     try:
-        authenticator.login(location='main', max_concurrent_users=0)
+        authenticator.login(location='main', max_concurrent_users=1)
     except Exception as e:
         st.error(e)
         

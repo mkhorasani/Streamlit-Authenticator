@@ -1,6 +1,6 @@
 import jwt
-import json
 import bcrypt
+import secrets
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
@@ -8,7 +8,6 @@ import extra_streamlit_components as stx
 from hasher import Hasher
 from validator import Validator
 from utils import generate_random_pw
-
 from exceptions import CredentialsError, ForgotError, LoginError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
@@ -17,7 +16,7 @@ class Authenticate:
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: float=30.0, 
-        preauthorized: list=None, validator: Validator=None):
+        domain: str=None, preauthorized: list=None, validator: Validator=None):
         """
         Create a new instance of "Authenticate".
 
@@ -31,6 +30,8 @@ class Authenticate:
             The key to be used for hashing the signature of the JWT cookie.
         cookie_expiry_days: float
             The number of days before the cookie expires on the client's browser.
+        domain: str
+            The specified domain for the cookie (sub.domain.com or .allsubdomains.com).
         preauthorized: list
             The list of emails of unregistered users authorized to register.
         validator: Validator
@@ -41,9 +42,16 @@ class Authenticate:
         self.cookie_name = cookie_name
         self.key = key
         self.cookie_expiry_days = cookie_expiry_days
+        self.domain = domain
         self.preauthorized = preauthorized
         self.cookie_manager = stx.CookieManager()
         self.validator = validator if validator is not None else Validator()
+
+        for username, _ in self.credentials['usernames'].items():
+            if 'logged_in' not in self.credentials['usernames'][username]:
+                self.credentials['usernames'][username]['logged_in'] = False
+            if 'id' not in self.credentials['usernames'][username]:
+                self.credentials['usernames'][username]['id'] = secrets.token_hex(32//2)
         
         if 'name' not in st.session_state:
             st.session_state['name'] = None
@@ -65,9 +73,11 @@ class Authenticate:
         str
             The JWT cookie for passwordless reauthentication.
         """
-        return jwt.encode({'name':st.session_state['name'],
-            'username':st.session_state['username'],
-            'exp_date':self.exp_date}, self.key, algorithm='HS256')
+        # return jwt.encode({'name':st.session_state['name'],
+        #     'username':st.session_state['username'],
+        #     'exp_date':self.exp_date}, self.key, algorithm='HS256')
+        return jwt.encode({'id': self.credentials['usernames'][self.username]['id'],
+            'exp_date': self.exp_date}, self.key, algorithm='HS256')
 
     def _token_decode(self) -> str:
         """
@@ -116,14 +126,11 @@ class Authenticate:
             if self.token is not False:
                 if not st.session_state['logout']:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
-                        if 'name' and 'username' in self.token:
-                            st.session_state['name'] = self.token['name']
-                            st.session_state['username'] = self.token['username']
+                        if 'id' in self.token:
+                            st.session_state['username'] = self._get_username('id', self.token['id'])
+                            st.session_state['name'] = self.credentials['usernames'][st.session_state['username']]['name']
                             st.session_state['authentication_status'] = True
-                            if 'meta' not in self.credentials['usernames'][self.username]:
-                                self.credentials['usernames'][self.username]['meta'] = {'logged_in': True}
-                            else:
-                                self.credentials['usernames'][self.username]['meta']['logged_in'] = True
+                            self.credentials['usernames'][st.session_state['username']]['logged_in'] = True
     
     def _record_failed_login_attempts(self, reset: bool=False):
         """
@@ -160,16 +167,13 @@ class Authenticate:
                         st.session_state['name'] = self.credentials['usernames'][self.username]['name']
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
-                        self.cookie_manager.set(self.cookie_name, self.token,
+                        self.cookie_manager.set(self.cookie_name, self.token, domain=self.domain,
                             expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                         st.session_state['authentication_status'] = True
                     else:
                         return True
                     self._record_failed_login_attempts(reset=True)
-                    if 'meta' not in self.credentials['usernames'][self.username]:
-                        self.credentials['usernames'][self.username]['meta'] = {'logged_in': True}
-                    else:
-                        self.credentials['usernames'][self.username]['meta']['logged_in'] = True
+                    self.credentials['usernames'][self.username]['logged_in'] = True
                 else:
                     if inplace:
                         st.session_state['authentication_status'] = False
@@ -196,7 +200,7 @@ class Authenticate:
         """
         concurrent_users = 0
         for username, _ in self.credentials['usernames'].items():
-            if self.credentials['usernames'][username]['meta']['logged_in']:
+            if self.credentials['usernames'][username]['logged_in']:
                 concurrent_users += 1
         return concurrent_users
 
@@ -249,9 +253,7 @@ class Authenticate:
         Clears cookie and session state variables associated with the logged in user.
         """
         self.cookie_manager.delete(self.cookie_name)
-        if 'meta' in self.credentials['usernames'][st.session_state['username']]:
-            if 'logged_in' in self.credentials['usernames'][st.session_state['username']]['meta']:
-                self.credentials['usernames'][st.session_state['username']]['meta']['logged_in'] = False
+        self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
@@ -345,6 +347,21 @@ class Authenticate:
             else:
                 raise CredentialsError('password')
     
+    def _credentials_contains_value(self, value):
+        """
+        Checks to see if a value is present in the credentials dictionary.
+
+        Parameters
+        ----------
+        value: str
+            The value being checked.
+        Returns
+        -------
+        bool
+            The presence/absence of the value, True: value present, False value absent.
+        """
+        return any(value in d.values() for d in self.credentials['usernames'].values())
+
     def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool, domains: list):
         """
         Adds to credentials dictionary the new user's information.
@@ -368,7 +385,7 @@ class Authenticate:
         """
         if not self.validator.validate_email(email):
             raise RegisterError('Email is not valid')
-        if email in json.dumps(self.credentials['usernames']):
+        if self._credentials_contains_value(email):
             raise RegisterError('Email already taken')
         if domains:
             if email.split('@')[1] not in ' '.join(domains):
@@ -379,9 +396,9 @@ class Authenticate:
             raise RegisterError('Username already taken')
         if not self.validator.validate_name(name):
             raise RegisterError('Name is not valid')
-
-        self.credentials['usernames'][username] = {'name': name, 
-            'password': Hasher([password]).generate()[0], 'email': email, 'meta': None}
+        self.credentials['usernames'][username] = {'name': name, 'password': Hasher([password]).generate()[0], 
+                                                   'email': email, 'logged_in': False,
+                                                   'id': secrets.token_hex(32//2)}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
@@ -513,8 +530,8 @@ class Authenticate:
         str
             Username associated with given key, value pair i.e. "jsmith".
         """
-        for username, entries in self.credentials['usernames'].items():
-            if entries[key] == value:
+        for username, values in self.credentials['usernames'].items():
+            if values[key] == value:
                 return username
         return False
 
@@ -616,7 +633,7 @@ class Authenticate:
                 if field == 'email':
                     if not self.validator.validate_email(new_value):
                         raise UpdateError('Email is not valid')
-                    if new_value in json.dumps(self.credentials['usernames']):
+                    if self._credentials_contains_value(new_value):
                         raise UpdateError('Email already taken')
                 if new_value != self.credentials['usernames'][self.username][field]:
                     self._update_entry(self.username, field, new_value)
@@ -624,7 +641,7 @@ class Authenticate:
                             st.session_state['name'] = new_value
                             self.exp_date = self._set_exp_date()
                             self.token = self._token_encode()
-                            self.cookie_manager.set(self.cookie_name, self.token,
+                            self.cookie_manager.set(self.cookie_name, self.token, domain=self.domain,
                             expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                     return True
                 else:
