@@ -2,6 +2,7 @@ import jwt
 import bcrypt
 import secrets
 import streamlit as st
+from typing import Optional
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 
@@ -16,7 +17,7 @@ class Authenticate:
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: float=30.0, 
-        domain: str=None, preauthorized: list=None, validator: Validator=None):
+        domain: Optional[str]=None, preauthorized: Optional[list]=None, validator: Optional[Validator]=None):
         """
         Create a new instance of "Authenticate".
 
@@ -205,7 +206,7 @@ class Authenticate:
         return concurrent_users
 
     def login(self, fields: dict={'Form name':'Login', 'Username':'Username', 'Password':'Password',
-                                  'Login':'Login'}, location: str='main', max_concurrent_users: int=None) -> tuple:
+                                  'Login':'Login'}, location: str='main', max_concurrent_users: Optional[int]=None) -> tuple:
         """
         Creates a login widget.
 
@@ -259,7 +260,7 @@ class Authenticate:
         st.session_state['username'] = None
         st.session_state['authentication_status'] = None
 
-    def logout(self, button_name: str='Logout', location: str='main', key: str=None):
+    def logout(self, button_name: str='Logout', location: str='main', key: Optional[str]=None):
         """
         Creates a logout button.
 
@@ -405,7 +406,7 @@ class Authenticate:
     def register_user(self, fields: dict={'Form name':'Register User', 'Email':'Email', 'Username':'Username', 
                                           'Password':'Password', 'Repeat Password':'Repeat password',
                                           'Register':'Register'}, location: str='main', 
-                                          preauthorization=True, domains: list=None) -> bool:
+                                          preauthorization=True, domains: Optional[list]=None) -> bool:
         """
         Creates a register new user widget.
 
