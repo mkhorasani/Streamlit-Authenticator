@@ -50,6 +50,8 @@ class Authenticate:
                 self.credentials['usernames'][username]['logged_in'] = False
             if 'id' not in self.credentials['usernames'][username]:
                 self.credentials['usernames'][username]['id'] = secrets.token_hex(32//2)
+            if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
+                self.credentials['usernames'][username]['password'] = Hasher._hash(self.credentials['usernames'][username]['password'])
         
         if 'name' not in st.session_state:
             st.session_state['name'] = None

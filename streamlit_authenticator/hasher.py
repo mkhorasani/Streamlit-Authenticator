@@ -1,3 +1,5 @@
+
+import re
 import bcrypt
 
 class Hasher:
@@ -15,6 +17,7 @@ class Hasher:
         """
         self.passwords = passwords
 
+    @classmethod
     def _hash(self, password: str) -> str:
         """
         Hashes the plain text password.
@@ -40,3 +43,16 @@ class Hasher:
             The list of hashed passwords.
         """
         return [self._hash(password) for password in self.passwords]
+    
+    @classmethod
+    def _is_hash(self, hash_string: str) -> bool:
+        """
+        Determines if a string is a hash.
+
+        Returns
+        -------
+        bool
+            The validity of the hash string.
+        """
+        bcrypt_regex = re.compile(r'^\$2[aby]\$\d+\$.{53}$')
+        return bool(bcrypt_regex.match(hash_string))
