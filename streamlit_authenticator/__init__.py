@@ -21,11 +21,10 @@ if not _RELEASE:
         config['cookie']['name'], 
         config['cookie']['key'], 
         config['cookie']['expiry_days'],
-        config['cookie']['domain'],
         config['preauthorized']
     )
 
-    # creating a login widget
+    # Creating a login widget
     try:
         authenticator.login(location='main', max_concurrent_users=1)
     except Exception as e:
@@ -50,7 +49,8 @@ if not _RELEASE:
 
     # Creating a new user registration widget
     try:
-        if authenticator.register_user(preauthorization=False):
+        email_register_user, username_register_user, name_register_user = authenticator.register_user(preauthorization=False)
+        if email_register_user:
             st.success('User registered successfully')
     except Exception as e:
         st.error(e)

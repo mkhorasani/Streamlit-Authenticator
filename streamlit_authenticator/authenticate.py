@@ -17,7 +17,7 @@ class Authenticate:
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: float=30.0, 
-        domain: Optional[str]=None, preauthorized: Optional[list]=None, validator: Optional[Validator]=None):
+        preauthorized: Optional[list]=None, validator: Optional[Validator]=None):
         """
         Create a new instance of "Authenticate".
 
@@ -31,22 +31,19 @@ class Authenticate:
             The key to be used for hashing the signature of the JWT cookie.
         cookie_expiry_days: float
             The number of days before the cookie expires on the client's browser.
-        domain: str
-            The specified domain for the cookie (sub.domain.com or .allsubdomains.com).
         preauthorized: list
             The list of emails of unregistered users authorized to register.
         validator: Validator
             A Validator object that checks the validity of the username, name, and email fields.
         """
-        self.credentials = credentials
-        self.credentials['usernames'] = {key.lower(): value for key, value in credentials['usernames'].items()}
-        self.cookie_name = cookie_name
-        self.key = key
-        self.cookie_expiry_days = cookie_expiry_days
-        self.domain = domain
-        self.preauthorized = preauthorized
-        self.cookie_manager = stx.CookieManager()
-        self.validator = validator if validator is not None else Validator()
+        self.credentials                =   credentials
+        self.credentials['usernames']   =   {key.lower(): value for key, value in credentials['usernames'].items()}
+        self.cookie_name                =   cookie_name
+        self.key                        =   key
+        self.cookie_expiry_days         =   cookie_expiry_days
+        self.preauthorized              =   preauthorized
+        self.cookie_manager             =   stx.CookieManager()
+        self.validator                  =   validator if validator is not None else Validator()
 
         for username, _ in self.credentials['usernames'].items():
             if 'logged_in' not in self.credentials['usernames'][username]:
@@ -74,9 +71,6 @@ class Authenticate:
         str
             The JWT cookie for passwordless reauthentication.
         """
-        # return jwt.encode({'name':st.session_state['name'],
-        #     'username':st.session_state['username'],
-        #     'exp_date':self.exp_date}, self.key, algorithm='HS256')
         return jwt.encode({'id': self.credentials['usernames'][self.username]['id'],
             'exp_date': self.exp_date}, self.key, algorithm='HS256')
 
@@ -168,7 +162,7 @@ class Authenticate:
                         st.session_state['name'] = self.credentials['usernames'][self.username]['name']
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
-                        self.cookie_manager.set(self.cookie_name, self.token, domain=self.domain,
+                        self.cookie_manager.set(self.cookie_name, self.token,
                             expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                         st.session_state['authentication_status'] = True
                     else:
@@ -424,8 +418,12 @@ class Authenticate:
             None: any domain is allowed
         Returns
         -------
-        bool
-            The status of registering the new user, True: user registered successfully.
+        str
+            Email associated with new user.
+        str
+            Username associated with new user.
+        str
+            Name associated with new user.
         """
         if preauthorization:
             if not self.preauthorized:
@@ -452,12 +450,13 @@ class Authenticate:
             if preauthorization:
                 if new_email in self.preauthorized['emails']:
                     self._register_credentials(new_username, new_name, new_password, new_email, preauthorization, domains)
-                    return True
+                    return new_email, new_username, new_name
                 else:
                     raise RegisterError('User not preauthorized to register')
             else:
                 self._register_credentials(new_username, new_name, new_password, new_email, preauthorization, domains)
-                return True                                                               
+                return new_email, new_username, new_name
+        return None, None, None                                                               
 
     def _set_random_password(self, username: str) -> str:
         """
@@ -642,7 +641,7 @@ class Authenticate:
                             st.session_state['name'] = new_value
                             self.exp_date = self._set_exp_date()
                             self.token = self._token_encode()
-                            self.cookie_manager.set(self.cookie_name, self.token, domain=self.domain,
+                            self.cookie_manager.set(self.cookie_name, self.token,
                             expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                     return True
                 else:
