@@ -292,7 +292,7 @@ if st.session_state["authentication_status"]:
 >    - Specifies the username of the user to update user details for.
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the update user details widget.
->  - **fields:** _dict, default {'Form name':'Update user details', 'Field':'Field', 'New value':'New value', 'Update':'Update', 'Name':'Name', 'Email':'Email'}_
+>  - **fields:** _dict, default {'Form name':'Update user details', 'Field':'Field', 'Name':'Name', 'Email':'Email', 'New value':'New value', 'Update':'Update'}_
 >    - Customizes the text of headers, buttons and other fields.
 > #### Returns:
 > - _bool_

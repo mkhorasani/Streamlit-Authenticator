@@ -610,11 +610,11 @@ class Authenticate:
         self.credentials['usernames'][username][key] = value
 
     def update_user_details(self, username: str, location: str='main', fields: dict={'Form name':'Update user details',
-                                                                                     'Field':'Field', 
-                                                                                     'New value':'New value', 
-                                                                                     'Update':'Update', 
+                                                                                     'Field':'Field',
                                                                                      'Name':'Name', 
-                                                                                     'Email':'Email'}, ) -> bool:
+                                                                                     'Email':'Email', 
+                                                                                     'New value':'New value', 
+                                                                                     'Update':'Update'}) -> bool:
         """
         Creates a update user details widget.
 
