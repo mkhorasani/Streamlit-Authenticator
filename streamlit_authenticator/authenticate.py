@@ -24,15 +24,15 @@ class Authenticate:
         Parameters
         ----------
         credentials: dict
-            The dictionary of usernames, names, passwords, and emails.
+            The dictionary of usernames, names, passwords, emails, and other user data.
         cookie_name: str
             The name of the JWT cookie stored on the client's browser for passwordless reauthentication.
         key: str
-            The key to be used for hashing the signature of the JWT cookie.
+            The key to be used to hash the signature of the JWT cookie.
         cookie_expiry_days: float
-            The number of days before the cookie expires on the client's browser.
+            The number of days before the reauthentication cookie automatically expires on the client's browser.
         preauthorized: list
-            The list of emails of unregistered users authorized to register.
+            The list of emails of unregistered users who are authorized to register.
         validator: Validator
             A Validator object that checks the validity of the username, name, and email fields.
         """
@@ -149,6 +149,7 @@ class Authenticate:
         inplace: bool
             Inplace setting, True: authentication status will be stored in session state, 
             False: authentication status will be returned as bool.
+
         Returns
         -------
         bool
@@ -201,19 +202,22 @@ class Authenticate:
                 concurrent_users += 1
         return concurrent_users
 
-    def login(self, fields: dict={'Form name':'Login', 'Username':'Username', 'Password':'Password',
-                                  'Login':'Login'}, location: str='main', max_concurrent_users: Optional[int]=None) -> tuple:
+    def login(self, location: str='main', max_concurrent_users: Optional[int]=None, fields: dict={'Form name':'Login', 
+                                                                                                  'Username':'Username', 
+                                                                                                  'Password':'Password',
+                                                                                                  'Login':'Login'}) -> tuple:
         """
         Creates a login widget.
 
         Parameters
         ----------
-        fields: dict
-            The rendered names of the fields/buttons.
         location: str
-            The location of the login form i.e. main or sidebar.
+            The location of the login widget i.e. main or sidebar.
         max_concurrent_users: int
             The number of maximum users allowed to login concurrently.
+        fields: dict
+            The rendered names of the fields/buttons.
+
         Returns
         -------
         str
@@ -238,7 +242,8 @@ class Authenticate:
                 login_form.subheader('Login' if 'Form name' not in fields else fields['Form name'])
                 self.username = login_form.text_input('Username' if 'Username' not in fields else fields['Username']).lower()
                 st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password' if 'Password' not in fields else fields['Password'], type='password')
+                self.password = login_form.text_input('Password' if 'Password' not in fields else fields['Password'],
+                                                       type='password')
 
                 if login_form.form_submit_button('Login' if 'Login' not in fields else fields['Login']):
                     self._check_credentials()
@@ -266,6 +271,8 @@ class Authenticate:
             The rendered name of the logout button.
         location: str
             The location of the logout button i.e. main or sidebar or unrendered.
+        key: str
+            A unique key to be used in multipage applications.
         """
         if location not in ['main', 'sidebar','unrendered']:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
@@ -292,12 +299,11 @@ class Authenticate:
         """
         self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
 
-    def reset_password(self, username: str, fields: dict={'Form name':'Reset password', 
-                                                          'Current password':'Current password', 
-                                                          'New password':'New password',
-                                                          'Repeat password':'Repeat password',
-                                                          'Reset':'Reset'}, 
-                                                          location: str='main') -> bool:
+    def reset_password(self, username: str, location: str='main', fields: dict={'Form name':'Reset password', 
+                                                                                'Current password':'Current password', 
+                                                                                'New password':'New password',
+                                                                                'Repeat password':'Repeat password',
+                                                                                'Reset':'Reset'} ) -> bool:
         """
         Creates a password reset widget.
 
@@ -305,13 +311,14 @@ class Authenticate:
         ----------
         username: str
             The username of the user to reset the password for.
+        location: str
+            The location of the password reset widget i.e. main or sidebar.
         fields: dict
             The rendered names of the fields/buttons.
-        location: str
-            The location of the password reset form i.e. main or sidebar.
+
         Returns
         -------
-        str
+        bool
             The status of resetting the password.
         """
         if location not in ['main', 'sidebar']:
@@ -352,6 +359,7 @@ class Authenticate:
         ----------
         value: str
             The value being checked.
+
         Returns
         -------
         bool
@@ -359,7 +367,8 @@ class Authenticate:
         """
         return any(value in d.values() for d in self.credentials['usernames'].values())
 
-    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool, domains: list):
+    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool,
+                               domains: list):
         """
         Adds to credentials dictionary the new user's information.
 
@@ -399,25 +408,29 @@ class Authenticate:
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
-    def register_user(self, fields: dict={'Form name':'Register User', 'Email':'Email', 'Username':'Username', 
-                                          'Password':'Password', 'Repeat Password':'Repeat password',
-                                          'Register':'Register'}, location: str='main', 
-                                          preauthorization=True, domains: Optional[list]=None) -> bool:
+    def register_user(self, location: str='main', preauthorization: bool=True, domains: Optional[list]=None, 
+                      fields: dict={'Form name':'Register User', 
+                                    'Email':'Email', 
+                                    'Username':'Username', 
+                                    'Password':'Password', 
+                                    'Repeat password':'Repeat password',
+                                    'Register':'Register'}) -> bool:
         """
         Creates a register new user widget.
 
         Parameters
         ----------
-        fields: dict
-            The rendered names of the fields/buttons.
         location: str
-            The location of the register new user form i.e. main or sidebar.
+            The location of the register new user widget i.e. main or sidebar.
         preauthorization: bool
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         domains: list
             The required list of domains a new email must belong to, list: the required list of domains
             None: any domain is allowed
+        fields: dict
+            The rendered names of the fields/buttons.
+
         Returns
         -------
         str
@@ -442,7 +455,8 @@ class Authenticate:
         new_username = register_user_form.text_input('Username' if 'Username' not in fields else fields['Username']).lower()
         new_name = register_user_form.text_input('Name' if 'Name' not in fields else fields['Name'])
         new_password = register_user_form.text_input('Password' if 'Password' not in fields else fields['Password'], type='password')
-        new_password_repeat = register_user_form.text_input('Repeat password' if 'Repeat password' not in fields else fields['Repeat password'], type='password')
+        new_password_repeat = register_user_form.text_input('Repeat password' if 'Repeat password' not in fields else fields['Repeat password'],
+                                                             type='password')
         
         if register_user_form.form_submit_button('Register' if 'Register' not in fields else fields['Register']):
             if len(new_password) == 0 or len(new_password_repeat) == 0:
@@ -451,12 +465,14 @@ class Authenticate:
                 raise RegisterError('Passwords do not match')
             if preauthorization:
                 if new_email in self.preauthorized['emails']:
-                    self._register_credentials(new_username, new_name, new_password, new_email, preauthorization, domains)
+                    self._register_credentials(new_username, new_name, new_password, new_email, 
+                                               preauthorization, domains)
                     return new_email, new_username, new_name
                 else:
                     raise RegisterError('User not preauthorized to register')
             else:
-                self._register_credentials(new_username, new_name, new_password, new_email, preauthorization, domains)
+                self._register_credentials(new_username, new_name, new_password, new_email, 
+                                           preauthorization, domains)
                 return new_email, new_username, new_name
         return None, None, None                                                               
 
@@ -468,6 +484,7 @@ class Authenticate:
         ----------
         username: str
             Username of user to set random password for.
+
         Returns
         -------
         str
@@ -477,23 +494,25 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def forgot_password(self, fields: dict={'Form name':'Forgot password', 'Username':'Username', 'Submit':'Submit'},
-                         location: str='main') -> tuple:
+    def forgot_password(self, location: str='main', fields: dict={'Form name':'Forgot password', 
+                                                                  'Username':'Username', 
+                                                                  'Submit':'Submit'}, ) -> tuple:
         """
         Creates a forgot password widget.
 
         Parameters
         ----------
+        location: str
+            The location of the forgot password widget i.e. main or sidebar.
         fields: dict
             The rendered names of the fields/buttons.
-        location: str
-            The location of the forgot password form i.e. main or sidebar.
+
         Returns
         -------
         str
-            Username associated with forgotten password.
+            Username associated with the forgotten password.
         str
-            Email associated with forgotten password.
+            Email associated with the forgotten password.
         str
             New plain text password that should be transferred to user securely.
         """
@@ -527,6 +546,7 @@ class Authenticate:
             Name of the credential to query i.e. "email".
         value: str
             Value of the queried credential i.e. "jsmith@gmail.com".
+
         Returns
         -------
         str
@@ -537,17 +557,19 @@ class Authenticate:
                 return username
         return False
 
-    def forgot_username(self, fields: dict={'Form name':'Forgot username', 'Email':'Email', 'Submit':'Submit'}, 
-                        location: str='main') -> tuple:
+    def forgot_username(self, location: str='main', fields: dict={'Form name':'Forgot username', 
+                                                                  'Email':'Email', 
+                                                                  'Submit':'Submit'}) -> tuple:
         """
         Creates a forgot username widget.
 
         Parameters
         ----------
+        location: str
+            The location of the forgot username widget i.e. main or sidebar.
         fields: dict
             The rendered names of the fields/buttons.
-        location: str
-            The location of the forgot username form i.e. main or sidebar.
+
         Returns
         -------
         str
@@ -587,10 +609,12 @@ class Authenticate:
         """
         self.credentials['usernames'][username][key] = value
 
-    def update_user_details(self, username: str, fields: dict={'Form name':'Update user details',
-                                                               'Field':'Field', 'New value':'New value', 
-                                                               'Update':'Update', 'Name':'Name', 'Email':'Email'}, 
-                                                               location: str='main') -> bool:
+    def update_user_details(self, username: str, location: str='main', fields: dict={'Form name':'Update user details',
+                                                                                     'Field':'Field', 
+                                                                                     'New value':'New value', 
+                                                                                     'Update':'Update', 
+                                                                                     'Name':'Name', 
+                                                                                     'Email':'Email'}, ) -> bool:
         """
         Creates a update user details widget.
 
@@ -598,14 +622,15 @@ class Authenticate:
         ----------
         username: str
             The username of the user to update user details for.
+        location: str
+            The location of the update user details widget i.e. main or sidebar.
         fields: dict
             The rendered names of the fields/buttons.
-        location: str
-            The location of the update user details form i.e. main or sidebar.
+
         Returns
         -------
-        str
-            The status of updating user details.
+        bool
+            The status of updating the user details.
         """
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")

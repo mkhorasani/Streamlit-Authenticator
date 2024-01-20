@@ -26,12 +26,12 @@ if not _RELEASE:
 
     # Creating a login widget
     try:
-        authenticator.login(location='main', max_concurrent_users=1)
+        authenticator.login()
     except Exception as e:
         st.error(e)
         
     if st.session_state["authentication_status"]:
-        authenticator.logout('Logout', 'main')
+        authenticator.logout()
         st.write(f'Welcome *{st.session_state["name"]}*')
         st.title('Some content')
     elif st.session_state["authentication_status"] is False:
