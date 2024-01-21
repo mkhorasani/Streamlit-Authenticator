@@ -132,6 +132,12 @@ class Authenticate:
     def _record_failed_login_attempts(self, reset: bool=False):
         """
         Records the number of failed login attempts for a given username.
+        
+        Parameters
+        ----------
+        reset: bool            
+            The reset failed login attempts option, True: number of failed login attempts for the user will be reset to 0, 
+            False: number of failed login attempts for the user will be incremented.
         """
         if self.username not in st.session_state['failed_login_attempts']:
             st.session_state['failed_login_attempts'][self.username] = 0
