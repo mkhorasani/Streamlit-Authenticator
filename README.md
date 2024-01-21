@@ -192,9 +192,9 @@ except Exception as e:
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the register user widget.
 >  - **preauthorization:** _bool, default True_
->    - Specifies tThe preauthorization requirement, True: user must be preauthorized to register, False: any user can register.
+>    - Specifies the preauthorization requirement, True: user must be preauthorized to register, False: any user can register.
 >  - **domains:** _list, default None_
->    - Specifies the location of the register user form.
+>    - Specifies the required list of domains a new email must belong to i.e. gmail.com, list: the required list of domains None: any domain is allowed.
 >  - **fields:** _dict, default {'Form name':'Register user', 'Email':'Email', 'Username':'Username', 'Password':'Password', 'Repeat password':'Repeat password', 'Register':'Register'}_
 >    - Customizes the text of headers, buttons and other fields.
 > #### Returns:
