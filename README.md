@@ -111,7 +111,7 @@ authenticator.login()
 > - _str_
 >   - The username of the authenticated user.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
 ### 3. Authenticating users
 
@@ -139,11 +139,11 @@ elif st.session_state["authentication_status"] is None:
 >  - **key:** _str, default None_
 >    - A unique key that should be used in multipage applications.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.JPG)
 
 * Or prompt an unverified user to enter a correct username and password.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.JPG)
 
 
 ### 4. Creating a password reset widget
@@ -171,7 +171,7 @@ if st.session_state["authentication_status"]:
 > - _bool_
 >   - The status of resetting the password.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.JPG)
 
 _Please remember to update the config file (as shown in step 9) after you use this widget._
 
@@ -205,7 +205,7 @@ except Exception as e:
 > - _str_
 >   - The name associated with new user.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.JPG)
 
 _Please remember to update the config file (as shown in step 9) after you use this widget._
 
@@ -239,7 +239,7 @@ except Exception as e:
 > - _str_
 >   - The new plain text password that should be transferred to user securely.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.JPG)
 
 _Please remember to update the config file (as shown in step 9) after you use this widget._
 
@@ -271,7 +271,7 @@ except Exception as e:
 > - _str_
 >   - The email associated with the forgotten username.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.JPG)
 
 ### 8. Creating an update user details widget
 
@@ -298,7 +298,7 @@ if st.session_state["authentication_status"]:
 > - _bool_
 >   - The status of updating the user details.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.PNG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.JPG)
 
 _Please remember to update the config file (as shown in step 9) after you use this widget._
 

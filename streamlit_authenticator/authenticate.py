@@ -645,7 +645,7 @@ class Authenticate:
         elif location == 'sidebar':
             update_user_details_form = st.sidebar.form('Update user details')
         
-        update_user_details_form.subheader('Form name' if 'Form name' not in fields else fields['Form name'])
+        update_user_details_form.subheader('Update user details' if 'Form name' not in fields else fields['Form name'])
         self.username = username.lower()
         update_user_details_form_fields = ['Name' if 'Name' not in fields else fields['Name'],
                                            'Email' if 'Email' not in fields else fields['Email']]
