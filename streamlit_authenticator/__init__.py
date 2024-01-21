@@ -3,10 +3,10 @@ import streamlit as st
 from yaml.loader import SafeLoader
 import streamlit.components.v1 as components
 
-from hasher import Hasher
-from authenticate import Authenticate
+from .hasher import Hasher
+from .authenticate import Authenticate
 
-_RELEASE = False
+_RELEASE = True
 
 if not _RELEASE:
     # hashed_passwords = Hasher(['abc', 'def']).generate()
