@@ -386,7 +386,8 @@ class Authenticate:
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         domains: list
-            The required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], list: the required list of domains, None: any domain is allowed.
+            The required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], 
+            list: the required list of domains, None: any domain is allowed.
         """
         if not self.validator.validate_email(email):
             raise RegisterError('Email is not valid')
@@ -425,7 +426,8 @@ class Authenticate:
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         domains: list
-            The required list of domains a new email must belong to, list: the required list of domains, None: any domain is allowed.
+            The required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], 
+            list: the required list of domains, None: any domain is allowed.
         fields: dict
             The rendered names of the fields/buttons.
 
