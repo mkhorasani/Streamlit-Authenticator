@@ -87,7 +87,7 @@ authenticator = stauth.Authenticate(
 >  - **preauthorized:** _list, default None_
 >    - Provides the list of emails of unregistered users who are authorized to register.
 >  - **validator:** _object, default None_
->    - Provides a validator object that will check the validity of the username, name, and email fields..
+>    - Provides a validator object that will check the validity of the username, name, and email fields.
 
 * Then render the login module as follows.
 
