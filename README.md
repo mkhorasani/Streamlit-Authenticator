@@ -145,6 +145,7 @@ elif st.session_state["authentication_status"] is None:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.JPG)
 
+* You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state['failed_login_attempts']** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
 ### 4. Creating a password reset widget
 
