@@ -125,9 +125,9 @@ class Authenticate:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
                         if 'id' in self.token:
                             st.session_state['username'] = self._get_username('id', self.token['id'])
-                            st.session_state['name'] = self.credentials['usernames'][st.session_state['username']]['name']
+                            st.session_state['name'] = self.credentials['usernames'][self._get_username('id', self.token['id'])]['name']
                             st.session_state['authentication_status'] = True
-                            self.credentials['usernames'][st.session_state['username']]['logged_in'] = True
+                            self.credentials['usernames'][self._get_username('id', self.token['id'])]['logged_in'] = True
     
     def _record_failed_login_attempts(self, reset: bool=False):
         """
