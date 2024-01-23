@@ -16,7 +16,7 @@ long_description = get_readme_content()
 
 setuptools.setup(
     name="streamlit-authenticator",
-    version="0.2.4",
+    version="0.2.5",
     author="Mohammad Khorasani",
     author_email="khorasani.mohammad@gmail.com",
     description="A secure authentication module to validate user credentials in a Streamlit application.",

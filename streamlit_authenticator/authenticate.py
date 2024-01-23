@@ -9,7 +9,7 @@ import extra_streamlit_components as stx
 from .hasher import Hasher
 from .validator import Validator
 from .utils import generate_random_pw
-from .exceptions import CredentialsError, ForgotError, LoginError, RegisterError, ResetError, UpdateError
+from .exceptions import CredentialsError, DeprecationError, ForgotError, LoginError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
     """
@@ -237,7 +237,11 @@ class Authenticate:
         self.max_concurrent_users = max_concurrent_users
 
         if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+            # Temporary deprecation error to be displayed until later releases
+            raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
+                                   with the 'fields' parameter. For further information please refer to 
+                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#2-creating-a-login-widget""")
+            # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if not st.session_state['authentication_status']:
             self._check_cookie()
             if not st.session_state['authentication_status']:
@@ -328,7 +332,11 @@ class Authenticate:
             The status of resetting the password.
         """
         if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+            # Temporary deprecation error to be displayed until later releases
+            raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
+                                   with the 'fields' parameter. For further information please refer to 
+                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#4-creating-a-password-reset-widget""")
+            # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             reset_password_form = st.form('Reset password')
         elif location == 'sidebar':
@@ -440,17 +448,21 @@ class Authenticate:
         Returns
         -------
         str
-            Email associated with new user.
+            Email associated with the new user.
         str
-            Username associated with new user.
+            Username associated with the new user.
         str
-            Name associated with new user.
+            Name associated with the new user.
         """
         if preauthorization:
             if not self.preauthorized:
                 raise ValueError("preauthorization argument must not be None")
         if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+            # Temporary deprecation error to be displayed until later releases
+            raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
+                                   with the 'fields' parameter. For further information please refer to 
+                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#5-creating-a-new-user-registration-widget""")
+            # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             register_user_form = st.form('Register user')
         elif location == 'sidebar':
@@ -520,10 +532,14 @@ class Authenticate:
         str
             Email associated with the forgotten password.
         str
-            New plain text password that should be transferred to user securely.
+            New plain text password that should be transferred to the user securely.
         """
         if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+            # Temporary deprecation error to be displayed until later releases
+            raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
+                                   with the 'fields' parameter. For further information please refer to 
+                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#6-creating-a-forgot-password-widget""")
+            # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             forgot_password_form = st.form('Forgot password')
         elif location == 'sidebar':
@@ -584,7 +600,11 @@ class Authenticate:
             Email associated with forgotten username.
         """
         if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+            # Temporary deprecation error to be displayed until later releases
+            raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
+                                   with the 'fields' parameter. For further information please refer to 
+                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#7-creating-a-forgot-username-widget""")
+            # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             forgot_username_form = st.form('Forgot username')
         elif location == 'sidebar':
@@ -639,7 +659,11 @@ class Authenticate:
             The status of updating the user details.
         """
         if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
+            # Temporary deprecation error to be displayed until later releases
+            raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
+                                   with the 'fields' parameter. For further information please refer to 
+                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#8-creating-an-update-user-details-widget""")
+            # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             update_user_details_form = st.form('Update user details')
         elif location == 'sidebar':

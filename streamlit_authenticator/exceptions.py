@@ -10,6 +10,19 @@ class CredentialsError(Exception):
         else:
             super().__init__('Username/password is incorrect')
 
+class DeprecationError(Exception):
+    """
+    Exceptions raised for possible deprecations.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
 class ForgotError(Exception):
     """
     Exceptions raised for the forgotten username/password widgets.
