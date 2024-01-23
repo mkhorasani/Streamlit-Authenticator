@@ -219,7 +219,7 @@ try:
     username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password()
     if username_of_forgotten_password:
         st.success('New password to be sent securely')
-        # Random password should be transferred to user securely
+        # Random password should be transferred to the user securely
     else:
         st.error('Username not found')
 except Exception as e:
@@ -253,7 +253,7 @@ try:
     username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username()
     if username_of_forgotten_username:
         st.success('Username to be sent securely')
-        # Username should be transferred to user securely
+        # Username should be transferred to the user securely
     else:
         st.error('Email not found')
 except Exception as e:

@@ -60,7 +60,7 @@ if not _RELEASE:
         username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password()
         if username_forgot_pw:
             st.success('New password sent securely')
-            # Random password to be transferred to user securely
+            # Random password to be transferred to the user securely
         else:
             st.error('Username not found')
     except Exception as e:
@@ -71,7 +71,7 @@ if not _RELEASE:
         username_forgot_username, email_forgot_username = authenticator.forgot_username()
         if username_forgot_username:
             st.success('Username sent securely')
-            # Username to be transferred to user securely
+            # Username to be transferred to the user securely
         else:
             st.error('Email not found')
     except Exception as e:
