@@ -113,6 +113,8 @@ authenticator.login()
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
+_Please remember to update the config file (as shown in step 9) after you use this widget._
+
 ### 3. Authenticating users
 
 * You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]** to allow a verified user to proceed to any restricted content.
