@@ -37,10 +37,14 @@ credentials:
   usernames:
     jsmith:
       email: jsmith@gmail.com
+      id: # Will be generated automatically
+      logged_in: False # Will be managed automatically
       name: John Smith
       password: abc # Will be hashed automatically
     rbriggs:
       email: rbriggs@gmail.com
+      id: # Will be generated automatically
+      logged_in: False # Will be managed automatically
       name: Rebecca Briggs
       password: def # Will be hashed automatically
 cookie:
