@@ -311,7 +311,7 @@ _Please remember to update the config file (as shown in step 9) after you use th
 
 ### 9. Updating the configuration file
 
-* Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
+* Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **login**, **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
 ```python
 with open('../config.yaml', 'w') as file:
