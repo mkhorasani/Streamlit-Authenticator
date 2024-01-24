@@ -240,7 +240,7 @@ class Authenticate:
             # Temporary deprecation error to be displayed until later releases
             raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
                                    with the 'fields' parameter. For further information please refer to 
-                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#2-creating-a-login-widget""")
+                                   https://github.com/mkhorasani/Streamlit-Authenticator/tree/main?tab=readme-ov-file#authenticatelogin""")
             # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if not st.session_state['authentication_status']:
             self._check_cookie()
@@ -335,7 +335,7 @@ class Authenticate:
             # Temporary deprecation error to be displayed until later releases
             raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
                                    with the 'fields' parameter. For further information please refer to 
-                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#4-creating-a-password-reset-widget""")
+                                   https://github.com/mkhorasani/Streamlit-Authenticator/tree/main?tab=readme-ov-file#authenticatereset_password""")
             # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             reset_password_form = st.form('Reset password')
@@ -461,7 +461,7 @@ class Authenticate:
             # Temporary deprecation error to be displayed until later releases
             raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
                                    with the 'fields' parameter. For further information please refer to 
-                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#5-creating-a-new-user-registration-widget""")
+                                   https://github.com/mkhorasani/Streamlit-Authenticator/tree/main?tab=readme-ov-file#authenticateregister_user""")
             # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             register_user_form = st.form('Register user')
@@ -538,7 +538,7 @@ class Authenticate:
             # Temporary deprecation error to be displayed until later releases
             raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
                                    with the 'fields' parameter. For further information please refer to 
-                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#6-creating-a-forgot-password-widget""")
+                                   https://github.com/mkhorasani/Streamlit-Authenticator/tree/main?tab=readme-ov-file#authenticateforgot_password""")
             # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             forgot_password_form = st.form('Forgot password')
@@ -603,7 +603,7 @@ class Authenticate:
             # Temporary deprecation error to be displayed until later releases
             raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
                                    with the 'fields' parameter. For further information please refer to 
-                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#7-creating-a-forgot-username-widget""")
+                                   https://github.com/mkhorasani/Streamlit-Authenticator/tree/main?tab=readme-ov-file#authenticateforgot_username""")
             # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             forgot_username_form = st.form('Forgot username')
@@ -662,7 +662,7 @@ class Authenticate:
             # Temporary deprecation error to be displayed until later releases
             raise DeprecationError("""Likely deprecation error, the 'form_name' parameter has been replaced
                                    with the 'fields' parameter. For further information please refer to 
-                                   https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#8-creating-an-update-user-details-widget""")
+                                   https://github.com/mkhorasani/Streamlit-Authenticator/tree/main?tab=readme-ov-file#authenticateupdate_user_details""")
             # raise ValueError("Location must be one of 'main' or 'sidebar'") 
         if location == 'main':
             update_user_details_form = st.form('Update user details')
