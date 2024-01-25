@@ -6,25 +6,21 @@ credentials:
   usernames:
     dbaldwin:
       email: dbaldwin@gmail.com
-      id: ca90970cf526d790c97a64b09d660f12
       logged_in: false
       name: David Baldwin
       password: $2b$12$E9/bCaN/r8sN/FV2l8NpgOgspUBAp7UAVU6BgsXJzp/pW8gQWCprC
     jsmith:
       email: jsmith@gmail.com
-      id: 50ef3d9d78113cc9a7325749e097ddfe
       logged_in: false
       name: John Smith
       password: $2b$12$iWlVOac3uujRvTrXDi6wructXftKmo/GyQd6SMu5FmyX306kH.yFO
     rbriggs:
       email: rbriggs@gmail.com
-      id: d2fa54c414ab242c61f90c0e740e8fb9
       logged_in: false
       name: Rebecca Briggs
       password: $2b$12$uNaTgvGPG9rMbzOJHYaPQePw0DUfp1qHBrSq6l4O304qani6pKFpm
     rcouper:
       email: rcouper@gmail.com
-      id: b45fa7e87a32e536bf7ffda33d4ac2b3
       logged_in: false
       name: Ross Couper
       password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu

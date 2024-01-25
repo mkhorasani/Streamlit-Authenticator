@@ -31,20 +31,18 @@ import streamlit_authenticator as stauth
 * Initially create a YAML configuration file and define your user's credentials: including names, usernames, and passwords (plain text passwords will be hashed automatically).
 * In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable passwordless reauthentication. If you do not require reauthentication, you may set the number of days to expiry to 0.
 * Finally, define a list of preauthorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
-* **_Please remember to update the config file (as shown in step 9) after you use the login, reset_password, register_user, forgot_password, or update_user_details widgets._**
+* **_Please remember to update the config file (as shown in step 9) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
 ```python
 credentials:
   usernames:
     jsmith:
       email: jsmith@gmail.com
-      id: # Will be generated automatically
       logged_in: False # Will be managed automatically
       name: John Smith
       password: abc # Will be hashed automatically
     rbriggs:
       email: rbriggs@gmail.com
-      id: # Will be generated automatically
       logged_in: False # Will be managed automatically
       name: Rebecca Briggs
       password: def # Will be hashed automatically
@@ -57,7 +55,7 @@ preauthorized:
   - melsby@gmail.com
 ```
 
-_Please note that other fields including 'id' and 'logged_in' corresponding to the unique user ID and log in status will be added automatically to each user's dictionary._
+_Please note that the 'logged_in' field corresponding to each user's log-in status will be added automatically._
 
 ### 2. Creating a login widget
 
@@ -117,8 +115,6 @@ authenticator.login()
 >   - The username of the authenticated user.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
-
-_Please remember to update the config file (as shown in step 9) after you use this widget._
 
 ### 3. Authenticating users
 
@@ -312,7 +308,7 @@ _Please remember to update the config file (as shown in step 9) after you use th
 
 ### 9. Updating the configuration file
 
-* Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **login**, **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
+* Please ensure that the configuration file is resaved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
 ```python
 with open('../config.yaml', 'w') as file:

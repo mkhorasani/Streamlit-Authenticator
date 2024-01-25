@@ -48,8 +48,6 @@ class Authenticate:
         for username, _ in self.credentials['usernames'].items():
             if 'logged_in' not in self.credentials['usernames'][username]:
                 self.credentials['usernames'][username]['logged_in'] = False
-            if 'id' not in self.credentials['usernames'][username]:
-                self.credentials['usernames'][username]['id'] = secrets.token_hex(32//2)
             if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
                 self.credentials['usernames'][username]['password'] = Hasher._hash(self.credentials['usernames'][username]['password'])
         
@@ -73,7 +71,7 @@ class Authenticate:
         str
             The JWT cookie for passwordless reauthentication.
         """
-        return jwt.encode({'id': self.credentials['usernames'][self.username]['id'],
+        return jwt.encode({'username': st.session_state['username'],
             'exp_date': self.exp_date}, self.key, algorithm='HS256')
 
     def _token_decode(self) -> str:
@@ -123,11 +121,11 @@ class Authenticate:
             if self.token is not False:
                 if not st.session_state['logout']:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
-                        if 'id' in self.token:
-                            st.session_state['username'] = self._get_username('id', self.token['id'])
-                            st.session_state['name'] = self.credentials['usernames'][self._get_username('id', self.token['id'])]['name']
+                        if 'username' in self.token:
+                            st.session_state['username'] = self.token['username']
+                            st.session_state['name'] = self.credentials['usernames'][self.token['username']]['name']
                             st.session_state['authentication_status'] = True
-                            self.credentials['usernames'][self._get_username('id', self.token['id'])]['logged_in'] = True
+                            self.credentials['usernames'][self.token['username']]['logged_in'] = True
     
     def _record_failed_login_attempts(self, reset: bool=False):
         """
@@ -417,8 +415,7 @@ class Authenticate:
         if not self.validator.validate_name(name):
             raise RegisterError('Name is not valid')
         self.credentials['usernames'][username] = {'name': name, 'password': Hasher([password]).generate()[0], 
-                                                   'email': email, 'logged_in': False,
-                                                   'id': secrets.token_hex(32//2)}
+                                                   'email': email, 'logged_in': False}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
