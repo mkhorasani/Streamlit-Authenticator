@@ -12,7 +12,7 @@ class CredentialsError(Exception):
 
 class DeprecationError(Exception):
     """
-    Exceptions raised for possible deprecations.
+    Exceptions raised for possible deprecation.
 
     Attributes
     ----------

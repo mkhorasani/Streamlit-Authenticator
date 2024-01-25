@@ -9,8 +9,6 @@ from .authenticate import Authenticate
 _RELEASE = True
 
 if not _RELEASE:
-    # hashed_passwords = Hasher(['abc', 'def']).generate()
-
     # Loading config file
     with open('../config.yaml') as file:
         config = yaml.load(file, Loader=SafeLoader)
