@@ -81,7 +81,7 @@ authenticator = stauth.Authenticate(
 > #### Parameters:
 >  - **credentials:** _dict_
 >    - Provides the usernames, names, passwords, and emails, and other user data.
->  - **cookie_name:** _str, default None_
+>  - **cookie_name:** _str_
 >    - Specifies the name of the JWT cookie stored on the client's browser for passwordless reauthentication.
 >  - **key:** _str_
 >    - Specifies the key that will be used to hash the signature of the JWT cookie.
