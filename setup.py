@@ -1,22 +1,11 @@
-import requests
 import setuptools
 
-# with open("README.md", "r") as fh:
-#     long_description = fh.read()
-
-def get_readme_content():
-    url = f'https://raw.githubusercontent.com/mkhorasani/Streamlit-Authenticator/main/README.md'
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return f"Error: {response.status_code}"
-
-long_description = get_readme_content()
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setuptools.setup(
     name="streamlit-authenticator",
-    version="0.3.0",
+    version="0.3.1",
     author="Mohammad Khorasani",
     author_email="khorasani.mohammad@gmail.com",
     description="A secure authentication module to validate user credentials in a Streamlit application.",

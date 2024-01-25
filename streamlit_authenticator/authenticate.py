@@ -1,6 +1,5 @@
 import jwt
 import bcrypt
-import secrets
 import streamlit as st
 from typing import Optional
 from datetime import datetime, timedelta
