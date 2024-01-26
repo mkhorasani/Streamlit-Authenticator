@@ -424,7 +424,7 @@ class Authenticate:
                                     'Username':'Username', 
                                     'Password':'Password', 
                                     'Repeat password':'Repeat password',
-                                    'Register':'Register'}) -> bool:
+                                    'Register':'Register'}) -> tuple:
         """
         Creates a register new user widget.
 
