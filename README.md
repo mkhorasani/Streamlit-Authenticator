@@ -4,9 +4,9 @@
 
 **A secure authentication module to validate user credentials in a Streamlit application.**
 <br/><br/><br/>
-<a href="https://amzn.to/3eQwEEn"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450">
+<a href="[https://amzn.to/3eQwEEn](http://tinyurl.com/2p8mw32d)"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450">
 
-###### _To learn more please refer to my book [Web Application Development with Streamlit](https://amzn.to/3eQwEEn)._
+###### _To learn more please refer to my book [Web Application Development with Streamlit](http://tinyurl.com/2p8mw32d)._
 
 
 ## Installation
