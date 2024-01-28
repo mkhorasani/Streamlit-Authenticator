@@ -150,7 +150,7 @@ elif st.session_state["authentication_status"] is None:
 
 * You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state['failed_login_attempts']** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
-### 4. Creating a password reset widget
+### 4. Creating a reset password widget
 
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
