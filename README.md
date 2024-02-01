@@ -215,14 +215,14 @@ _Please remember to update the config file (as shown in step 9) after you use th
 
 ### 6. Creating a forgot password widget
 
-* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password of the user which should then be transferred to them securely.
+* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password which the developer should then transfer to the user securely.
 
 ```python
 try:
     username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password()
     if username_of_forgotten_password:
         st.success('New password to be sent securely')
-        # Random password should be transferred to the user securely
+        # The developer should securely transfer the new password to the user.
     else:
         st.error('Username not found')
 except Exception as e:
@@ -249,14 +249,14 @@ _Please remember to update the config file (as shown in step 9) after you use th
 
 ### 7. Creating a forgot username widget
 
-* You may use the **forgot_username** widget to allow a user to retrieve their forgotten username. The widget will return the username and email of the user which should then be transferred to them securely.
+* You may use the **forgot_username** widget to allow a user to retrieve their forgotten username. The widget will return the username and email which the developer should then transfer to the user securely.
 
 ```python
 try:
     username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username()
     if username_of_forgotten_username:
         st.success('Username to be sent securely')
-        # Username should be transferred to the user securely
+        # The developer should securely transfer the username to the user.
     else:
         st.error('Email not found')
 except Exception as e:
