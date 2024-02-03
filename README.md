@@ -224,7 +224,7 @@ try:
     if username_of_forgotten_password:
         st.success('New password to be sent securely')
         # The developer should securely transfer the new password to the user.
-    else:
+    elif username_of_forgotten_password == False:
         st.error('Username not found')
 except Exception as e:
     st.error(e)
@@ -258,7 +258,7 @@ try:
     if username_of_forgotten_username:
         st.success('Username to be sent securely')
         # The developer should securely transfer the username to the user.
-    else:
+    elif username_of_forgotten_username == False:
         st.error('Email not found')
 except Exception as e:
     st.error(e)

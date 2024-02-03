@@ -55,22 +55,22 @@ if not _RELEASE:
 
     # Creating a forgot password widget
     try:
-        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password()
-        if username_forgot_pw:
+        username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password()
+        if username_of_forgotten_password:
             st.success('New password sent securely')
             # Random password to be transferred to the user securely
-        else:
+        elif username_of_forgotten_password == False:
             st.error('Username not found')
     except Exception as e:
         st.error(e)
 
     # Creating a forgot username widget
     try:
-        username_forgot_username, email_forgot_username = authenticator.forgot_username()
-        if username_forgot_username:
+        username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username()
+        if username_of_forgotten_username:
             st.success('Username sent securely')
             # Username to be transferred to the user securely
-        else:
+        elif username_of_forgotten_username == False:
             st.error('Email not found')
     except Exception as e:
         st.error(e)
