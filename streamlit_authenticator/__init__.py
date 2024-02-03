@@ -47,8 +47,8 @@ if not _RELEASE:
 
     # Creating a new user registration widget
     try:
-        email_register_user, username_register_user, name_register_user = authenticator.register_user(preauthorization=False)
-        if email_register_user:
+        email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(preauthorization=False)
+        if email_of_registered_user:
             st.success('User registered successfully')
     except Exception as e:
         st.error(e)

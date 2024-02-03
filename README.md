@@ -185,7 +185,8 @@ _Please remember to update the config file (as shown in step 9) after you use th
 
 ```python
 try:
-    if authenticator.register_user(preauthorization=False):
+    email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(preauthorization=False)
+    if email_of_registered_user:
         st.success('User registered successfully')
 except Exception as e:
     st.error(e)
