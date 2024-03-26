@@ -1,3 +1,8 @@
+"""
+Script description: This module raises the Credentials, Deprecation, Forgot, Login,
+Register, Reset, and Update errors. 
+"""
+
 class CredentialsError(Exception):
     """
     Exception raised for incorrect credentials.
@@ -12,7 +17,7 @@ class CredentialsError(Exception):
 
 class DeprecationError(Exception):
     """
-    Exceptions raised for possible deprecation.
+    Exceptions raised for deprecations.
 
     Attributes
     ----------
@@ -87,3 +92,4 @@ class UpdateError(Exception):
     def __init__(self, message: str):
         self.message = message
         super().__init__(self.message)
+        
