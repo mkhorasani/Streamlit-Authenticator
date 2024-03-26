@@ -1,3 +1,4 @@
-streamlit_authenticator/__pycache__
-/test
+__pycache__/
+.vscode/
 graphics/logo.pptx
+/misc
