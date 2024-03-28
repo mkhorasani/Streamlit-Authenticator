@@ -33,7 +33,7 @@ import streamlit_authenticator as stauth
 ### 1. Creating a configuration file
 
 * Initially create a YAML configuration file and define your user's credentials: including names, usernames, and passwords (plain text passwords will be hashed automatically).
-* In addition, enter a name, random key, and number of days to expiry for a JWT cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
+* In addition, enter a name, random key, and number of days to expiry for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Finally, define a list of pre-authorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
 * **_Please remember to update the config file (as shown in step 9) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
@@ -89,7 +89,7 @@ authenticator = stauth.Authenticate(
 >  - **credentials:** _dict_
 >    - Provides the usernames, names, passwords, and emails, and other user data.
 >  - **cookie_name:** _str_
->    - Specifies the name of the JWT cookie stored on the client's browser for password-less re-authentication.
+>    - Specifies the name of the re-authentication cookie stored on the client's browser for password-less re-authentication.
 >  - **cookie_key:** _str_
 >    - Specifies the key that will be used to hash the signature of the re-authentication cookie.
 >  - **cookie_expiry_days:** _float, default 30.0_
