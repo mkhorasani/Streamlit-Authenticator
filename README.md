@@ -66,6 +66,7 @@ _Please note that the 'logged_in' field corresponding to each user's log-in stat
 ### 2. Creating a login widget
 
 * Subsequently import the configuration file into your script and create an authentication object.
+* **_Please remember to recreate the authenticator object on each and every page in a multi-page application._**
 
 ```python
 import yaml
@@ -99,6 +100,7 @@ authenticator = stauth.Authenticate(
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 
 * Then render the login module as follows.
+* **_Please remember to re-invoke the login function on each and every page in a multi-page application._**
 
 ```python
 authenticator.login()
