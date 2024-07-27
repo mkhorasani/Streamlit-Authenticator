@@ -72,7 +72,7 @@ pre-authorized:
 > - _dict_
 >   - The credentials dict with hashed passwords.
 
-_Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status will be added and managed automatically._
+_Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
 
 ### 2. Creating a login widget
 
@@ -110,14 +110,15 @@ authenticator = stauth.Authenticate(
 >  - **validator:** _Validator, optional, default None_
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 >  - **auto_hash:** _bool, default True_
->    - Automatic hashing requirement for passwords, True: plain text passwords will be automatically hashed, False: plain text passwords will not be automatically hashed.
+>    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
 
 * Then render the login module as follows.
-* **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 
 ```python
 authenticator.login()
 ```
+
+* **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 
 > ### Authenticate.login
 > #### Parameters:
@@ -136,7 +137,7 @@ authenticator.login()
 >  - **key:** _str, default 'Login'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 >  - **sleep_time:** _float, optional, default None_
 >    - Optional sleep time for the login widget.
 > #### Returns:
@@ -175,7 +176,7 @@ elif st.session_state['authentication_status'] is None:
 >  - **key:** _str, default None_
 >    - Unique key that should be used in multi-page applications.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.JPG)
 
@@ -211,7 +212,7 @@ if st.session_state['authentication_status']:
 >  - **key:** _str, default 'Reset password'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns::
 > - _bool_
 >   - Status of resetting the password.
@@ -253,7 +254,7 @@ except Exception as e:
 >  - **key:** _str, default 'Register user'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _str_
 >   - Email associated with the new user.
@@ -297,7 +298,7 @@ except Exception as e:
 >  - **key:** _str, default 'Forgot password'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _str_
 >   - Username associated with the forgotten password.
@@ -340,7 +341,7 @@ except Exception as e:
 >  - **key:** _str, default 'Forgot username'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _str_
 >   - Forgotten username that should be transferred to the user securely.
@@ -376,7 +377,7 @@ if st.session_state['authentication_status']:
 >  - **key:** _str, default 'Update user details'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission.
+>    - Optional callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _bool_
 >   - Status of updating the user details.
