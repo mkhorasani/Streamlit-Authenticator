@@ -2,7 +2,7 @@
 <!--- [![Downloads](https://pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator) --->
 <!--- [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/khorasani) --->
 
-**A secure authentication module to validate user credentials in a Streamlit application** 
+**A secure authentication module to validate user credentials in a Streamlit application**
 
 [![Downloads](https://static.pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
 [![Downloads](https://static.pepy.tech/badge/streamlit-authenticator/month)](https://pepy.tech/project/streamlit-authenticator)
@@ -23,7 +23,7 @@ pip install streamlit-authenticator
 
 ## Example
 
-Using Streamlit-Authenticator is as simple as importing the module and calling it to verify your predefined users' credentials.
+Using Streamlit-Authenticator is as simple as importing the module and calling it to verify your user's credentials.
 
 ```python
 import streamlit as st
@@ -33,7 +33,7 @@ import streamlit_authenticator as stauth
 ### 1. Creating a configuration file
 
 * Initially create a YAML configuration file and define your user's credentials: including names, usernames, and passwords (plain text passwords will be hashed automatically).
-* In addition, enter a name, random key, and number of days to expiry for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
+* In addition, enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Finally, define a list of pre-authorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
 * **_Please remember to update the config file (as shown in step 9) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
@@ -61,7 +61,18 @@ pre-authorized:
   - melsby@gmail.com
 ```
 
-_Please note that the 'logged_in' field corresponding to each user's log-in status will be added automatically._
+* Plain text passwords will be hashed automatically by default, however, for a large number of users it is recommended to pre-hash the passwords in the credentials using the **Hasher.hash_passwords** function.
+* If you choose to pre-hash the passwords, please set the **auto_hash** parameter in the **Authenticate** class to False (see next section).
+
+> ### Hasher.hash_passwords
+> #### Parameters:
+>  - **credentials:** _dict_
+>    - The credentials dict with plain text passwords.
+> #### Returns::
+> - _dict_
+>   - The credentials dict with hashed passwords.
+
+_Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status will be added and managed automatically._
 
 ### 2. Creating a login widget
 
@@ -94,13 +105,15 @@ authenticator = stauth.Authenticate(
 >    - Specifies the key that will be used to hash the signature of the re-authentication cookie.
 >  - **cookie_expiry_days:** _float, default 30.0_
 >    - Specifies the number of days before the re-authentication cookie automatically expires on the client's browser.
->  - **pre-authorized:** _list, default None_
+>  - **pre_authorized:** _list, optional, default None_
 >    - Provides the list of emails of unregistered users who are authorized to register.
->  - **validator:** _object, default None_
+>  - **validator:** _Validator, optional, default None_
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
+>  - **auto_hash:** _bool, default True_
+>    - Automatic hashing requirement for passwords, True: plain text passwords will be automatically hashed, False: plain text passwords will not be automatically hashed.
 
 * Then render the login module as follows.
-* **_Please remember to re-invoke the login function on each and every page in a multi-page application._**
+* **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 
 ```python
 authenticator.login()
@@ -108,16 +121,24 @@ authenticator.login()
 
 > ### Authenticate.login
 > #### Parameters:
->  - **location:** _str, {'main', 'sidebar'}, default 'main'_
+>  - **location:** _str, {'main', 'sidebar', 'unrendered'}, default 'main'_
 >    - Specifies the location of the login widget.
->  - **max_concurrent_users:** _int, default None_
->    - Limits the number of concurrent users. If not specified there will be no limit to the number of users.
->  - **max_login_attempts:** _int, default None_
+>  - **max_concurrent_users:** _int, optional, default None_
+>    - Limits the number of concurrent users. If not specified there will be no limit to the number of concurrently logged in users.
+>  - **max_login_attempts:** _int, optional, default None_
 >    - Limits the number of failed login attempts. If not specified there will be no limit to the number of failed login attempts.
->  - **fields:** _dict, default {'Form name':'Login', 'Username':'Username', 'Password':'Password', 'Login':'Login'}_
+>  - **fields:** _dict, optional, default {'Form name':'Login', 'Username':'Username', 'Password':'Password', 'Login':'Login'}_
 >    - Customizes the text of headers, buttons and other fields.
+>  - **captcha:** _bool, default False_
+>    - Specifies the captcha requirement for the login widget, True: captcha required, False: captcha removed.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
+>  - **key:** _str, default 'Login'_
+>    - Unique key provided to widget to avoid duplicate WidgetID errors.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on form submission.
+>  - **sleep_time:** _float, optional, default None_
+>    - Optional sleep time for the login widget.
 > #### Returns:
 > - _str_
 >   - Name of the authenticated user.
@@ -130,18 +151,18 @@ authenticator.login()
 
 ### 3. Authenticating users
 
-* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state["name"]**, **st.session_state["authentication_status"]**, and **st.session_state["username"]** to allow a verified user to proceed to any restricted content.
+* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
 * The optional **key** parameter for the logout button should be used with multi-page applications to prevent Streamlit from throwing duplicate key errors.
 
 ```python
-if st.session_state["authentication_status"]:
+if st.session_state['authentication_status']:
     authenticator.logout()
     st.write(f'Welcome *{st.session_state["name"]}*')
     st.title('Some content')
-elif st.session_state["authentication_status"] is False:
+elif st.session_state['authentication_status'] is False:
     st.error('Username/password is incorrect')
-elif st.session_state["authentication_status"] is None:
+elif st.session_state['authentication_status'] is None:
     st.warning('Please enter your username and password')
 ```
 
@@ -149,10 +170,12 @@ elif st.session_state["authentication_status"] is None:
 > #### Parameters:
 >  - **button_name:** _str, default 'Logout'_
 >    - Customizes the button name.
->  - **location:** _str, {'main', 'sidebar','unrendered'}, default 'main'_
+>  - **location:** _str, {'main', 'sidebar', 'unrendered'}, default 'main'_
 >    - Specifies the location of the logout button. If 'unrendered' is passed, the logout logic will be executed without rendering the button.
 >  - **key:** _str, default None_
 >    - Unique key that should be used in multi-page applications.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on submission.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.JPG)
 
@@ -167,9 +190,9 @@ elif st.session_state["authentication_status"] is None:
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
 ```python
-if st.session_state["authentication_status"]:
+if st.session_state['authentication_status']:
     try:
-        if authenticator.reset_password(st.session_state["username"]):
+        if authenticator.reset_password(st.session_state['username']):
             st.success('Password modified successfully')
     except Exception as e:
         st.error(e)
@@ -181,21 +204,28 @@ if st.session_state["authentication_status"]:
 >    - Specifies the username of the user to reset the password for.
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the reset password widget.
->  - **fields:** _dict, default {'Form name':'Reset password', 'Current password':'Current password', 'New password':'New password', 'Repeat password': 'Repeat password', 'Reset':'Reset'}_
+>  - **fields:** _dict, optional, default {'Form name':'Reset password', 'Current password':'Current password', 'New password':'New password', 'Repeat password': 'Repeat password', 'Reset':'Reset'}_
 >    - Customizes the text of headers, buttons and other fields.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
+>  - **key:** _str, default 'Reset password'_
+>    - Unique key provided to widget to avoid duplicate WidgetID errors.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on form submission.
 > #### Returns::
 > - _bool_
 >   - Status of resetting the password.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.JPG)
 
-_Please remember to update the config file (as shown in step 9) after you use this widget._
+**_Please remember to update the config file (as shown in step 9) after you use this widget._**
 
 ### 5. Creating a new user registration widget
 
-* You may use the **register_user** widget to allow a user to sign up to your application as shown below. If you require the user to be pre-authorized, set the **pre-authorization** argument to True and add their email to the **pre-authorized** list in the configuration file. Once they have registered, their email will be automatically removed from the **pre-authorized** list in the configuration file. Alternatively, to allow anyone to sign up, set the **pre-authorization** argument to False.
+* You may use the **register_user** widget to allow a user to sign up to your application as shown below.
+* If you require the user to be pre-authorized, set the **pre_authorization** parameter to True and add their email to the **pre_authorized** list in the configuration file.
+* Once they have registered, their email will be automatically removed from the **pre_authorized** list in the configuration file.
+* Alternatively, to allow anyone to sign up, set the **pre_authorization** parameter to False.
 
 ```python
 try:
@@ -210,14 +240,20 @@ except Exception as e:
 > #### Parameters:
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the register user widget.
->  - **pre-authorization:** _bool, default True_
+>  - **pre_authorization:** _bool, default True_
 >    - Specifies the pre-authorization requirement, True: user must be pre-authorized to register, False: any user can register.
->  - **domains:** _list, default None_
+>  - **domains:** _list, optional, default None_
 >    - Specifies the required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], list: the required list of domains, None: any domain is allowed.
->  - **fields:** _dict, default {'Form name':'Register user', 'Email':'Email', 'Username':'Username', 'Password':'Password', 'Repeat password':'Repeat password', 'Register':'Register'}_
+>  - **fields:** _dict, optional, default {'Form name':'Register user', 'Email':'Email', 'Username':'Username', 'Password':'Password', 'Repeat password':'Repeat password', 'Register':'Register'}_
 >    - Customizes the text of headers, buttons and other fields.
+>  - **captcha:** _bool, default True_
+>    - Specifies the captcha requirement for the register user widget, True: captcha required, False: captcha removed.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
+>  - **key:** _str, default 'Register user'_
+>    - Unique key provided to widget to avoid duplicate WidgetID errors.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on form submission.
 > #### Returns:
 > - _str_
 >   - Email associated with the new user.
@@ -228,11 +264,13 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.JPG)
 
-_Please remember to update the config file (as shown in step 9) after you use this widget._
+**_Please remember to update the config file (as shown in step 9) after you use this widget._**
 
 ### 6. Creating a forgot password widget
 
-* You may use the **forgot_password** widget to allow a user to generate a new random password. This password will be automatically hashed and saved in the configuration file. The widget will return the username, email, and new random password which the developer should then transfer to the user securely.
+* You may use the **forgot_password** widget to allow a user to generate a new random password.
+* The new password will be automatically hashed and saved in the configuration file.
+* The widget will return the username, email, and new random password which the developer should then transfer to the user securely.
 
 ```python
 try:
@@ -250,10 +288,16 @@ except Exception as e:
 > #### Parameters
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the forgot password widget.
->  - **fields:** _dict, default {'Form name':'Forgot password', 'Username':'Username', 'Submit':'Submit'}_
+>  - **fields:** _dict, optional, default {'Form name':'Forgot password', 'Username':'Username', 'Submit':'Submit'}_
 >    - Customizes the text of headers, buttons and other fields.
+>  - **captcha:** _bool, default False_
+>    - Specifies the captcha requirement for the forgot password widget, True: captcha required, False: captcha removed.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
+>  - **key:** _str, default 'Forgot password'_
+>    - Unique key provided to widget to avoid duplicate WidgetID errors.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on form submission.
 > #### Returns:
 > - _str_
 >   - Username associated with the forgotten password.
@@ -264,11 +308,12 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.JPG)
 
-_Please remember to update the config file (as shown in step 9) after you use this widget._
+**_Please remember to update the config file (as shown in step 9) after you use this widget._**
 
 ### 7. Creating a forgot username widget
 
-* You may use the **forgot_username** widget to allow a user to retrieve their forgotten username. The widget will return the username and email which the developer should then transfer to the user securely.
+* You may use the **forgot_username** widget to allow a user to retrieve their forgotten username.
+* The widget will return the username and email which the developer should then transfer to the user securely.
 
 ```python
 try:
@@ -286,10 +331,16 @@ except Exception as e:
 > #### Parameters
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the forgot username widget.
->  - **fields:** _dict, default {'Form name':'Forgot username', 'Email':'Email', 'Submit':'Submit'}_
+>  - **fields:** _dict, optional, default {'Form name':'Forgot username', 'Email':'Email', 'Submit':'Submit'}_
 >    - Customizes the text of headers, buttons and other fields.
+>  - **captcha:** _bool, default False_
+>    - Specifies the captcha requirement for the forgot username widget, True: captcha required, False: captcha removed.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
+>  - **key:** _str, default 'Forgot username'_
+>    - Unique key provided to widget to avoid duplicate WidgetID errors.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on form submission.
 > #### Returns:
 > - _str_
 >   - Forgotten username that should be transferred to the user securely.
@@ -300,12 +351,13 @@ except Exception as e:
 
 ### 8. Creating an update user details widget
 
-* You may use the **update_user_details** widget to allow a logged in user to update their name and/or email. The widget will automatically save the updated details in both the configuration file and re-authentication cookie.
+* You may use the **update_user_details** widget to allow a logged in user to update their name and/or email.
+* The widget will automatically save the updated details in both the configuration file and re-authentication cookie.
 
 ```python
-if st.session_state["authentication_status"]:
+if st.session_state['authentication_status']:
     try:
-        if authenticator.update_user_details(st.session_state["username"]):
+        if authenticator.update_user_details(st.session_state['username']):
             st.success('Entries updated successfully')
     except Exception as e:
         st.error(e)
@@ -317,17 +369,21 @@ if st.session_state["authentication_status"]:
 >    - Specifies the username of the user to update user details for.
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the update user details widget.
->  - **fields:** _dict, default {'Form name':'Update user details', 'Field':'Field', 'Name':'Name', 'Email':'Email', 'New value':'New value', 'Update':'Update'}_
+>  - **fields:** _dict, optional, default {'Form name':'Update user details', 'Field':'Field', 'Name':'Name', 'Email':'Email', 'New value':'New value', 'Update':'Update'}_
 >    - Customizes the text of headers, buttons and other fields.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
+>  - **key:** _str, default 'Update user details'_
+>    - Unique key provided to widget to avoid duplicate WidgetID errors.
+>  - **callback:** _callable, optional, default None_
+>    - Optional callback function that will be invoked on form submission.
 > #### Returns:
 > - _bool_
 >   - Status of updating the user details.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.JPG)
 
-_Please remember to update the config file (as shown in step 9) after you use this widget._
+**_Please remember to update the config file (as shown in step 9) after you use this widget._**
 
 ### 9. Updating the configuration file
 

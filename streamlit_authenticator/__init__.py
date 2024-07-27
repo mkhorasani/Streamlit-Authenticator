@@ -12,13 +12,14 @@ import streamlit as st
 import streamlit.components.v1 as components
 from yaml.loader import SafeLoader
 
-from .authenticate import Authenticate
-from .utilities.exceptions import (CredentialsError,
-                                  ForgotError,
-                                  LoginError,
-                                  RegisterError,
-                                  ResetError,
-                                  UpdateError)
+from .views import Authenticate
+from .utilities import (CredentialsError,
+                        ForgotError,
+                        Hasher,
+                        LoginError,
+                        RegisterError,
+                        ResetError,
+                        UpdateError)
 
 _RELEASE = True
 
@@ -26,6 +27,9 @@ if not _RELEASE:
     # Loading config file
     with open('../config.yaml', 'r', encoding='utf-8') as file:
         config = yaml.load(file, Loader=SafeLoader)
+
+    # Hashing all plain text passwords once
+    # Hasher.hash_passwords(config['credentials'])
 
     # Creating the authenticator object
     authenticator = Authenticate(
@@ -42,26 +46,24 @@ if not _RELEASE:
     except LoginError as e:
         st.error(e)
 
-    if st.session_state["authentication_status"]:
+    if st.session_state['authentication_status']:
         authenticator.logout()
         st.write(f'Welcome *{st.session_state["name"]}*')
         st.title('Some content')
-    elif st.session_state["authentication_status"] is False:
+    elif st.session_state['authentication_status'] is False:
         st.error('Username/password is incorrect')
-    elif st.session_state["authentication_status"] is None:
+    elif st.session_state['authentication_status'] is None:
         st.warning('Please enter your username and password')
 
     # Creating a password reset widget
-    if st.session_state["authentication_status"]:
+    if st.session_state['authentication_status']:
         try:
-            if authenticator.reset_password(st.session_state["username"]):
+            if authenticator.reset_password(st.session_state['username']):
                 st.success('Password modified successfully')
-        except ResetError as e:
-            st.error(e)
-        except CredentialsError as e:
+        except (CredentialsError, ResetError) as e:
             st.error(e)
 
-    # # Creating a new user registration widget
+    # Creating a new user registration widget
     try:
         (email_of_registered_user,
          username_of_registered_user,
@@ -71,7 +73,7 @@ if not _RELEASE:
     except RegisterError as e:
         st.error(e)
 
-    # # Creating a forgot password widget
+    # Creating a forgot password widget
     try:
         (username_of_forgotten_password,
          email_of_forgotten_password,
@@ -84,7 +86,7 @@ if not _RELEASE:
     except ForgotError as e:
         st.error(e)
 
-    # # Creating a forgot username widget
+    # Creating a forgot username widget
     try:
         (username_of_forgotten_username,
          email_of_forgotten_username) = authenticator.forgot_username()
@@ -96,10 +98,10 @@ if not _RELEASE:
     except ForgotError as e:
         st.error(e)
 
-    # # Creating an update user details widget
-    if st.session_state["authentication_status"]:
+    # Creating an update user details widget
+    if st.session_state['authentication_status']:
         try:
-            if authenticator.update_user_details(st.session_state["username"]):
+            if authenticator.update_user_details(st.session_state['username']):
                 st.success('Entries updated successfully')
         except UpdateError as e:
             st.error(e)

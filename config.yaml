@@ -13,7 +13,7 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       failed_login_attempts: 0
-      logged_in: true
+      logged_in: false
       name: John Smith
       password: $2b$12$iWlVOac3uujRvTrXDi6wructXftKmo/GyQd6SMu5FmyX306kH.yFO
     rbriggs:
@@ -28,12 +28,6 @@ credentials:
       logged_in: false
       name: Ross Couper
       password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu
-    wdewe:
-      email: wedw@ew.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: dwew
-      password: $2b$12$QJBPc7PxaTTBVJ.3cl4KlOPPqYCWVfaHqkk2IsoGDExXhihKZLDgy
 pre-authorized:
   emails:
   - melsby@gmail.com

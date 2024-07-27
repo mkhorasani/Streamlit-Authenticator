@@ -1,5 +1,6 @@
 """
-Script description: This module implements cookies for password-less re-authentication. 
+Script description: This module executes the logic for the cookies for password-less
+re-authentication. 
 
 Libraries imported:
 - datetime: Module implementing DateTime data types.
@@ -14,14 +15,14 @@ from jwt import DecodeError, InvalidSignatureError
 import streamlit as st
 import extra_streamlit_components as stx
 
-class CookieHandler:
+class CookieModel:
     """
-    This class will execute all actions related to the re-authentication cookie, 
-    including retrieving, deleting, and setting the cookie.
+    This class executes the logic for the cookies for password-less re-authentication, 
+    including deleting, getting, and setting the cookie.
     """
-    def __init__(self, cookie_name: str, cookie_key: str, cookie_expiry_days: float=30.0):
+    def __init__(self, cookie_name: str, cookie_key: str, cookie_expiry_days: float):
         """
-        Create a new instance of "CookieHandler".
+        Create a new instance of "CookieService".
 
         Parameters
         ----------
@@ -39,23 +40,6 @@ class CookieHandler:
         self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
-    def get_cookie(self) -> str:
-        """
-        Retrieves, checks, and then returns the re-authentication cookie.
-
-        Returns
-        -------
-        str
-            re-authentication cookie.
-        """
-        if st.session_state['logout']:
-            return False
-        self.token = self.cookie_manager.get(self.cookie_name)
-        if self.token is not None:
-            self.token = self._token_decode()
-            if (self.token is not False and 'username' in self.token and
-                self.token['exp_date'] > datetime.utcnow().timestamp()):
-                return self.token
     def delete_cookie(self):
         """
         Deletes the re-authentication cookie.
@@ -64,14 +48,34 @@ class CookieHandler:
             self.cookie_manager.delete(self.cookie_name)
         except KeyError as e:
             print(e)
+    def get_cookie(self) -> str:
+        """
+        Gets, checks, and then returns the re-authentication cookie.
+
+        Returns
+        -------
+        str
+            Re-authentication cookie.
+        """
+        if st.session_state['logout']:
+            return False
+        self.token = self.cookie_manager.get(self.cookie_name)
+        if self.token is not None:
+            self.token = self._token_decode()
+            if (self.token is not False and 'username' in self.token and
+                self.token['exp_date'] > datetime.now().timestamp()):
+                return self.token
+        return None
     def set_cookie(self):
         """
         Sets the re-authentication cookie.
         """
-        self.exp_date = self._set_exp_date()
-        token = self._token_encode()
-        self.cookie_manager.set(self.cookie_name, token,
-                                expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+        if self.cookie_expiry_days != 0:
+            self.exp_date = self._set_exp_date()
+            token = self._token_encode()
+            self.cookie_manager.set(self.cookie_name, token,
+                                    expires_at=datetime.now() + \
+                                    timedelta(days=self.cookie_expiry_days))
     def _set_exp_date(self) -> str:
         """
         Sets the re-authentication cookie's expiry date.
@@ -81,7 +85,7 @@ class CookieHandler:
         str
             re-authentication cookie's expiry timestamp in Unix Epoch.
         """
-        return (datetime.utcnow() + timedelta(days=self.cookie_expiry_days)).timestamp()
+        return (datetime.now() + timedelta(days=self.cookie_expiry_days)).timestamp()
     def _token_decode(self) -> str:
         """
         Decodes the contents of the re-authentication cookie.
@@ -93,10 +97,7 @@ class CookieHandler:
         """
         try:
             return jwt.decode(self.token, self.cookie_key, algorithms=['HS256'])
-        except InvalidSignatureError as e:
-            print(e)
-            return False
-        except DecodeError as e:
+        except (DecodeError, InvalidSignatureError) as e:
             print(e)
             return False
     def _token_encode(self) -> str:

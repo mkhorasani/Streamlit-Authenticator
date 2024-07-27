@@ -24,10 +24,16 @@ class Hasher:
         """
         self.passwords = passwords
     @classmethod
-    def check_pw(cls, password, hashed_password) -> bool:
+    def check_pw(cls, password: str, hashed_password: str) -> bool:
         """
         Checks the validity of the entered password.
 
+        Parameters
+        ----------
+        password: str
+            The plain text password.
+        hashed_password: str
+            The hashed password.
         Returns
         -------
         bool
@@ -45,6 +51,28 @@ class Hasher:
         """
         return [self._hash(password) for password in self.passwords]
     @classmethod
+    def hash_passwords(cls, credentials: dict) -> dict:
+        """
+        Hashes all plain text passwords in the credentials dict.
+
+        Parameters
+        ----------
+        credentials: dict
+            The credentials dict with plain text passwords.
+        Returns
+        -------
+        dict
+            The credentials dict with hashed passwords.
+        """
+        usernames = credentials['usernames']
+
+        for _, user in usernames.items():
+            password = user['password']
+            if not cls._is_hash(password):
+                hashed_password = cls._hash(password)
+                user['password'] = hashed_password
+        return credentials
+    @classmethod
     def _hash(cls, password: str) -> str:
         """
         Hashes the plain text password.
@@ -52,7 +80,7 @@ class Hasher:
         Parameters
         ----------
         password: str
-            The plain text password to be hashed.
+            The plain text password.
         Returns
         -------
         str
@@ -67,7 +95,9 @@ class Hasher:
         Returns
         -------
         bool
-            The validity of the hash string.
+            The state of whether the string is a hash,
+            True: the string is a hash,
+            False: the string is not a hash.
         """
         bcrypt_regex = re.compile(r'^\$2[aby]\$\d+\$.{53}$')
         return bool(bcrypt_regex.match(hash_string))

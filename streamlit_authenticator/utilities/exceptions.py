@@ -3,6 +3,19 @@ Script description: This module raises the Credentials, Deprecation, Forgot, Log
 Register, Reset, and Update errors. 
 """
 
+class AuthenticateError(Exception):
+    """
+    Exceptions raised for the Authenticate class.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
 class CredentialsError(Exception):
     """
     Exception raised for incorrect credentials.
@@ -44,6 +57,19 @@ class ForgotError(Exception):
 class LoginError(Exception):
     """
     Exceptions raised for the Login widget.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+class LogoutError(Exception):
+    """
+    Exceptions raised for the Logout button.
 
     Attributes
     ----------
