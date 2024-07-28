@@ -120,7 +120,7 @@ authenticator = stauth.Authenticate(
 
 ### 3. Creating a login widget
 
-* You can render the login module as follows.
+* You can render the login widget as follows.
 
 ```python
 authenticator.login()
