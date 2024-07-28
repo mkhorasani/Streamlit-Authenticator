@@ -37,7 +37,7 @@ import streamlit_authenticator as stauth
 * Initially create a YAML configuration file and define your user's credentials: including names, usernames, and passwords (plain text passwords will be hashed automatically).
 * In addition, enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Finally, define a list of pre-authorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
-* **_Please remember to update the config file (as shown in step 9) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
+* **_Please remember to update the config file (as shown in step 10) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
 ```python
 credentials:
@@ -63,23 +63,11 @@ pre-authorized:
   - melsby@gmail.com
 ```
 
-* Plain text passwords will be hashed automatically by default, however, for a large number of users it is recommended to pre-hash the passwords in the credentials using the **Hasher.hash_passwords** function.
-* If you choose to pre-hash the passwords, please set the **auto_hash** parameter in the **Authenticate** class to False (see next section).
+* _Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
 
-> ### Hasher.hash_passwords
-> #### Parameters:
->  - **credentials:** _dict_
->    - The credentials dict with plain text passwords.
-> #### Returns:
-> - _dict_
->   - The credentials dict with hashed passwords.
-
-_Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
-
-### 2. Creating a login widget
+### 2. Setup
 
 * Subsequently import the configuration file into your script and create an authentication object.
-* **_Please remember to recreate the authenticator object on each and every page in a multi-page application._**
 
 ```python
 import yaml
@@ -87,6 +75,9 @@ from yaml.loader import SafeLoader
 
 with open('../config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
+
+# Pre-hashing all plain text passwords once
+# Hasher.hash_passwords(config['credentials'])
 
 authenticator = stauth.Authenticate(
     config['credentials'],
@@ -96,6 +87,17 @@ authenticator = stauth.Authenticate(
     config['pre-authorized']
 )
 ```
+
+* Plain text passwords will be hashed automatically by default, however, for a large number of users it is recommended to pre-hash the passwords in the credentials using the **Hasher.hash_passwords** function.
+* If you choose to pre-hash the passwords, please set the **auto_hash** parameter in the **Authenticate** class to False.
+  
+> ### Hasher.hash_passwords
+> #### Parameters:
+>  - **credentials:** _dict_
+>    - The credentials dict with plain text passwords.
+> #### Returns:
+> - _dict_
+>   - The credentials dict with hashed passwords.
 
 > ### Authenticate
 > #### Parameters:
@@ -114,13 +116,15 @@ authenticator = stauth.Authenticate(
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
 
-* Then render the login module as follows.
+* **_Please remember to recreate the authenticator object on each and every page in a multi-page application._**
+
+### 3. Creating a login widget
+
+* You can render the login module as follows.
 
 ```python
 authenticator.login()
 ```
-
-* **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 
 > ### Authenticate.login
 > #### Parameters:
@@ -152,7 +156,9 @@ authenticator.login()
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
-### 3. Authenticating users
+* **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
+
+### 4. Authenticating users
 
 * You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
@@ -188,7 +194,7 @@ elif st.session_state['authentication_status'] is None:
 
 * You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state['failed_login_attempts']** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
-### 4. Creating a reset password widget
+### 5. Creating a reset password widget
 
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
@@ -221,9 +227,9 @@ if st.session_state['authentication_status']:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.JPG)
 
-**_Please remember to update the config file (as shown in step 9) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 10) after you use this widget._**
 
-### 5. Creating a new user registration widget
+### 6. Creating a new user registration widget
 
 * You may use the **register_user** widget to allow a user to sign up to your application as shown below.
 * If you require the user to be pre-authorized, set the **pre_authorization** parameter to True and add their email to the **pre_authorized** list in the configuration file.
@@ -267,9 +273,9 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.JPG)
 
-**_Please remember to update the config file (as shown in step 9) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 10) after you use this widget._**
 
-### 6. Creating a forgot password widget
+### 7. Creating a forgot password widget
 
 * You may use the **forgot_password** widget to allow a user to generate a new random password.
 * The new password will be automatically hashed and saved in the configuration file.
@@ -311,9 +317,9 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.JPG)
 
-**_Please remember to update the config file (as shown in step 9) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 10) after you use this widget._**
 
-### 7. Creating a forgot username widget
+### 8. Creating a forgot username widget
 
 * You may use the **forgot_username** widget to allow a user to retrieve their forgotten username.
 * The widget will return the username and email which the developer should then transfer to the user securely.
@@ -352,7 +358,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.JPG)
 
-### 8. Creating an update user details widget
+### 9. Creating an update user details widget
 
 * You may use the **update_user_details** widget to allow a logged in user to update their name and/or email.
 * The widget will automatically save the updated details in both the configuration file and re-authentication cookie.
@@ -386,9 +392,9 @@ if st.session_state['authentication_status']:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.JPG)
 
-**_Please remember to update the config file (as shown in step 9) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 10) after you use this widget._**
 
-### 9. Updating the configuration file
+### 10. Updating the configuration file
 
 * Please ensure that the configuration file is re-saved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
