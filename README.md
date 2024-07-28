@@ -21,6 +21,8 @@ Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/strea
 pip install streamlit-authenticator
 ```
 
+Please feel free to test the [demo app](https://demoapp-v0-3-3.streamlit.app/).
+
 ## Example
 
 Using Streamlit-Authenticator is as simple as importing the module and calling it to verify your user's credentials.
@@ -68,7 +70,7 @@ pre-authorized:
 > #### Parameters:
 >  - **credentials:** _dict_
 >    - The credentials dict with plain text passwords.
-> #### Returns::
+> #### Returns:
 > - _dict_
 >   - The credentials dict with hashed passwords.
 
