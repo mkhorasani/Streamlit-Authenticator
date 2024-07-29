@@ -12,9 +12,9 @@ import time
 from typing import Callable, Dict, List, Optional
 import streamlit as st
 
-from .. import params
-from ..controllers import AuthenticationController, CookieController
-from ..utilities import Helpers, LogoutError, ResetError, UpdateError, Validator
+import params
+from controllers import AuthenticationController, CookieController
+from utilities import DeprecationError, Helpers, LogoutError, ResetError, UpdateError, Validator
 
 class Authenticate:
     """
@@ -22,8 +22,8 @@ class Authenticate:
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict, cookie_name: str, cookie_key: str,
-                 cookie_expiry_days: float=30.0, pre_authorized: Optional[List[str]]=None,
-                 validator: Optional[Validator]=None, auto_hash: bool=True):
+                 cookie_expiry_days: float=30.0, validator: Optional[Validator]=None,
+                 auto_hash: bool=True):
         """
         Create a new instance of "Authenticate".
 
@@ -38,9 +38,7 @@ class Authenticate:
             Key to be used to hash the signature of the re-authentication cookie.
         cookie_expiry_days: float
             Number of days before the re-authentication cookie automatically expires on the client's 
-            browser.
-        pre-authorized: list, optional
-            List of emails of unregistered users who are authorized to register.        
+            browser.       
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
         auto_hash: bool
@@ -48,11 +46,15 @@ class Authenticate:
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
         """
+        if isinstance(validator, dict):
+            raise DeprecationError(f"""Please note that the 'pre_authorized' list parameter has been
+                                   removed from the Authenticate class and added directly to the
+                                   'register_user' function. For further information please refer to
+                                   {params.REGISTER_USER_LINK}.""")
         self.cookie_controller  =   CookieController(cookie_name,
                                                      cookie_key,
                                                      cookie_expiry_days)
         self.authentication_controller  =   AuthenticationController(credentials,
-                                                                     pre_authorized,
                                                                      validator,
                                                                      auto_hash)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
@@ -285,7 +287,7 @@ class Authenticate:
             if st.session_state['authentication_status']:
                 self.authentication_controller.logout()
                 self.cookie_controller.delete_cookie()
-    def register_user(self, location: str='main', pre_authorization: bool=True,
+    def register_user(self, location: str='main', pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, fields: Optional[Dict[str, str]]=None,
                       captcha: bool=True, clear_on_submit: bool=False, key: str='Register user',
                       callback: Optional[Callable]=None) -> tuple:
@@ -296,10 +298,8 @@ class Authenticate:
         ----------
         location: str
             Location of the register new user widget i.e. main or sidebar.
-        pre-authorization: bool
-            Pre-authorization requirement, 
-            True: user must be pre-authorized to register, 
-            False: any user can register.
+        pre-authorized: list, optional
+            List of emails of unregistered users who are authorized to register. 
         domains: list, optional
             Required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], 
             list: required list of domains, 
@@ -328,6 +328,10 @@ class Authenticate:
         str
             Name associated with the new user.
         """
+        if isinstance(pre_authorized, bool):
+            raise DeprecationError(f"""Please note that the 'pre_authorized' now requires the list
+                                   of pre-authorized emails. For further information please refer
+                                   to {params.REGISTER_USER_LINK}.""")
         if fields is None:
             fields = {'Form name':'Register user', 'Email':'Email', 'Username':'Username',
                       'Password':'Password', 'Repeat password':'Repeat password',
@@ -362,7 +366,7 @@ class Authenticate:
                                                  else fields['Register']):
             return self.authentication_controller.register_user(new_name, new_email, new_username,
                                                                 new_password, new_password_repeat,
-                                                                pre_authorization, domains,
+                                                                pre_authorized, domains,
                                                                 callback, captcha, entered_captcha)
         return None, None, None
     def reset_password(self, username: str, location: str='main',

@@ -10,8 +10,8 @@ Libraries imported:
 from typing import Callable, Dict, List, Optional
 import streamlit as st
 
-from ..models import AuthenticationModel
-from ..utilities import (ForgotError,
+from models import AuthenticationModel
+from utilities import (ForgotError,
                          Helpers,
                          LoginError,
                          RegisterError,
@@ -24,17 +24,14 @@ class AuthenticationController:
     This class controls the requests for the login, logout, register user, reset password, 
     forgot password, forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, pre_authorized: Optional[List[str]]=None,
-                 validator: Optional[Validator]=None, auto_hash: bool=True):
+    def __init__(self, credentials: dict, validator: Optional[Validator]=None, auto_hash: bool=True):
         """
         Create a new instance of "AuthenticationController".
 
         Parameters
         ----------
         credentials: dict
-            Dictionary of usernames, names, passwords, emails, and other user data.
-        pre-authorized: list, optional
-            List of emails of unregistered users who are authorized to register.        
+            Dictionary of usernames, names, passwords, emails, and other user data.       
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
         auto_hash: bool
@@ -43,7 +40,6 @@ class AuthenticationController:
             False: plain text passwords will not be automatically hashed.
         """
         self.authentication_model = AuthenticationModel(credentials,
-                                                        pre_authorized,
                                                         validator,
                                                         auto_hash)
         self.validator = Validator()
@@ -187,7 +183,8 @@ class AuthenticationController:
         """
         self.authentication_model.logout()
     def register_user(self, new_name: str, new_email: str, new_username: str,
-                      new_password: str, new_password_repeat: str, pre_authorization: bool,
+                      new_password: str, new_password_repeat: str,
+                      pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, callback: Optional[Callable]=None,
                       captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
         """
@@ -205,10 +202,8 @@ class AuthenticationController:
             Password of the new user.
         new_password_repeat: str
             Repeated password of the new user.
-        pre-authorization: bool
-            Pre-authorization requirement, 
-            True: user must be pre-authorized to register, 
-            False: any user can register.
+        pre-authorized: list, optional
+            List of emails of unregistered users who are authorized to register. 
         domains: list, optional
             Required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], 
             list: the required list of domains, 
@@ -252,16 +247,13 @@ class AuthenticationController:
             raise RegisterError('Passwords do not match')
         if not self.validator.validate_password(new_password):
             raise RegisterError('Password does not meet criteria')
-        if pre_authorization:
-            if not self.authentication_model.pre_authorized:
-                raise RegisterError('Pre-authorization argument must not be None')
         if captcha:
             if not entered_captcha:
                 raise RegisterError('Captcha not entered')
             entered_captcha = entered_captcha.strip()
             self._check_captcha('register_user_captcha', RegisterError, entered_captcha)
         return self.authentication_model.register_user(new_name, new_email, new_username,
-                                                       new_password, pre_authorization,
+                                                       new_password, pre_authorized,
                                                        callback)
     def reset_password(self, username: str, password: str, new_password: str,
                        new_password_repeat: str, callback: Optional[Callable]=None) -> bool:

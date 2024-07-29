@@ -10,8 +10,8 @@ Libraries imported:
 from typing import Callable, Dict, List, Optional
 import streamlit as st
 
-from .. import params
-from ..utilities import (Hasher,
+import params
+from utilities import (Hasher,
                          Helpers,
                          CredentialsError,
                          LoginError,
@@ -24,17 +24,15 @@ class AuthenticationModel:
     This class executes the logic for the login, logout, register user, reset password, 
     forgot password, forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, pre_authorized: Optional[List[str]]=None,
-                 validator: Optional[Validator]=None, auto_hash: bool=True):
+    def __init__(self, credentials: dict, validator: Optional[Validator]=None,
+                 auto_hash: bool=True):
         """
         Create a new instance of "AuthenticationService".
 
         Parameters
         ----------
         credentials: dict
-            Dictionary of usernames, names, passwords, emails, and other user data.
-        pre-authorized: list, optional
-            List of emails of unregistered users who are authorized to register.        
+            Dictionary of usernames, names, passwords, emails, and other user data.  
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
         auto_hash: bool
@@ -65,7 +63,6 @@ class AuthenticationModel:
                 st.session_state['AuthenticationService.__init__'] = True
         else:
             self.credentials['usernames'] = {}
-        self.pre_authorized = pre_authorized
         self.validator = validator if validator is not None else Validator()
         if 'name' not in st.session_state:
             st.session_state['name'] = None
@@ -323,7 +320,7 @@ class AuthenticationModel:
             {'name': name, 'password': Hasher([password]).generate()[0], 'email': email,
              'logged_in': False}
     def register_user(self, new_name: str, new_email: str, new_username: str,
-                      new_password: str, pre_authorization: bool,
+                      new_password: str, pre_authorized: Optional[List[str]]=None,
                       callback: Optional[Callable]=None) -> tuple:
         """
         Registers a new user's name, username, password, and email.
@@ -338,10 +335,8 @@ class AuthenticationModel:
             Username of the new user.
         new_password: str
             Password of the new user.
-        pre-authorization: bool
-            Pre-authorization requirement, 
-            True: user must be pre-authorized to register, 
-            False: any user can register.
+        pre-authorized: list, optional
+            List of emails of unregistered users who are authorized to register. 
         callback: callable, optional
             Optional callback function that will be invoked on form submission.
 
@@ -361,11 +356,11 @@ class AuthenticationModel:
         if callback:
             callback({'new_name': new_name, 'new_email': new_email,
                       'new_username': new_username})
-        if pre_authorization:
-            if new_email in self.pre_authorized['emails']:
-                self._register_credentials(new_username, new_name, new_password, new_email)
-                self.pre_authorized['emails'].remove(new_email)
-                return new_email, new_username, new_name
+        if pre_authorized and new_email in pre_authorized['emails']:
+            self._register_credentials(new_username, new_name, new_password, new_email)
+            pre_authorized['emails'].remove(new_email)
+            return new_email, new_username, new_name
+        if pre_authorized and new_email not in pre_authorized['emails']:
             raise RegisterError('User not pre-authorized to register')
         self._register_credentials(new_username, new_name, new_password, new_email)
         return new_email, new_username, new_name

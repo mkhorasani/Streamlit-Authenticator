@@ -3,7 +3,7 @@ Script description: This module controls requests made to the cookie model for p
 re-authentication. 
 """
 
-from ..models import CookieModel
+from models import CookieModel
 
 class CookieController:
     """

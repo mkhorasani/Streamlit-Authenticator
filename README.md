@@ -83,8 +83,7 @@ authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
     config['cookie']['key'],
-    config['cookie']['expiry_days'],
-    config['pre-authorized']
+    config['cookie']['expiry_days']
 )
 ```
 
@@ -109,8 +108,6 @@ authenticator = stauth.Authenticate(
 >    - Specifies the key that will be used to hash the signature of the re-authentication cookie.
 >  - **cookie_expiry_days:** _float, default 30.0_
 >    - Specifies the number of days before the re-authentication cookie automatically expires on the client's browser.
->  - **pre_authorized:** _list, optional, default None_
->    - Provides the list of emails of unregistered users who are authorized to register.
 >  - **validator:** _Validator, optional, default None_
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 >  - **auto_hash:** _bool, default True_
@@ -238,7 +235,7 @@ if st.session_state['authentication_status']:
 
 ```python
 try:
-    email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(pre_authorization=False)
+    email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(pre_authorized=config['pre-authorized'])
     if email_of_registered_user:
         st.success('User registered successfully')
 except Exception as e:
@@ -249,8 +246,8 @@ except Exception as e:
 > #### Parameters:
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the register user widget.
->  - **pre_authorization:** _bool, default True_
->    - Specifies the pre-authorization requirement, True: user must be pre-authorized to register, False: any user can register.
+>  - **pre_authorized:** _list, optional, default None_
+>    - Optional list of emails of unregistered users who are authorized to register. If no list is provided, all users will be allowed to register.
 >  - **domains:** _list, optional, default None_
 >    - Specifies the required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], list: the required list of domains, None: any domain is allowed.
 >  - **fields:** _dict, optional, default {'Form name':'Register user', 'Email':'Email', 'Username':'Username', 'Password':'Password', 'Repeat password':'Repeat password', 'Register':'Register'}_
