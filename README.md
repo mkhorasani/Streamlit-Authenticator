@@ -116,7 +116,7 @@ authenticator = stauth.Authenticate(
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
 
-* **_Please remember to pass the authenticator object to each and every page in a multi-page application._**
+* **_Please remember to pass the authenticator object to each and every page in a multi-page application as a session state variable._**
 
 ### 3. Creating a login widget
 
