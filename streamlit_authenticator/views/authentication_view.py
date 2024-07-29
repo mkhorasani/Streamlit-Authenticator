@@ -61,7 +61,7 @@ class Authenticate:
                         captcha: bool=False, clear_on_submit: bool=False,
                         key: str='Forgot password', callback: Optional[Callable]=None) -> tuple:
         """
-        Creates a forgot password widget.
+        Renders a forgot password widget.
 
         Parameters
         ----------
@@ -118,7 +118,7 @@ class Authenticate:
                         captcha: bool=False, clear_on_submit: bool=False,
                         key: str='Forgot username', callback: Optional[Callable]=None) -> tuple:
         """
-        Creates a forgot username widget.
+        Renders a forgot username widget.
 
         Parameters
         ----------
@@ -174,7 +174,7 @@ class Authenticate:
               captcha: bool=False, clear_on_submit: bool=False, key: str='Login',
               callback: Optional[Callable]=None, sleep_time: Optional[float]=None) -> tuple:
         """
-        Creates a login widget.
+        Renders a login widget.
 
         Parameters
         ----------
@@ -254,7 +254,7 @@ class Authenticate:
     def logout(self, button_name: str='Logout', location: str='main', key: str='Logout',
                callback: Optional[Callable]=None):
         """
-        Creates a logout button.
+        Renders a logout button.
 
         Parameters
         ----------
@@ -292,7 +292,7 @@ class Authenticate:
                       captcha: bool=True, clear_on_submit: bool=False, key: str='Register user',
                       callback: Optional[Callable]=None) -> tuple:
         """
-        Creates a register new user widget.
+        Renders a register new user widget.
 
         Parameters
         ----------
@@ -373,7 +373,7 @@ class Authenticate:
                        fields: Optional[Dict[str, str]]=None, clear_on_submit: bool=False,
                        key: str='Reset password', callback: Optional[Callable]=None) -> bool:
         """
-        Creates a password reset widget.
+        Renders a password reset widget.
 
         Parameters
         ----------
@@ -435,7 +435,7 @@ class Authenticate:
                             clear_on_submit: bool=False, key: str='Update user details',
                             callback: Optional[Callable]=None) -> bool:
         """
-        Creates a update user details widget.
+        Renders a update user details widget.
 
         Parameters
         ----------
