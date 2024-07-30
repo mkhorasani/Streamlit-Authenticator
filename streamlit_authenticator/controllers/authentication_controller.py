@@ -70,7 +70,7 @@ class AuthenticationController:
         username: str
             Username associated with the forgotten password.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
         captcha: bool
             Captcha requirement for the login widget, 
             True: captcha required,
@@ -106,7 +106,7 @@ class AuthenticationController:
         email: str
             Email associated with the forgotten username.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
         captcha: bool
             Captcha requirement for the login widget, 
             True: captcha required,
@@ -150,7 +150,7 @@ class AuthenticationController:
         token: dict, optional
             The re-authentication cookie to get the username from.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
         captcha: bool
             Captcha requirement for the login widget, 
             True: captcha required,
@@ -209,7 +209,7 @@ class AuthenticationController:
             list: the required list of domains, 
             None: any domain is allowed.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
         captcha: bool
             Captcha requirement for the login widget, 
             True: captcha required,
@@ -271,7 +271,7 @@ class AuthenticationController:
         new_password_repeat: str
             Repeated new password of the user.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -303,7 +303,7 @@ class AuthenticationController:
         field: str
             Field to update i.e. name or email.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
