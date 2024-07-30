@@ -140,9 +140,9 @@ authenticator.login()
 >  - **key:** _str, default 'Login'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 >  - **sleep_time:** _float, optional, default None_
->    - Optional sleep time for the login widget.
+>    - Sleep time for the login widget.
 > #### Returns:
 > - _str_
 >   - Name of the authenticated user.
@@ -181,7 +181,7 @@ elif st.session_state['authentication_status'] is None:
 >  - **key:** _str, default None_
 >    - Unique key that should be used in multi-page applications.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/logged_in.JPG)
 
@@ -217,7 +217,7 @@ if st.session_state['authentication_status']:
 >  - **key:** _str, default 'Reset password'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns::
 > - _bool_
 >   - Status of resetting the password.
@@ -247,7 +247,7 @@ except Exception as e:
 >  - **location:** _str, {'main', 'sidebar'}, default 'main'_
 >    - Specifies the location of the register user widget.
 >  - **pre_authorized:** _list, optional, default None_
->    - Optional list of emails of unregistered users who are authorized to register. If no list is provided, all users will be allowed to register.
+>    - List of emails of unregistered users who are authorized to register. If no list is provided, all users will be allowed to register.
 >  - **domains:** _list, optional, default None_
 >    - Specifies the required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], list: the required list of domains, None: any domain is allowed.
 >  - **fields:** _dict, optional, default {'Form name':'Register user', 'Email':'Email', 'Username':'Username', 'Password':'Password', 'Repeat password':'Repeat password', 'Register':'Register'}_
@@ -259,7 +259,7 @@ except Exception as e:
 >  - **key:** _str, default 'Register user'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _str_
 >   - Email associated with the new user.
@@ -303,7 +303,7 @@ except Exception as e:
 >  - **key:** _str, default 'Forgot password'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _str_
 >   - Username associated with the forgotten password.
@@ -346,7 +346,7 @@ except Exception as e:
 >  - **key:** _str, default 'Forgot username'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _str_
 >   - Forgotten username that should be transferred to the user securely.
@@ -382,7 +382,7 @@ if st.session_state['authentication_status']:
 >  - **key:** _str, default 'Update user details'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
->    - Optional callback function that will be invoked on form submission with a dict as a parameter.
+>    - Callback function that will be invoked on form submission with a dict as a parameter.
 > #### Returns:
 > - _bool_
 >   - Status of updating the user details.
