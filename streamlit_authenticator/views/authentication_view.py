@@ -6,11 +6,13 @@ Libraries imported:
 - time: Module implementing the sleep function.
 - typing: Module implementing standard typing notations for Python functions.
 - streamlit: Framework used to build pure Python web applications.
+- streamlit_oauth: Module used to implement Google OAuth login.
 """
 
 import time
 from typing import Callable, Dict, List, Optional
 import streamlit as st
+from streamlit_oauth import OAuth2Component
 
 import params
 from controllers import AuthenticationController, CookieController
@@ -80,7 +82,7 @@ class Authenticate:
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -137,7 +139,7 @@ class Authenticate:
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -169,6 +171,69 @@ class Authenticate:
             return self.authentication_controller.forgot_username(email, callback,
                                                                   captcha, entered_captcha)
         return None, email
+    def guest_login(self, location: str='main', max_concurrent_users: Optional[int]=None,
+              max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
+              google_variables: Optional[dict]=None, captcha: bool=False,
+              clear_on_submit: bool=False, key: str='Login', callback: Optional[Callable]=None,
+              sleep_time: Optional[float]=None) -> tuple:
+        """
+        Renders a login widget.
+
+        Parameters
+        ----------
+        location: str
+            Location of the logout button i.e. main, sidebar or unrendered.
+        max_concurrent_users: int, optional
+            Maximum number of users allowed to login concurrently.
+        max_login_attempts: int, optional
+            Maximum number of failed login attempts a user can make.
+        fields: dict, optional
+            Rendered names of the fields/buttons.
+        google_variables: dict, optional
+            Config variables to implement a Google OAuth login.
+        captcha: bool
+            Captcha requirement for the login widget, 
+            True: captcha required,
+            False: captcha removed.
+        clear_on_submit: bool
+            Clear on submit setting, 
+            True: clears inputs on submit, 
+            False: keeps inputs on submit.
+        key: str
+            Unique key provided to widget to avoid duplicate WidgetID errors.
+        callback: callable, optional
+            Callback function that will be invoked on form submission.
+        sleep_time: float, optional
+            Sleep time for the login widget.
+
+        Returns
+        -------
+        str
+            Email of the authenticated user.
+        bool
+            Status of authentication, 
+            None: no credentials entered, 
+            True: correct credentials, 
+            False: incorrect credentials.
+        """
+        oauth2 = OAuth2Component(google_variables['client_id'],
+                                 google_variables['client_secret'],
+                                 google_variables['authorize_url'],
+                                 google_variables['token_url'])
+        # Check if token exists in session state
+        if 'token' not in st.session_state:
+            # If not, show authorize button
+            result = oauth2.authorize_button('Google login',
+                                             google_variables['redirect_uri'],
+                                             google_variables['scope'])
+            if result and 'token' in result:
+                # If authorization successful, save token in session state
+                st.session_state.token = result.get('token')
+                st.experimental_rerun()
+        else:
+            # If token exists in session state, show the token
+            token = st.session_state['token']
+        pass
     def login(self, location: str='main', max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
               captcha: bool=False, clear_on_submit: bool=False, key: str='Login',
@@ -197,9 +262,9 @@ class Authenticate:
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
         sleep_time: float, optional
-            Optional sleep time for the login widget.
+            Sleep time for the login widget.
 
         Returns
         -------
@@ -265,7 +330,7 @@ class Authenticate:
         key: str
             Unique key to be used in multi-page applications.
         callback: callable, optional
-            Optional callback function that will be invoked on submission.
+            Callback function that will be invoked on submission.
         """
         if not st.session_state['authentication_status']:
             raise LogoutError('User must be logged in to use the logout button')
@@ -317,7 +382,7 @@ class Authenticate:
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -390,7 +455,7 @@ class Authenticate:
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -452,7 +517,7 @@ class Authenticate:
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
