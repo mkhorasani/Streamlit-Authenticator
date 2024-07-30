@@ -21,7 +21,7 @@ Streamlit-Authenticator is distributed via [PyPI](https://pypi.org/project/strea
 pip install streamlit-authenticator
 ```
 
-Please feel free to test the [demo app](https://demoapp-v0-3-3.streamlit.app/).
+Please feel free to test the [demo app](https://demo-app-v0-3-3.streamlit.app/).
 
 ## Example
 
