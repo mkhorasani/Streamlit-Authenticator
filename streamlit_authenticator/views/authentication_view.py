@@ -329,9 +329,9 @@ class Authenticate:
             Name associated with the new user.
         """
         if isinstance(pre_authorized, bool):
-            raise DeprecationError(f"""Please note that the 'pre_authorized' now requires the list
-                                   of pre-authorized emails. For further information please refer
-                                   to {params.REGISTER_USER_LINK}.""")
+            raise DeprecationError(f"""Please note that the 'pre_authorized' parameter now
+                                   requires the list of pre-authorized emails. For further
+                                   information please refer to {params.REGISTER_USER_LINK}.""")
         if fields is None:
             fields = {'Form name':'Register user', 'Email':'Email', 'Username':'Username',
                       'Password':'Password', 'Repeat password':'Repeat password',
