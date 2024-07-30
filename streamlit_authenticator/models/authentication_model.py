@@ -155,7 +155,7 @@ class AuthenticationModel:
         username: str
             Username associated with the forgotten password.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -181,7 +181,7 @@ class AuthenticationModel:
         email: str
             Email associated with the forgotten username.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -243,7 +243,7 @@ class AuthenticationModel:
         token: dict, optional
             The re-authentication cookie to get the username from.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -338,7 +338,7 @@ class AuthenticationModel:
         pre-authorized: list, optional
             List of emails of unregistered users who are authorized to register. 
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -379,7 +379,7 @@ class AuthenticationModel:
         new_password: str
             New password of the user.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -453,7 +453,7 @@ class AuthenticationModel:
         field: str
             Field to update i.e. name or email.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
