@@ -22,7 +22,7 @@ class CookieModel:
     """
     def __init__(self, cookie_name: str, cookie_key: str, cookie_expiry_days: float):
         """
-        Create a new instance of "CookieService".
+        Create a new instance of "CookieModel".
 
         Parameters
         ----------
