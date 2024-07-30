@@ -27,7 +27,7 @@ class AuthenticationModel:
     def __init__(self, credentials: dict, validator: Optional[Validator]=None,
                  auto_hash: bool=True):
         """
-        Create a new instance of "AuthenticationService".
+        Create a new instance of "AuthenticationModel".
 
         Parameters
         ----------
