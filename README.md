@@ -23,6 +23,7 @@
 - [Creating a forgot username widget](#8-creating-a-forgot-username-widget)
 - [Creating an update user details widget](#9-creating-an-update-user-details-widget)
 - [Updating the configuration file](#10-updating-the-configuration-file)
+- [License](#license)
 
 ## Installation
 
@@ -416,3 +417,7 @@ with open('../config.yaml', 'w') as file:
 
 <!--- ## Credits
 - Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components). --->
+
+## License
+
+This project is proprietary software. The use of this software is governed by the terms specified in the [LICENSE](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/LICENSE) file. Unauthorized copying, modification, or distribution of this software is prohibited.
