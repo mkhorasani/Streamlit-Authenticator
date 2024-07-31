@@ -12,6 +12,17 @@
 
 ###### _To learn more please refer to my book [Web Application Development with Streamlit](http://tinyurl.com/2p8mw32d)._
 
+## Table of Contents
+- [Creating a configuration file](#1-creating-a-configuration-file)
+- [Setup](#2-setup)
+- [Creating a login widget](#3-creating-a-login-widget)
+- [Authenticating users](#4-authenticating-users)
+- [Creating a reset password widget](#5-creating-a-reset-password-widget)
+- [Creating a new user registration widget](#6-creating-a-new-user-registration-widget)
+- [Creating a forgot password widget](#7-creating-a-forgot-password-widget)
+- [Creating a forgot username widget](#8-creating-a-forgot-username-widget)
+- [Creating an update user details widget](#9-creating-an-update-user-details-widget)
+- [Updating the configuration file](#10-updating-the-configuration-file)
 
 ## Installation
 
