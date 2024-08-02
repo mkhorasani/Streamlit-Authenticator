@@ -42,13 +42,13 @@ class AuthenticationModel:
         """
         self.credentials = credentials
         if self.credentials['usernames']:
-            if 'AuthenticationService.__init__' not in st.session_state:
-                st.session_state['AuthenticationService.__init__'] = None
-            if not st.session_state['AuthenticationService.__init__']:
-                self.credentials['usernames'] = {
-                    key.lower(): value
-                    for key, value in self.credentials['usernames'].items()
-                    }
+            self.credentials['usernames'] = {
+                key.lower(): value
+                for key, value in self.credentials['usernames'].items()
+                }
+            if 'AuthenticationModel.__init__' not in st.session_state:
+                st.session_state['AuthenticationModel.__init__'] = None
+            if not st.session_state['AuthenticationModel.__init__']:
                 if auto_hash:
                     if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
                         print(f"""Auto hashing in progress. To avoid runtime delays, please manually
@@ -60,7 +60,7 @@ class AuthenticationModel:
                         if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
                             self.credentials['usernames'][username]['password'] = \
                             Hasher._hash(self.credentials['usernames'][username]['password'])
-                st.session_state['AuthenticationService.__init__'] = True
+                st.session_state['AuthenticationModel.__init__'] = True
         else:
             self.credentials['usernames'] = {}
         self.validator = validator if validator is not None else Validator()
