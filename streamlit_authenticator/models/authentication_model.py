@@ -46,21 +46,17 @@ class AuthenticationModel:
                 key.lower(): value
                 for key, value in self.credentials['usernames'].items()
                 }
-            if 'AuthenticationModel.__init__' not in st.session_state:
-                st.session_state['AuthenticationModel.__init__'] = None
-            if not st.session_state['AuthenticationModel.__init__']:
-                if auto_hash:
-                    if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
-                        print(f"""Auto hashing in progress. To avoid runtime delays, please manually
-                              pre-hash all plain text passwords in the credentials using the
-                              Hasher.hash_passwords function, and set auto_hash=False for the
-                              Authenticate class. For more information please refer to
-                              {params.AUTO_HASH_MAX_USERS_LINK}.""")
-                    for username, _ in self.credentials['usernames'].items():
-                        if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
-                            self.credentials['usernames'][username]['password'] = \
-                            Hasher._hash(self.credentials['usernames'][username]['password'])
-                st.session_state['AuthenticationModel.__init__'] = True
+            if auto_hash:
+                if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
+                    print(f"""Auto hashing in progress. To avoid runtime delays, please manually
+                            pre-hash all plain text passwords in the credentials using the
+                            Hasher.hash_passwords function, and set auto_hash=False for the
+                            Authenticate class. For more information please refer to
+                            {params.AUTO_HASH_MAX_USERS_LINK}.""")
+                for username, _ in self.credentials['usernames'].items():
+                    if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
+                        self.credentials['usernames'][username]['password'] = \
+                        Hasher._hash(self.credentials['usernames'][username]['password'])
         else:
             self.credentials['usernames'] = {}
         self.validator = validator if validator is not None else Validator()
@@ -112,7 +108,7 @@ class AuthenticationModel:
             self._record_failed_login_attempts(username)
             return False
         except (TypeError, ValueError) as e:
-            print(e)
+            print(f'{e} please hash all plain text passwords')
         return None
     def _count_concurrent_users(self) -> int:
         """
