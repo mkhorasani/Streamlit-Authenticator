@@ -16,8 +16,7 @@ from utilities import (Hasher,
                          CredentialsError,
                          LoginError,
                          RegisterError,
-                         UpdateError,
-                         Validator)
+                         UpdateError)
 
 class AuthenticationModel:
     """
