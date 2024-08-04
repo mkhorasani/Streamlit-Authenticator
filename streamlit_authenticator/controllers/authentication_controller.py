@@ -39,9 +39,7 @@ class AuthenticationController:
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
         """
-        self.authentication_model = AuthenticationModel(credentials,
-                                                        validator,
-                                                        auto_hash)
+        self.authentication_model = AuthenticationModel(credentials, auto_hash)
         self.validator = validator if validator is not None else Validator()
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
