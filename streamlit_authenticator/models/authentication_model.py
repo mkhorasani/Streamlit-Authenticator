@@ -24,8 +24,7 @@ class AuthenticationModel:
     This class executes the logic for the login, logout, register user, reset password, 
     forgot password, forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, validator: Optional[Validator]=None,
-                 auto_hash: bool=True):
+    def __init__(self, credentials: dict, auto_hash: bool=True):
         """
         Create a new instance of "AuthenticationModel".
 
@@ -33,8 +32,6 @@ class AuthenticationModel:
         ----------
         credentials: dict
             Dictionary of usernames, names, passwords, emails, and other user data.  
-        validator: Validator, optional
-            Validator object that checks the validity of the username, name, and email fields.
         auto_hash: bool
             Automatic hashing requirement for the passwords, 
             True: plain text passwords will be automatically hashed,
@@ -59,7 +56,6 @@ class AuthenticationModel:
                         Hasher._hash(self.credentials['usernames'][username]['password'])
         else:
             self.credentials['usernames'] = {}
-        self.validator = validator if validator is not None else Validator()
         if 'name' not in st.session_state:
             st.session_state['name'] = None
         if 'authentication_status' not in st.session_state:
