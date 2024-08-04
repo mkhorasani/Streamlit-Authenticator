@@ -42,7 +42,7 @@ class AuthenticationController:
         self.authentication_model = AuthenticationModel(credentials,
                                                         validator,
                                                         auto_hash)
-        self.validator = Validator()
+        self.validator = validator if validator is not None else Validator()
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
         Checks the validity of the entered captcha.
