@@ -98,7 +98,7 @@ except ForgotError as e:
 if st.session_state["authentication_status"]:
     try:
         if authenticator.update_user_details(st.session_state["username"]):
-            st.success('Entries updated successfully')
+            st.success('Entry updated successfully')
     except UpdateError as e:
         st.error(e)
 
