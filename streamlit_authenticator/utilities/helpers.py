@@ -70,12 +70,12 @@ class Helpers:
         Parameters
         ----------
         length: int
-            Length of the returned password.
+            Length of the randomly generated password.
 
         Returns
         -------
         str
             Randomly generated password.
         """
-        letters = string.ascii_letters + string.digits
+        letters = string.ascii_letters + string.digits + string.punctuation
         return ''.join(random.choice(letters) for i in range(length)).replace(' ','')
