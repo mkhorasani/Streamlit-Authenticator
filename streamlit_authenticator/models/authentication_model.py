@@ -251,10 +251,15 @@ class AuthenticationModel:
                 st.session_state['authentication_status'] = True
                 self._record_failed_login_attempts(username, reset=True)
                 self.credentials['usernames'][username]['logged_in'] = True
+                if 'password_hint' in st.session_state:
+                    del st.session_state['password_hint']
                 if callback:
                     callback({'username': username})
                 return True
             st.session_state['authentication_status'] = False
+            if 'password_hint' in self._get_credentials()[username]:
+                st.session_state['password_hint'] = \
+                    self._get_credentials()[username]['password_hint']
             return False
         if token:
             if not token['username'] in self.credentials['usernames']:

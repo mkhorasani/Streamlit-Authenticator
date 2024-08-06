@@ -260,6 +260,8 @@ except Exception as e:
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on form submission with a dict as a parameter.
+>  - **password_instructions:** _str, optional, default None_
+>    - Instructions to select the new password.
 > #### Returns:
 > - _str_
 >   - Email associated with the new user.

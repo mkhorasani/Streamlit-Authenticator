@@ -229,7 +229,7 @@ class Authenticate:
             if result and 'token' in result:
                 # If authorization successful, save token in session state
                 st.session_state.token = result.get('token')
-                st.experimental_rerun()
+                st.rerun()
         else:
             # If token exists in session state, show the token
             token = st.session_state['token']
@@ -287,7 +287,7 @@ class Authenticate:
             token = self.cookie_controller.get_cookie()
             if token:
                 self.authentication_controller.login(token=token)
-            time.sleep(params.LOGIN_SLEEP_TIME if sleep_time is None else sleep_time)
+            time.sleep(params.PRE_LOGIN_SLEEP_TIME if sleep_time is None else sleep_time)
             if not st.session_state['authentication_status']:
                 if location == 'main':
                     login_form = st.form(key=key, clear_on_submit=clear_on_submit)
@@ -299,8 +299,13 @@ class Authenticate:
                 login_form.subheader('Login' if 'Form name' not in fields else fields['Form name'])
                 username = login_form.text_input('Username' if 'Username' not in fields
                                                  else fields['Username'])
-                password = login_form.text_input('Password' if 'Password' not in fields
-                                                 else fields['Password'], type='password')
+                if 'password_hint' in st.session_state:
+                    password = login_form.text_input('Password' if 'Password' not in fields
+                                                    else fields['Password'], type='password',
+                                                    help=st.session_state['password_hint'])
+                else:
+                    password = login_form.text_input('Password' if 'Password' not in fields
+                                                    else fields['Password'], type='password')
                 entered_captcha = None
                 if captcha:
                     entered_captcha = login_form.text_input('Captcha' if 'Captcha' not in fields
@@ -314,6 +319,7 @@ class Authenticate:
                                                             callback=callback, captcha=captcha,
                                                             entered_captcha=entered_captcha):
                         self.cookie_controller.set_cookie()
+                    time.sleep(params.POST_LOGIN_SLEEP_TIME)
                     st.rerun()
         return (st.session_state['name'], st.session_state['authentication_status'],
                 st.session_state['username'])
@@ -356,7 +362,8 @@ class Authenticate:
     def register_user(self, location: str='main', pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, fields: Optional[Dict[str, str]]=None,
                       captcha: bool=True, clear_on_submit: bool=False, key: str='Register user',
-                      callback: Optional[Callable]=None) -> tuple:
+                      callback: Optional[Callable]=None,
+                      password_instructions: Optional[str]=None) -> tuple:
         """
         Renders a register new user widget.
 
@@ -384,6 +391,8 @@ class Authenticate:
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
             Callback function that will be invoked on form submission.
+        password_instructions: str, optional
+            Instructions to select the new password.
 
         Returns
         -------
@@ -418,7 +427,10 @@ class Authenticate:
                                                      else fields['Username'])
         new_password = register_user_form.text_input('Password' if 'Password' not in fields
                                                      else fields['Password'],
-                                                     type='password')
+                                                     type='password',
+                                                     help=params.PASSWORD_INSTRUCTIONS if \
+                                                     password_instructions is None else \
+                                                     password_instructions)
         new_password_repeat = register_user_form.text_input('Repeat password'
                                                             if 'Repeat password' not in fields
                                                             else fields['Repeat password'],
