@@ -10,7 +10,7 @@ Libraries imported:
 """
 
 import time
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 import streamlit as st
 from streamlit_oauth import OAuth2Component
 
@@ -25,7 +25,7 @@ class Authenticate:
     """
     def __init__(self, credentials: dict, cookie_name: str, cookie_key: str,
                  cookie_expiry_days: float=30.0, validator: Optional[Validator]=None,
-                 auto_hash: bool=True):
+                 auto_hash: bool=True, **kwargs: Optional[Dict[str, Any]]):
         """
         Create a new instance of "Authenticate".
 
@@ -47,6 +47,8 @@ class Authenticate:
             Automatic hashing requirement for passwords, 
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
+        **kwargs : dict, optional
+            Arguments to pass to the Authenticate class.
         """
         if isinstance(validator, dict):
             raise DeprecationError(f"""Please note that the 'pre_authorized' list parameter has been
@@ -59,6 +61,7 @@ class Authenticate:
         self.authentication_controller  =   AuthenticationController(credentials,
                                                                      validator,
                                                                      auto_hash)
+        self.attrs = kwargs
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
                         key: str='Forgot password', callback: Optional[Callable]=None) -> tuple:
@@ -237,7 +240,7 @@ class Authenticate:
     def login(self, location: str='main', max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
               captcha: bool=False, clear_on_submit: bool=False, key: str='Login',
-              callback: Optional[Callable]=None, sleep_time: Optional[float]=None) -> tuple:
+              callback: Optional[Callable]=None) -> tuple:
         """
         Renders a login widget.
 
@@ -263,8 +266,6 @@ class Authenticate:
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
             Callback function that will be invoked on form submission.
-        sleep_time: float, optional
-            Sleep time for the login widget.
 
         Returns
         -------
@@ -287,7 +288,8 @@ class Authenticate:
             token = self.cookie_controller.get_cookie()
             if token:
                 self.authentication_controller.login(token=token)
-            time.sleep(params.PRE_LOGIN_SLEEP_TIME if sleep_time is None else sleep_time)
+            time.sleep(params.PRE_LOGIN_SLEEP_TIME if 'login_sleep_time' not in self.attrs \
+                       else self.attrs['login_sleep_time'])
             if not st.session_state['authentication_status']:
                 if location == 'main':
                     login_form = st.form(key=key, clear_on_submit=clear_on_submit)

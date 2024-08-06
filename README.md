@@ -112,6 +112,8 @@ authenticator = stauth.Authenticate(
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
+>  - ****kwargs:** _dict, optional_
+>    - Arguments to pass to the Authenticate class.
 
 * **_Please remember to recreate the authenticator object on each and every page in a multi-page application._**
 
