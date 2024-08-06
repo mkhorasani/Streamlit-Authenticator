@@ -314,6 +314,7 @@ class Authenticate:
                                                             callback=callback, captcha=captcha,
                                                             entered_captcha=entered_captcha):
                         self.cookie_controller.set_cookie()
+                    st.rerun()
         return (st.session_state['name'], st.session_state['authentication_status'],
                 st.session_state['username'])
     def logout(self, button_name: str='Logout', location: str='main', key: str='Logout',
