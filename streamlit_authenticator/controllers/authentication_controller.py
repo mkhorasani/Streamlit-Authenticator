@@ -251,7 +251,7 @@ class AuthenticationController:
         if new_password != new_password_repeat:
             raise RegisterError('Passwords do not match')
         if not self.validator.validate_length(password_hint, 1):
-            raise Register('Password hint cannot be empty')
+            raise RegisterError('Password hint cannot be empty')
         if not self.validator.validate_password(new_password):
             raise RegisterError('Password does not meet criteria')
         if captcha:
