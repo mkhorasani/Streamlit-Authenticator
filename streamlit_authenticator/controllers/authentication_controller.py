@@ -182,7 +182,7 @@ class AuthenticationController:
         self.authentication_model.logout()
     def register_user(self, new_name: str, new_email: str, new_username: str,
                       new_password: str, new_password_repeat: str,
-                      pre_authorized: Optional[List[str]]=None,
+                      password_hint: str, pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, callback: Optional[Callable]=None,
                       captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
         """
@@ -200,6 +200,8 @@ class AuthenticationController:
             Password of the new user.
         new_password_repeat: str
             Repeated password of the new user.
+        password_hint: str
+            Password hint for the user to remember a forgotten password.
         pre-authorized: list, optional
             List of emails of unregistered users who are authorized to register. 
         domains: list, optional
@@ -229,6 +231,7 @@ class AuthenticationController:
         new_username = new_username.lower().strip()
         new_password = new_password.strip()
         new_password_repeat = new_password_repeat.strip()
+        password_hint = password_hint.strip()
         if not self.validator.validate_name(new_name):
             raise RegisterError('Name is not valid')
         if not self.validator.validate_email(new_email):
@@ -243,6 +246,8 @@ class AuthenticationController:
             raise RegisterError('Password/repeat password fields cannot be empty')
         if new_password != new_password_repeat:
             raise RegisterError('Passwords do not match')
+        if not self.validator.validate_length(password_hint, 1):
+            raise Register('Password hint cannot be empty')
         if not self.validator.validate_password(new_password):
             raise RegisterError('Password does not meet criteria')
         if captcha:
@@ -251,8 +256,8 @@ class AuthenticationController:
             entered_captcha = entered_captcha.strip()
             self._check_captcha('register_user_captcha', RegisterError, entered_captcha)
         return self.authentication_model.register_user(new_name, new_email, new_username,
-                                                       new_password, pre_authorized,
-                                                       callback)
+                                                       new_password, password_hint,
+                                                       pre_authorized, callback)
     def reset_password(self, username: str, password: str, new_password: str,
                        new_password_repeat: str, callback: Optional[Callable]=None) -> bool:
         """
