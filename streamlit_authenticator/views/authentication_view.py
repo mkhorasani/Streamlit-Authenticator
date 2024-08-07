@@ -412,7 +412,7 @@ class Authenticate:
         if fields is None:
             fields = {'Form name':'Register user', 'Email':'Email', 'Username':'Username',
                       'Password':'Password', 'Repeat password':'Repeat password',
-                      'Register':'Register', 'Captcha':'Captcha'}
+                      'Password hint':'Password hint', 'Register':'Register', 'Captcha':'Captcha'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -437,6 +437,9 @@ class Authenticate:
                                                             if 'Repeat password' not in fields
                                                             else fields['Repeat password'],
                                                             type='password')
+        password_hint = register_user_form.text_input('Password hint'
+                                                      if 'Password hint' not in fields
+                                                      else fields['Password hint'])
         entered_captcha = None
         if captcha:
             entered_captcha = register_user_form.text_input('Captcha' if 'Captcha' not in fields
@@ -446,8 +449,9 @@ class Authenticate:
                                                  else fields['Register']):
             return self.authentication_controller.register_user(new_name, new_email, new_username,
                                                                 new_password, new_password_repeat,
-                                                                pre_authorized, domains,
-                                                                callback, captcha, entered_captcha)
+                                                                password_hint, pre_authorized,
+                                                                domains, callback, captcha,
+                                                                entered_captcha)
         return None, None, None
     def reset_password(self, username: str, location: str='main',
                        fields: Optional[Dict[str, str]]=None, clear_on_submit: bool=False,
