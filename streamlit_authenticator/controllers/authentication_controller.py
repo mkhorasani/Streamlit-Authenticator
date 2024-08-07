@@ -174,12 +174,16 @@ class AuthenticationController:
             self._check_captcha('login_captcha', LoginError, entered_captcha)
         return self.authentication_model.login(username, password, max_concurrent_users,
                                                max_login_attempts, token, callback)
-    def logout(self):
+    def logout(self, callback: Optional[Callable]=None):
         """
         Controls the request to logout the user.
 
+        Parameters
+        ----------
+        callback: callable, optional
+            Callback function that will be invoked on button press.
         """
-        self.authentication_model.logout()
+        self.authentication_model.logout(callback)
     def register_user(self, new_name: str, new_email: str, new_username: str,
                       new_password: str, new_password_repeat: str,
                       password_hint: str, pre_authorized: Optional[List[str]]=None,
