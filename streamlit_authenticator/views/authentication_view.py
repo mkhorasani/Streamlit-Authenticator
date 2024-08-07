@@ -347,16 +347,12 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
         if location == 'main':
             if st.button(button_name, key=key):
-                self.authentication_controller.logout()
+                self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
-                if callback:
-                    callback({})
         elif location == 'sidebar':
             if st.sidebar.button(button_name, key=key):
-                self.authentication_controller.logout()
+                self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
-                if callback:
-                    callback({})
         elif location == 'unrendered':
             if st.session_state['authentication_status']:
                 self.authentication_controller.logout()
