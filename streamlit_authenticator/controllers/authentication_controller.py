@@ -184,8 +184,8 @@ class AuthenticationController:
             Callback function that will be invoked on button press.
         """
         self.authentication_model.logout(callback)
-    def register_user(self, new_name: str, new_email: str, new_username: str,
-                      new_password: str, new_password_repeat: str,
+    def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
+                      new_username: str, new_password: str, new_password_repeat: str,
                       password_hint: str, pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, callback: Optional[Callable]=None,
                       captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
@@ -194,8 +194,10 @@ class AuthenticationController:
 
         Parameters
         ----------
-        new_name: str
-            Name of the new user.
+        new_first_name: str
+            First name of the new user.
+        new_last_name: str
+            Last name of the new user.
         new_email: str
             Email of the new user.
         new_username: str
@@ -230,14 +232,17 @@ class AuthenticationController:
         str
             Name of the new user.
         """
-        new_name = new_name.strip()
+        new_first_name = new_first_name.strip()
+        new_last_name = new_last_name.strip()
         new_email = new_email.strip()
         new_username = new_username.lower().strip()
         new_password = new_password.strip()
         new_password_repeat = new_password_repeat.strip()
         password_hint = password_hint.strip()
-        if not self.validator.validate_name(new_name):
-            raise RegisterError('Name is not valid')
+        if not self.validator.validate_name(new_first_name):
+            raise RegisterError('First name is not valid')
+        if not self.validator.validate_name(new_last_name):
+            raise RegisterError('Last name is not valid')
         if not self.validator.validate_email(new_email):
             raise RegisterError('Email is not valid')
         if domains:
@@ -259,8 +264,8 @@ class AuthenticationController:
                 raise RegisterError('Captcha not entered')
             entered_captcha = entered_captcha.strip()
             self._check_captcha('register_user_captcha', RegisterError, entered_captcha)
-        return self.authentication_model.register_user(new_name, new_email, new_username,
-                                                       new_password, password_hint,
+        return self.authentication_model.register_user(new_first_name, new_last_name, new_email,
+                                                       new_username, new_password, password_hint,
                                                        pre_authorized, callback)
     def reset_password(self, username: str, password: str, new_password: str,
                        new_password_repeat: str, callback: Optional[Callable]=None) -> bool:

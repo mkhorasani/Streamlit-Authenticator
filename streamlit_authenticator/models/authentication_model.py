@@ -247,7 +247,13 @@ class AuthenticationModel:
         if username:
             if self.check_credentials(username, password, max_concurrent_users, max_login_attempts):
                 st.session_state['username'] = username
-                st.session_state['name'] = self.credentials['usernames'][username]['name']
+                if 'first_name' in self.credentials['usernames'][username] and \
+                    'last_name' in self.credentials['usernames'][username]:
+                    first_name = self.credentials['usernames'][token['username']]['first_name']
+                    last_name = self.credentials['usernames'][token['username']]['last_name']
+                    st.session_state['name'] = f'{first_name} {last_name}'
+                else:
+                    st.session_state['name'] = self.credentials['usernames'][username]['name']
                 st.session_state['authentication_status'] = True
                 self._record_failed_login_attempts(username, reset=True)
                 self.credentials['usernames'][username]['logged_in'] = True
@@ -265,7 +271,13 @@ class AuthenticationModel:
             if not token['username'] in self.credentials['usernames']:
                 raise LoginError('User not authorized')
             st.session_state['username'] = token['username']
-            st.session_state['name'] = self.credentials['usernames'][token['username']]['name']
+            if 'first_name' in self.credentials['usernames'][token['username']] and \
+                'last_name' in self.credentials['usernames'][token['username']]:
+                first_name = self.credentials['usernames'][token['username']]['first_name']
+                last_name = self.credentials['usernames'][token['username']]['last_name']
+                st.session_state['name'] = f'{first_name} {last_name}'
+            else:
+                st.session_state['name'] = self.credentials['usernames'][token['username']]['name']
             st.session_state['authentication_status'] = True
             self.credentials['usernames'][token['username']]['logged_in'] = True
         return None
@@ -304,8 +316,8 @@ class AuthenticationModel:
             self.credentials['usernames'][username]['failed_login_attempts'] = 0
         else:
             self.credentials['usernames'][username]['failed_login_attempts'] += 1
-    def _register_credentials(self, username: str, name: str, password: str, email: str,
-                              password_hint: str):
+    def _register_credentials(self, username: str, first_name: str, last_name: str,
+                              password: str, email: str, password_hint: str):
         """
         Adds the new user's information to the credentials dictionary.
 
@@ -313,8 +325,10 @@ class AuthenticationModel:
         ----------
         username: str
             Username of the new user.
-        name: str
-            Name of the new user.
+        first_name: str
+            First name of the new user.
+        last_name: str
+            Last name of the new user.
         password: str
             Password of the new user.
         email: str
@@ -323,11 +337,12 @@ class AuthenticationModel:
             Password hint for the user to remember their password.
         """
         self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
-                                                   'name': name,
+                                                   'first_name': first_name,
+                                                   'last_name': last_name,
                                                    'password': Hasher.hash(password),
                                                    'password_hint': password_hint}
-    def register_user(self, new_name: str, new_email: str, new_username: str,
-                      new_password: str, password_hint: str,
+    def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
+                      new_username: str, new_password: str, password_hint: str,
                       pre_authorized: Optional[List[str]]=None,
                       callback: Optional[Callable]=None) -> tuple:
         """
@@ -335,8 +350,10 @@ class AuthenticationModel:
 
         Parameters
         ----------
-        new_name: str
-            Name of the new user.
+        new_first_name: str
+            First name of the new user.
+        new_last_name: str
+            Last name of the new user.
         new_email: str
             Email of the new user.
         new_username: str
@@ -364,18 +381,18 @@ class AuthenticationModel:
         if new_username in self.credentials['usernames']:
             raise RegisterError('Username already taken')
         if pre_authorized and new_email in pre_authorized['emails']:
-            self._register_credentials(new_username, new_name, new_password, new_email,
-                                       password_hint)
+            self._register_credentials(new_username, new_first_name, new_last_name, new_password,
+                                       new_email, password_hint)
             pre_authorized['emails'].remove(new_email)
-            return new_email, new_username, new_name
+            return new_email, new_username, f'{new_first_name} {new_last_name}'
         if pre_authorized and new_email not in pre_authorized['emails']:
             raise RegisterError('User not pre-authorized to register')
-        self._register_credentials(new_username, new_name, new_password, new_email,
-                                   password_hint)
+        self._register_credentials(new_username, new_first_name, new_last_name, new_password,
+                                   new_email, password_hint)
         if callback:
-            callback({'new_name': new_name, 'new_email': new_email,
-                      'new_username': new_username})
-        return new_email, new_username, new_name
+            callback({'new_name': new_first_name, 'new_last_name': new_last_name,
+                      'new_email': new_email, 'new_username': new_username})
+        return new_email, new_username, f'{new_first_name} {new_last_name}'
     def reset_password(self, username: str, password: str, new_password: str,
                        callback: Optional[Callable]=None) -> bool:
         """

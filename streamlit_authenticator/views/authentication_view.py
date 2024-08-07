@@ -406,7 +406,8 @@ class Authenticate:
                                    requires the list of pre-authorized emails. For further
                                    information please refer to {params.REGISTER_USER_LINK}.""")
         if fields is None:
-            fields = {'Form name':'Register user', 'Email':'Email', 'Username':'Username',
+            fields = {'Form name':'Register user', 'First name':'First name',
+                      'Last name':'Last name', 'Email':'Email', 'Username':'Username',
                       'Password':'Password', 'Repeat password':'Repeat password',
                       'Password hint':'Password hint', 'Register':'Register', 'Captcha':'Captcha'}
         if location not in ['main', 'sidebar']:
@@ -417,19 +418,22 @@ class Authenticate:
             register_user_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
         register_user_form.subheader('Register user' if 'Form name' not in fields
                                      else fields['Form name'])
-        new_name = register_user_form.text_input('Name' if 'Name' not in fields
-                                                 else fields['Name'])
-        new_email = register_user_form.text_input('Email' if 'Email' not in fields
+        col1, col2 = register_user_form.columns(2)
+        new_first_name = col1.text_input('First name' if 'First name' not in fields
+                                                 else fields['First name'])
+        new_last_name = col2.text_input('Last name' if 'Last name' not in fields
+                                                      else fields['Last name'])
+        new_email = col1.text_input('Email' if 'Email' not in fields
                                                   else fields['Email'])
-        new_username = register_user_form.text_input('Username' if 'Username' not in fields
+        new_username = col2.text_input('Username' if 'Username' not in fields
                                                      else fields['Username'])
-        new_password = register_user_form.text_input('Password' if 'Password' not in fields
+        new_password = col1.text_input('Password' if 'Password' not in fields
                                                      else fields['Password'],
                                                      type='password',
                                                      help=params.PASSWORD_INSTRUCTIONS if \
                                                      password_instructions is None else \
                                                      password_instructions)
-        new_password_repeat = register_user_form.text_input('Repeat password'
+        new_password_repeat = col2.text_input('Repeat password'
                                                             if 'Repeat password' not in fields
                                                             else fields['Repeat password'],
                                                             type='password')
@@ -443,7 +447,8 @@ class Authenticate:
             register_user_form.image(Helpers.generate_captcha('register_user_captcha'))
         if register_user_form.form_submit_button('Register' if 'Register' not in fields
                                                  else fields['Register']):
-            return self.authentication_controller.register_user(new_name, new_email, new_username,
+            return self.authentication_controller.register_user(new_first_name, new_last_name,
+                                                                new_email, new_username,
                                                                 new_password, new_password_repeat,
                                                                 password_hint, pre_authorized,
                                                                 domains, callback, captcha,
