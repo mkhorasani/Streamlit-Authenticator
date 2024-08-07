@@ -339,7 +339,7 @@ class Authenticate:
         key: str
             Unique key to be used in multi-page applications.
         callback: callable, optional
-            Callback function that will be invoked on submission.
+            Callback function that will be invoked on button press.
         """
         if not st.session_state['authentication_status']:
             raise LogoutError('User must be logged in to use the logout button')
