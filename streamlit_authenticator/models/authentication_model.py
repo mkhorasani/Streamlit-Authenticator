@@ -269,15 +269,22 @@ class AuthenticationModel:
             st.session_state['authentication_status'] = True
             self.credentials['usernames'][token['username']]['logged_in'] = True
         return None
-    def logout(self):
+    def logout(self, callback: Optional[Callable]=None):
         """
         Clears the cookie and session state variables associated with the logged in user.
+
+        Parameters
+        ----------
+        callback: callable, optional
+            Callback function that will be invoked on button press.
         """
         self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
         st.session_state['authentication_status'] = None
+        if callback:
+            callback({})
     def _record_failed_login_attempts(self, username: str, reset: bool=False):
         """
         Records the number of failed login attempts for a given username.
