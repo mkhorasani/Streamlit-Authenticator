@@ -50,7 +50,7 @@ class AuthenticationModel:
                             Authenticate class. For more information please refer to
                             {params.AUTO_HASH_MAX_USERS_LINK}.""")
                 for username, _ in self.credentials['usernames'].items():
-                    if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
+                    if not Hasher.is_hash(self.credentials['usernames'][username]['password']):
                         self.credentials['usernames'][username]['password'] = \
                         Hasher._hash(self.credentials['usernames'][username]['password'])
         else:
@@ -297,7 +297,8 @@ class AuthenticationModel:
             self.credentials['usernames'][username]['failed_login_attempts'] = 0
         else:
             self.credentials['usernames'][username]['failed_login_attempts'] += 1
-    def _register_credentials(self, username: str, name: str, password: str, email: str):
+    def _register_credentials(self, username: str, name: str, password: str, email: str,
+                              password_hint: str):
         """
         Adds the new user's information to the credentials dictionary.
 
@@ -311,12 +312,16 @@ class AuthenticationModel:
             Password of the new user.
         email: str
             Email of the new user.
+        password_hint: str
+            Password hint for the user to remember their password.
         """
-        self.credentials['usernames'][username] = \
-            {'name': name, 'password': Hasher([password]).generate()[0], 'email': email,
-             'logged_in': False}
+        self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
+                                                   'name': name,
+                                                   'password': Hasher.hash(password),
+                                                   'password_hint': password_hint}
     def register_user(self, new_name: str, new_email: str, new_username: str,
-                      new_password: str, pre_authorized: Optional[List[str]]=None,
+                      new_password: str, password_hint: str,
+                      pre_authorized: Optional[List[str]]=None,
                       callback: Optional[Callable]=None) -> tuple:
         """
         Registers a new user's name, username, password, and email.
@@ -331,6 +336,8 @@ class AuthenticationModel:
             Username of the new user.
         new_password: str
             Password of the new user.
+        password_hint: str
+            Password hint for the user to remember a forgotten password.
         pre-authorized: list, optional
             List of emails of unregistered users who are authorized to register. 
         callback: callable, optional
@@ -349,16 +356,18 @@ class AuthenticationModel:
             raise RegisterError('Email already taken')
         if new_username in self.credentials['usernames']:
             raise RegisterError('Username already taken')
-        if callback:
-            callback({'new_name': new_name, 'new_email': new_email,
-                      'new_username': new_username})
         if pre_authorized and new_email in pre_authorized['emails']:
-            self._register_credentials(new_username, new_name, new_password, new_email)
+            self._register_credentials(new_username, new_name, new_password, new_email,
+                                       password_hint)
             pre_authorized['emails'].remove(new_email)
             return new_email, new_username, new_name
         if pre_authorized and new_email not in pre_authorized['emails']:
             raise RegisterError('User not pre-authorized to register')
-        self._register_credentials(new_username, new_name, new_password, new_email)
+        self._register_credentials(new_username, new_name, new_password, new_email,
+                                   password_hint)
+        if callback:
+            callback({'new_name': new_name, 'new_email': new_email,
+                      'new_username': new_username})
         return new_email, new_username, new_name
     def reset_password(self, username: str, password: str, new_password: str,
                        callback: Optional[Callable]=None) -> bool:
