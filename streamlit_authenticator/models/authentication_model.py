@@ -337,7 +337,7 @@ class AuthenticationModel:
         new_password: str
             Password of the new user.
         password_hint: str
-            Password hint for the user to remember a forgotten password.
+            Password hint for the user to remember their password.
         pre-authorized: list, optional
             List of emails of unregistered users who are authorized to register. 
         callback: callable, optional
