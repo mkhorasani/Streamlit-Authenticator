@@ -37,24 +37,24 @@ class AuthenticationModel:
             False: plain text passwords will not be automatically hashed.
         """
         self.credentials = credentials
-        if self.credentials['usernames']:
-            self.credentials['usernames'] = {
+        if self._get_credentials():
+            self._get_credentials() = {
                 key.lower(): value
-                for key, value in self.credentials['usernames'].items()
+                for key, value in self._get_credentials().items()
                 }
             if auto_hash:
-                if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
+                if len(self._get_credentials()) > params.AUTO_HASH_MAX_USERS:
                     print(f"""Auto hashing in progress. To avoid runtime delays, please manually
                           pre-hash all plain text passwords in the credentials using the
                           Hasher.hash_passwords function, and set auto_hash=False for the
                           Authenticate class. For more information please refer to
                           {params.AUTO_HASH_MAX_USERS_LINK}.""")
-                for username, _ in self.credentials['usernames'].items():
-                    if not Hasher.is_hash(self.credentials['usernames'][username]['password']):
-                        self.credentials['usernames'][username]['password'] = \
-                        Hasher._hash(self.credentials['usernames'][username]['password'])
+                for username, _ in self._get_credentials().items():
+                    if not Hasher.is_hash(self._get_credentials()[username]['password']):
+                        self._get_credentials()[username]['password'] = \
+                        Hasher._hash(self._get_credentials()[username]['password'])
         else:
-            self.credentials['usernames'] = {}
+            self._get_credentials() = {}
         if 'name' not in st.session_state:
             st.session_state['name'] = None
         if 'authentication_status' not in st.session_state:
@@ -91,14 +91,14 @@ class AuthenticationModel:
         if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
             max_concurrent_users - 1:
             raise LoginError('Maximum number of concurrent users exceeded')
-        if username not in self.credentials['usernames']:
+        if username not in self._get_credentials():
             return False
         if isinstance(max_login_attempts, int) and \
-            'failed_login_attempts' in self.credentials['usernames'][username] and \
-            self.credentials['usernames'][username]['failed_login_attempts'] >= max_login_attempts:
+            'failed_login_attempts' in self._get_credentials()[username] and \
+            self._get_credentials()[username]['failed_login_attempts'] >= max_login_attempts:
             raise LoginError('Maximum number of login attempts exceeded')
         try:
-            if Hasher.check_pw(password, self.credentials['usernames'][username]['password']):
+            if Hasher.check_pw(password, self._get_credentials()[username]['password']):
                 return True
             self._record_failed_login_attempts(username)
             return False
@@ -115,9 +115,9 @@ class AuthenticationModel:
             Number of users logged in concurrently.
         """
         concurrent_users = 0
-        for username, _ in self.credentials['usernames'].items():
-            if 'logged_in' in self.credentials['usernames'][username] and \
-                self.credentials['usernames'][username]['logged_in']:
+        for username, _ in self._get_credentials().items():
+            if 'logged_in' in self._get_credentials()[username] and \
+                self._get_credentials()[username]['logged_in']:
                 concurrent_users += 1
         return concurrent_users
     def _credentials_contains_value(self, value: str) -> bool:
@@ -136,7 +136,7 @@ class AuthenticationModel:
             True: value present, 
             False value absent.
         """
-        return any(value in d.values() for d in self.credentials['usernames'].values())
+        return any(value in d.values() for d in self._get_credentials().values())
     def forgot_password(self, username: str, callback: Optional[Callable]=None) -> tuple:
         """
         Creates a new random password for the user.
@@ -157,7 +157,7 @@ class AuthenticationModel:
         str
             New random password of the user.
         """
-        if username in self.credentials['usernames']:
+        if username in self._get_credentials():
             if callback:
                 callback({'username': username})
             return (username, self._get_credentials()[username]['email'],
@@ -210,7 +210,7 @@ class AuthenticationModel:
         str
             Username associated with the given key, value pair i.e. "jsmith".
         """
-        for username, values in self.credentials['usernames'].items():
+        for username, values in self._get_credentials().items():
             if values[key] == value:
                 return username
         return False
@@ -246,17 +246,21 @@ class AuthenticationModel:
         """
         if username:
             if self.check_credentials(username, password, max_concurrent_users, max_login_attempts):
-                st.session_state['username'] = username
-                if 'first_name' in self.credentials['usernames'][username] and \
-                    'last_name' in self.credentials['usernames'][username]:
-                    first_name = self.credentials['usernames'][token['username']]['first_name']
-                    last_name = self.credentials['usernames'][token['username']]['last_name']
+                if 'first_name' in self._get_credentials()[username] and \
+                    'last_name' in self._get_credentials()[username]:
+                    first_name = self._get_credentials()[token['username']]['first_name']
+                    last_name = self._get_credentials()[token['username']]['last_name']
                     st.session_state['name'] = f'{first_name} {last_name}'
                 else:
-                    st.session_state['name'] = self.credentials['usernames'][username]['name']
+                    st.session_state['name'] = self._get_credentials()[username]['name']
+                st.session_state['username'] = username
                 st.session_state['authentication_status'] = True
+                if 'roles' in self._get_credentials()[username]:
+                    st.session_state['roles'] = self._get_credentials()[username]['roles']
+                else:
+                    st.session_state['roles'] = None
                 self._record_failed_login_attempts(username, reset=True)
-                self.credentials['usernames'][username]['logged_in'] = True
+                self._get_credentials()[username]['logged_in'] = True
                 if 'password_hint' in st.session_state:
                     del st.session_state['password_hint']
                 if callback:
@@ -268,18 +272,22 @@ class AuthenticationModel:
                     self._get_credentials()[username]['password_hint']
             return False
         if token:
-            if not token['username'] in self.credentials['usernames']:
+            if not token['username'] in self._get_credentials():
                 raise LoginError('User not authorized')
-            st.session_state['username'] = token['username']
-            if 'first_name' in self.credentials['usernames'][token['username']] and \
-                'last_name' in self.credentials['usernames'][token['username']]:
-                first_name = self.credentials['usernames'][token['username']]['first_name']
-                last_name = self.credentials['usernames'][token['username']]['last_name']
+            if 'first_name' in self._get_credentials()[token['username']] and \
+                'last_name' in self._get_credentials()[token['username']]:
+                first_name = self._get_credentials()[token['username']]['first_name']
+                last_name = self._get_credentials()[token['username']]['last_name']
                 st.session_state['name'] = f'{first_name} {last_name}'
             else:
-                st.session_state['name'] = self.credentials['usernames'][token['username']]['name']
+                st.session_state['name'] = self._get_credentials()[token['username']]['name']
+            st.session_state['username'] = token['username']
             st.session_state['authentication_status'] = True
-            self.credentials['usernames'][token['username']]['logged_in'] = True
+            if 'roles' in self._get_credentials()[username]:
+                st.session_state['roles'] = self._get_credentials()[token['username']]['roles']
+            else:
+                st.session_state['roles'] = None
+            self._get_credentials()[token['username']]['logged_in'] = True
         return None
     def logout(self, callback: Optional[Callable]=None):
         """
@@ -290,7 +298,7 @@ class AuthenticationModel:
         callback: callable, optional
             Callback function that will be invoked on button press.
         """
-        self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
+        self._get_credentials()[st.session_state['username']]['logged_in'] = False
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
@@ -310,12 +318,12 @@ class AuthenticationModel:
             True: number of failed login attempts for the user will be reset to 0, 
             False: number of failed login attempts for the user will be incremented.
         """
-        if 'failed_login_attempts' not in self.credentials['usernames'][username]:
-            self.credentials['usernames'][username]['failed_login_attempts'] = 0
+        if 'failed_login_attempts' not in self._get_credentials()[username]:
+            self._get_credentials()[username]['failed_login_attempts'] = 0
         if reset:
-            self.credentials['usernames'][username]['failed_login_attempts'] = 0
+            self._get_credentials()[username]['failed_login_attempts'] = 0
         else:
-            self.credentials['usernames'][username]['failed_login_attempts'] += 1
+            self._get_credentials()[username]['failed_login_attempts'] += 1
     def _register_credentials(self, username: str, first_name: str, last_name: str,
                               password: str, email: str, password_hint: str,
                               roles: Optional[List[str]]=None):
@@ -339,12 +347,10 @@ class AuthenticationModel:
         roles: list, optional
             User roles for registered users.
         """
-        self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
-                                                   'first_name': first_name,
-                                                   'last_name': last_name,
-                                                   'password': Hasher.hash(password),
-                                                   'password_hint': password_hint,
-                                                   'roles': roles}
+        self._get_credentials()[username] = {'email': email, 'logged_in': False,
+                                             'first_name': first_name, 'last_name': last_name,
+                                              'password': Hasher.hash(password),
+                                              'password_hint': password_hint, 'roles': roles}
     def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
                       new_username: str, new_password: str, password_hint: str,
                       pre_authorized: Optional[List[str]]=None,
@@ -385,7 +391,7 @@ class AuthenticationModel:
         """
         if self._credentials_contains_value(new_email):
             raise RegisterError('Email already taken')
-        if new_username in self.credentials['usernames']:
+        if new_username in self._get_credentials():
             raise RegisterError('Username already taken')
         if pre_authorized and new_email in pre_authorized['emails']:
             self._register_credentials(new_username, new_first_name, new_last_name, new_password,
@@ -445,7 +451,7 @@ class AuthenticationModel:
             New plain text password that should be transferred to the user securely.
         """
         random_password = Helpers.generate_random_pw()
-        self.credentials['usernames'][username]['password'] = \
+        self._get_credentials()[username]['password'] = \
             Hasher([random_password]).generate()[0]
         return random_password
     def _update_entry(self, username: str, key: str, value: str):
@@ -461,7 +467,7 @@ class AuthenticationModel:
         value: str
             Updated entry value i.e. "jsmith@gmail.com".
         """
-        self.credentials['usernames'][username][key] = value
+        self._get_credentials()[username][key] = value
     def _update_password(self, username: str, password: str):
         """
         Updates the credentials dictionary with the user's hashed reset password.
@@ -473,7 +479,7 @@ class AuthenticationModel:
         password: str
             Updated plain text password.
         """
-        self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
+        self._get_credentials()[username]['password'] = Hasher([password]).generate()[0]
     def update_user_details(self, new_value: str, username: str, field: str,
                             callback: Optional[Callable]=None) -> bool:
         """
@@ -500,7 +506,7 @@ class AuthenticationModel:
         if field == 'email':
             if self._credentials_contains_value(new_value):
                 raise UpdateError('Email already taken')
-        if new_value != self.credentials['usernames'][username][field]:
+        if new_value != self._get_credentials()[username][field]:
             self._update_entry(username, field, new_value)
             if field == 'name':
                 st.session_state['name'] = new_value
