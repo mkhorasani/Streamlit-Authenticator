@@ -234,8 +234,6 @@ class AuthenticationController:
             Username of the new user.
         str
             Name of the new user.
-        list
-            Roles associate with the new user.
         """
         new_first_name = new_first_name.strip()
         new_last_name = new_last_name.strip()
