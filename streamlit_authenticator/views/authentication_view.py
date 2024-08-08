@@ -402,8 +402,6 @@ class Authenticate:
             Username associated with the new user.
         str
             Name associated with the new user.
-        list
-            Roles associate with the new user.
         """
         if isinstance(pre_authorized, bool):
             raise DeprecationError(f"""Please note that the 'pre_authorized' parameter now
@@ -452,7 +450,7 @@ class Authenticate:
                                                                 password_hint, pre_authorized,
                                                                 domains, roles, callback, captcha,
                                                                 entered_captcha)
-        return None, None, None, None
+        return None, None, None
     def reset_password(self, username: str, location: str='main',
                        fields: Optional[Dict[str, str]]=None, clear_on_submit: bool=False,
                        key: str='Reset password', callback: Optional[Callable]=None) -> bool:
