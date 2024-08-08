@@ -187,8 +187,9 @@ class AuthenticationController:
     def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
                       new_username: str, new_password: str, new_password_repeat: str,
                       password_hint: str, pre_authorized: Optional[List[str]]=None,
-                      domains: Optional[List[str]]=None, callback: Optional[Callable]=None,
-                      captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
+                      domains: Optional[List[str]]=None, roles: Optional[List[str]]=None,
+                      callback: Optional[Callable]=None, captcha: bool=False,
+                      entered_captcha: Optional[str]=None) -> tuple:
         """
         Controls the request to register the new user's name, username, password, and email.
 
@@ -214,6 +215,8 @@ class AuthenticationController:
             Required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], 
             list: the required list of domains, 
             None: any domain is allowed.
+        roles: list, optional
+            User roles for registered users.
         callback: callable, optional
             Callback function that will be invoked on form submission.
         captcha: bool
@@ -231,6 +234,8 @@ class AuthenticationController:
             Username of the new user.
         str
             Name of the new user.
+        list
+            Roles associate with the new user.
         """
         new_first_name = new_first_name.strip()
         new_last_name = new_last_name.strip()
@@ -259,6 +264,8 @@ class AuthenticationController:
             raise RegisterError('Password hint cannot be empty')
         if not self.validator.validate_password(new_password):
             raise RegisterError('Password does not meet criteria')
+        if not isinstance(roles, list):
+            raise RegisterError('Roles must be provided as a list')
         if captcha:
             if not entered_captcha:
                 raise RegisterError('Captcha not entered')
@@ -266,7 +273,7 @@ class AuthenticationController:
             self._check_captcha('register_user_captcha', RegisterError, entered_captcha)
         return self.authentication_model.register_user(new_first_name, new_last_name, new_email,
                                                        new_username, new_password, password_hint,
-                                                       pre_authorized, callback)
+                                                       pre_authorized, roles, callback)
     def reset_password(self, username: str, password: str, new_password: str,
                        new_password_repeat: str, callback: Optional[Callable]=None) -> bool:
         """
