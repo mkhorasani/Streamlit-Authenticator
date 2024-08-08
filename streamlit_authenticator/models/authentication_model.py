@@ -317,7 +317,8 @@ class AuthenticationModel:
         else:
             self.credentials['usernames'][username]['failed_login_attempts'] += 1
     def _register_credentials(self, username: str, first_name: str, last_name: str,
-                              password: str, email: str, password_hint: str):
+                              password: str, email: str, password_hint: str,
+                              roles: Optional[List[str]]=None):
         """
         Adds the new user's information to the credentials dictionary.
 
@@ -335,18 +336,22 @@ class AuthenticationModel:
             Email of the new user.
         password_hint: str
             Password hint for the user to remember their password.
+        roles: list, optional
+            User roles for registered users.
         """
         self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
                                                    'first_name': first_name,
                                                    'last_name': last_name,
                                                    'password': Hasher.hash(password),
-                                                   'password_hint': password_hint}
+                                                   'password_hint': password_hint,
+                                                   'roles': roles}
     def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
                       new_username: str, new_password: str, password_hint: str,
                       pre_authorized: Optional[List[str]]=None,
+                      roles: Optional[List[str]]=None,
                       callback: Optional[Callable]=None) -> tuple:
         """
-        Registers a new user's name, username, password, and email.
+        Registers a new user's first name, last name, username, password, email, and roles.
 
         Parameters
         ----------
@@ -363,7 +368,9 @@ class AuthenticationModel:
         password_hint: str
             Password hint for the user to remember their password.
         pre-authorized: list, optional
-            List of emails of unregistered users who are authorized to register. 
+            List of emails of unregistered users who are authorized to register.
+        roles: list, optional
+            User roles for registered users.
         callback: callable, optional
             Callback function that will be invoked on form submission.
 
@@ -382,13 +389,13 @@ class AuthenticationModel:
             raise RegisterError('Username already taken')
         if pre_authorized and new_email in pre_authorized['emails']:
             self._register_credentials(new_username, new_first_name, new_last_name, new_password,
-                                       new_email, password_hint)
+                                       new_email, password_hint, roles)
             pre_authorized['emails'].remove(new_email)
             return new_email, new_username, f'{new_first_name} {new_last_name}'
         if pre_authorized and new_email not in pre_authorized['emails']:
             raise RegisterError('User not pre-authorized to register')
         self._register_credentials(new_username, new_first_name, new_last_name, new_password,
-                                   new_email, password_hint)
+                                   new_email, password_hint, roles)
         if callback:
             callback({'new_name': new_first_name, 'new_last_name': new_last_name,
                       'new_email': new_email, 'new_username': new_username})
