@@ -38,7 +38,7 @@ class AuthenticationModel:
         """
         self.credentials = credentials
         if self._get_credentials():
-            self._get_credentials() = {
+            self.credentials['usernames'] = {
                 key.lower(): value
                 for key, value in self._get_credentials().items()
                 }
@@ -54,13 +54,17 @@ class AuthenticationModel:
                         self._get_credentials()[username]['password'] = \
                         Hasher._hash(self._get_credentials()[username]['password'])
         else:
-            self._get_credentials() = {}
+            self.credentials['usernames'] = {}
         if 'name' not in st.session_state:
             st.session_state['name'] = None
         if 'authentication_status' not in st.session_state:
             st.session_state['authentication_status'] = None
         if 'username' not in st.session_state:
             st.session_state['username'] = None
+        if 'email' not in st.session_state:
+            st.session_state['email'] = None
+        if 'roles' not in st.session_state:
+            st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
     def check_credentials(self, username: str, password: str,
@@ -214,6 +218,36 @@ class AuthenticationModel:
             if values[key] == value:
                 return username
         return False
+    def _get_user_variables(self, username: str) -> tuple:
+        """
+        Gets the user's email, name, and roles based on a provided username.
+
+        Parameters
+        ----------
+        username: str
+            Username of the user.
+
+        Returns
+        -------
+        str
+            Email associated with the given username.
+        str
+            Name associated with the given username.
+        str
+            Roles associated with the given username.
+        """
+        if 'first_name' in self._get_credentials()[username] and \
+            'last_name' in self._get_credentials()[username]:
+            first_name = self._get_credentials()[username]['first_name']
+            last_name = self._get_credentials()[username]['last_name']
+            name = f'{first_name} {last_name}'
+        else:
+            name = self._get_credentials()[username]['name']
+        if 'roles' in self._get_credentials()[username]:
+            roles = self._get_credentials()[username]['roles']
+        else:
+            roles = None
+        return self._get_credentials()[username]['email'], name, roles 
     def login(self, username: str, password: str, max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, token: Optional[Dict[str, str]]=None,
               callback: Optional[Callable]=None) -> bool:
@@ -246,19 +280,10 @@ class AuthenticationModel:
         """
         if username:
             if self.check_credentials(username, password, max_concurrent_users, max_login_attempts):
-                if 'first_name' in self._get_credentials()[username] and \
-                    'last_name' in self._get_credentials()[username]:
-                    first_name = self._get_credentials()[token['username']]['first_name']
-                    last_name = self._get_credentials()[token['username']]['last_name']
-                    st.session_state['name'] = f'{first_name} {last_name}'
-                else:
-                    st.session_state['name'] = self._get_credentials()[username]['name']
-                st.session_state['username'] = username
+                st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
+                    self._get_user_variables(username)
                 st.session_state['authentication_status'] = True
-                if 'roles' in self._get_credentials()[username]:
-                    st.session_state['roles'] = self._get_credentials()[username]['roles']
-                else:
-                    st.session_state['roles'] = None
+                st.session_state['username'] = username
                 self._record_failed_login_attempts(username, reset=True)
                 self._get_credentials()[username]['logged_in'] = True
                 if 'password_hint' in st.session_state:
@@ -274,19 +299,10 @@ class AuthenticationModel:
         if token:
             if not token['username'] in self._get_credentials():
                 raise LoginError('User not authorized')
-            if 'first_name' in self._get_credentials()[token['username']] and \
-                'last_name' in self._get_credentials()[token['username']]:
-                first_name = self._get_credentials()[token['username']]['first_name']
-                last_name = self._get_credentials()[token['username']]['last_name']
-                st.session_state['name'] = f'{first_name} {last_name}'
-            else:
-                st.session_state['name'] = self._get_credentials()[token['username']]['name']
-            st.session_state['username'] = token['username']
+            st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
+                self._get_user_variables(token['username'])
             st.session_state['authentication_status'] = True
-            if 'roles' in self._get_credentials()[username]:
-                st.session_state['roles'] = self._get_credentials()[token['username']]['roles']
-            else:
-                st.session_state['roles'] = None
+            st.session_state['username'] = token['username']
             self._get_credentials()[token['username']]['logged_in'] = True
         return None
     def logout(self, callback: Optional[Callable]=None):
@@ -303,6 +319,8 @@ class AuthenticationModel:
         st.session_state['name'] = None
         st.session_state['username'] = None
         st.session_state['authentication_status'] = None
+        st.session_state['email'] = None
+        st.session_state['roles'] = None
         if callback:
             callback({})
     def _record_failed_login_attempts(self, username: str, reset: bool=False):

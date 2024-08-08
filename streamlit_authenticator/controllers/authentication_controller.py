@@ -263,7 +263,8 @@ class AuthenticationController:
         if not self.validator.validate_password(new_password):
             raise RegisterError('Password does not meet criteria')
         if not isinstance(roles, list):
-            raise RegisterError('Roles must be provided as a list')
+            roles = None
+            print('Roles must be provided as a list')
         if captcha:
             if not entered_captcha:
                 raise RegisterError('Captcha not entered')

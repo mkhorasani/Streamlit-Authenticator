@@ -152,6 +152,10 @@ authenticator.login()
 >   - Status of authentication, None: no credentials entered, False: incorrect credentials, True: correct credentials.
 > - _str_
 >   - Username of the authenticated user.
+> - _str_
+>   - Email of the authenticated user.
+> - _str_
+>   - Roles of the authenticated user.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
@@ -256,14 +260,16 @@ except Exception as e:
 >    - Customizes the text of headers, buttons and other fields.
 >  - **captcha:** _bool, default True_
 >    - Specifies the captcha requirement for the register user widget, True: captcha required, False: captcha removed.
+>  - **password_instructions:** _str, optional, default None_
+>    - Instructions to select the new password.
+>  - **roles:** _list, optional, default None_
+>    - User roles for registered users.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Register user'_
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on form submission with a dict as a parameter.
->  - **password_instructions:** _str, optional, default None_
->    - Instructions to select the new password.
 > #### Returns:
 > - _str_
 >   - Email associated with the new user.

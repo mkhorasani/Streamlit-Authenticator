@@ -278,6 +278,10 @@ class Authenticate:
             False: incorrect credentials.
         str
             Username of the authenticated user.
+        str
+            Email of the authenticated user.
+        str
+            Roles of the authenticated user.
         """
         if fields is None:
             fields = {'Form name':'Login', 'Username':'Username', 'Password':'Password',
@@ -324,7 +328,7 @@ class Authenticate:
                     time.sleep(params.POST_LOGIN_SLEEP_TIME)
                     st.rerun()
         return (st.session_state['name'], st.session_state['authentication_status'],
-                st.session_state['username'])
+                st.session_state['username'], st.session_state['email'], st.session_state['roles'])
     def logout(self, button_name: str='Logout', location: str='main', key: str='Logout',
                callback: Optional[Callable]=None):
         """
