@@ -291,6 +291,7 @@ class AuthenticationController:
             State of resetting the password, 
             True: password reset successfully.
         """
+        username = username.lower().strip()
         if not self.validator.validate_length(new_password, 1):
             raise ResetError('No new password provided')
         if new_password != new_password_repeat:
@@ -323,6 +324,7 @@ class AuthenticationController:
             State of updating the user's detail, 
             True: details updated successfully.
         """
+        username = username.lower().strip()
         if field == 'name':
             if not self.validator.validate_name(new_value):
                 raise UpdateError('Name is not valid')
