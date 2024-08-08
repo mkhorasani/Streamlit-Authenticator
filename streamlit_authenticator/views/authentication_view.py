@@ -175,10 +175,10 @@ class Authenticate:
                                                                   captcha, entered_captcha)
         return None, email
     def guest_login(self, location: str='main', max_concurrent_users: Optional[int]=None,
-              max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
-              google_variables: Optional[dict]=None, captcha: bool=False,
-              clear_on_submit: bool=False, key: str='Login', callback: Optional[Callable]=None,
-              sleep_time: Optional[float]=None) -> tuple:
+                    max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
+                    google_variables: Optional[dict]=None, captcha: bool=False,
+                    clear_on_submit: bool=False, key: str='Login',
+                    callback: Optional[Callable]=None) -> tuple:
         """
         Renders a login widget.
 
@@ -297,17 +297,17 @@ class Authenticate:
                     login_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
                 elif location == 'unrendered':
                     return (st.session_state['name'], st.session_state['authentication_status'],
-                        st.session_state['username'])
+                            st.session_state['username'])
                 login_form.subheader('Login' if 'Form name' not in fields else fields['Form name'])
                 username = login_form.text_input('Username' if 'Username' not in fields
                                                  else fields['Username'])
                 if 'password_hint' in st.session_state:
                     password = login_form.text_input('Password' if 'Password' not in fields
-                                                    else fields['Password'], type='password',
-                                                    help=st.session_state['password_hint'])
+                                                     else fields['Password'], type='password',
+                                                     help=st.session_state['password_hint'])
                 else:
                     password = login_form.text_input('Password' if 'Password' not in fields
-                                                    else fields['Password'], type='password')
+                                                     else fields['Password'], type='password')
                 entered_captcha = None
                 if captcha:
                     entered_captcha = login_form.text_input('Captcha' if 'Captcha' not in fields
@@ -420,26 +420,21 @@ class Authenticate:
                                      else fields['Form name'])
         col1, col2 = register_user_form.columns(2)
         new_first_name = col1.text_input('First name' if 'First name' not in fields
-                                                 else fields['First name'])
+                                         else fields['First name'])
         new_last_name = col2.text_input('Last name' if 'Last name' not in fields
-                                                      else fields['Last name'])
+                                        else fields['Last name'])
         new_email = col1.text_input('Email' if 'Email' not in fields
-                                                  else fields['Email'])
+                                    else fields['Email'])
         new_username = col2.text_input('Username' if 'Username' not in fields
-                                                     else fields['Username'])
+                                       else fields['Username'])
         new_password = col1.text_input('Password' if 'Password' not in fields
-                                                     else fields['Password'],
-                                                     type='password',
-                                                     help=params.PASSWORD_INSTRUCTIONS if \
-                                                     password_instructions is None else \
-                                                     password_instructions)
-        new_password_repeat = col2.text_input('Repeat password'
-                                                            if 'Repeat password' not in fields
-                                                            else fields['Repeat password'],
-                                                            type='password')
-        password_hint = register_user_form.text_input('Password hint'
-                                                      if 'Password hint' not in fields
-                                                      else fields['Password hint'])
+                                       else fields['Password'], type='password',
+                                       help=params.PASSWORD_INSTRUCTIONS if password_instructions
+                                       is None else password_instructions)
+        new_password_repeat = col2.text_input('Repeat password' if 'Repeat password' not in fields
+                                              else fields['Repeat password'], type='password')
+        password_hint = register_user_form.text_input('Password hint' if 'Password hint' not in
+                                                      fields else fields['Password hint'])
         entered_captcha = None
         if captcha:
             entered_captcha = register_user_form.text_input('Captcha' if 'Captcha' not in fields
@@ -496,7 +491,6 @@ class Authenticate:
             reset_password_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
         reset_password_form.subheader('Reset password' if 'Form name' not in fields
                                       else fields['Form name'])
-        username = username.lower()
         password = reset_password_form.text_input('Current password'
                                                   if 'Current password' not in fields
                                                   else fields['Current password'],
@@ -557,7 +551,6 @@ class Authenticate:
             update_user_details_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
         update_user_details_form.subheader('Update user details' if 'Form name' not in fields
                                            else fields['Form name'])
-        username = username.lower()
         update_user_details_form_fields = ['Name' if 'Name' not in fields else fields['Name'],
                                            'Email' if 'Email' not in fields else fields['Email']]
         field = update_user_details_form.selectbox('Field' if 'Field' not in fields
