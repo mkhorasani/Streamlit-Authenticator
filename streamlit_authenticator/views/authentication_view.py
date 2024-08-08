@@ -359,9 +359,9 @@ class Authenticate:
                 self.cookie_controller.delete_cookie()
     def register_user(self, location: str='main', pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, fields: Optional[Dict[str, str]]=None,
-                      captcha: bool=True, clear_on_submit: bool=False, key: str='Register user',
-                      callback: Optional[Callable]=None,
-                      password_instructions: Optional[str]=None) -> tuple:
+                      captcha: bool=True, password_instructions: Optional[str]=None,
+                      roles: Optional[List[str]]=None, clear_on_submit: bool=False,
+                      key: str='Register user', callback: Optional[Callable]=None) -> tuple:
         """
         Renders a register new user widget.
 
@@ -381,6 +381,10 @@ class Authenticate:
             Captcha requirement for the register user widget, 
             True: captcha required,
             False: captcha removed.
+        password_instructions: str, optional
+            Instructions to select the new password.
+        roles: list, optional
+            User roles for registered users.
         clear_on_submit: bool
             Clear on submit setting, 
             True: clears inputs on submit, 
@@ -389,8 +393,6 @@ class Authenticate:
             Unique key provided to widget to avoid duplicate WidgetID errors.
         callback: callable, optional
             Callback function that will be invoked on form submission.
-        password_instructions: str, optional
-            Instructions to select the new password.
 
         Returns
         -------
@@ -400,6 +402,8 @@ class Authenticate:
             Username associated with the new user.
         str
             Name associated with the new user.
+        list
+            Roles associate with the new user.
         """
         if isinstance(pre_authorized, bool):
             raise DeprecationError(f"""Please note that the 'pre_authorized' parameter now
@@ -446,9 +450,9 @@ class Authenticate:
                                                                 new_email, new_username,
                                                                 new_password, new_password_repeat,
                                                                 password_hint, pre_authorized,
-                                                                domains, callback, captcha,
+                                                                domains, roles, callback, captcha,
                                                                 entered_captcha)
-        return None, None, None
+        return None, None, None, None
     def reset_password(self, username: str, location: str='main',
                        fields: Optional[Dict[str, str]]=None, clear_on_submit: bool=False,
                        key: str='Reset password', callback: Optional[Callable]=None) -> bool:
