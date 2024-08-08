@@ -45,10 +45,10 @@ class AuthenticationModel:
             if auto_hash:
                 if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
                     print(f"""Auto hashing in progress. To avoid runtime delays, please manually
-                            pre-hash all plain text passwords in the credentials using the
-                            Hasher.hash_passwords function, and set auto_hash=False for the
-                            Authenticate class. For more information please refer to
-                            {params.AUTO_HASH_MAX_USERS_LINK}.""")
+                          pre-hash all plain text passwords in the credentials using the
+                          Hasher.hash_passwords function, and set auto_hash=False for the
+                          Authenticate class. For more information please refer to
+                          {params.AUTO_HASH_MAX_USERS_LINK}.""")
                 for username, _ in self.credentials['usernames'].items():
                     if not Hasher.is_hash(self.credentials['usernames'][username]['password']):
                         self.credentials['usernames'][username]['password'] = \
