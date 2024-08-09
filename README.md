@@ -7,10 +7,10 @@
 [![Downloads](https://static.pepy.tech/badge/streamlit-authenticator)](https://pepy.tech/project/streamlit-authenticator)
 [![Downloads](https://static.pepy.tech/badge/streamlit-authenticator/month)](https://pepy.tech/project/streamlit-authenticator)
 [![Downloads](https://static.pepy.tech/badge/streamlit-authenticator/week)](https://pepy.tech/project/streamlit-authenticator)
-<br/><br/><br/>
-<a href="http://tinyurl.com/2p8mw32d"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450">
+<!--- <br/><br/><br/> ---?
+<!--- <a href="http://tinyurl.com/2p8mw32d"><img src="https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_test/main/Web%20App%20Web%20Dev%20with%20Streamlit%20-%20Cover.png" width="300" height="450"> --->
 
-###### _To learn more please refer to my book [Web Application Development with Streamlit](http://tinyurl.com/2p8mw32d)._
+<!--- ###### _To learn more please refer to my book [Web Application Development with Streamlit](http://tinyurl.com/2p8mw32d)._ --->
 
 ## Table of Contents
 - [Creating a configuration file](#1-creating-a-configuration-file)
