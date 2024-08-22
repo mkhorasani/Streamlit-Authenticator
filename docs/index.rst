@@ -14,6 +14,12 @@ Welcome to Streamlit Authenticator's documentation!
 .. automodule:: streamlit_authenticator.views.authentication_view
    :members:
 
+.. automodule:: streamlit_authenticator.utilities.hasher
+   :members:
+
+.. automodule:: streamlit_authenticator.viutilitiesews.validator
+   :members:
+
 Indices and tables
 ==================
 
