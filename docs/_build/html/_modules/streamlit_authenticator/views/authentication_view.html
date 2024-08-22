@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>streamlit_authenticator.views.authentication_view &#8212; Streamlit Authenticator v0.3.3 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for streamlit_authenticator.views.authentication_view</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Script description: This module renders the login, logout, register user, reset password,</span>
+<span class="sd">forgot password, forgot username, and modify user details widgets. </span>
+
+<span class="sd">Libraries imported:</span>
+<span class="sd">- time: Module implementing the sleep function.</span>
+<span class="sd">- typing: Module implementing standard typing notations for Python functions.</span>
+<span class="sd">- streamlit: Framework used to build pure Python web applications.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">params</span>
+<span class="kn">from</span> <span class="nn">..controllers</span> <span class="kn">import</span> <span class="n">AuthenticationController</span><span class="p">,</span> <span class="n">CookieController</span>
+<span class="kn">from</span> <span class="nn">..utilities</span> <span class="kn">import</span> <span class="n">Helpers</span><span class="p">,</span> <span class="n">LogoutError</span><span class="p">,</span> <span class="n">ResetError</span><span class="p">,</span> <span class="n">UpdateError</span><span class="p">,</span> <span class="n">Validator</span>
+
+<div class="viewcode-block" id="Authenticate"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate">[docs]</a><span class="k">class</span> <span class="nc">Authenticate</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class renders login, logout, register user, reset password, forgot password, </span>
+<span class="sd">    forgot username, and modify user details widgets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cookie_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cookie_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">cookie_expiry_days</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">pre_authorized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">validator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Validator</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auto_hash</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new instance of &quot;Authenticate&quot;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        credentials: dict</span>
+<span class="sd">            Dictionary of usernames, names, passwords, emails, and other user data.</span>
+<span class="sd">        cookie_name: str</span>
+<span class="sd">            Name of the re-authentication cookie stored on the client&#39;s browser for password-less </span>
+<span class="sd">            re-authentication.</span>
+<span class="sd">        cookie_key: str</span>
+<span class="sd">            Key to be used to hash the signature of the re-authentication cookie.</span>
+<span class="sd">        cookie_expiry_days: float</span>
+<span class="sd">            Number of days before the re-authentication cookie automatically expires on the client&#39;s </span>
+<span class="sd">            browser.</span>
+<span class="sd">        pre-authorized: list, optional</span>
+<span class="sd">            List of emails of unregistered users who are authorized to register.        </span>
+<span class="sd">        validator: Validator, optional</span>
+<span class="sd">            Validator object that checks the validity of the username, name, and email fields.</span>
+<span class="sd">        auto_hash: bool</span>
+<span class="sd">            Automatic hashing requirement for passwords, </span>
+<span class="sd">            True: plain text passwords will be automatically hashed,</span>
+<span class="sd">            False: plain text passwords will not be automatically hashed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span>  <span class="o">=</span>   <span class="n">CookieController</span><span class="p">(</span><span class="n">cookie_name</span><span class="p">,</span>
+                                                     <span class="n">cookie_key</span><span class="p">,</span>
+                                                     <span class="n">cookie_expiry_days</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span>  <span class="o">=</span>   <span class="n">AuthenticationController</span><span class="p">(</span><span class="n">credentials</span><span class="p">,</span>
+                                                                     <span class="n">pre_authorized</span><span class="p">,</span>
+                                                                     <span class="n">validator</span><span class="p">,</span>
+                                                                     <span class="n">auto_hash</span><span class="p">)</span>
+<div class="viewcode-block" id="Authenticate.forgot_password"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.forgot_password">[docs]</a>    <span class="k">def</span> <span class="nf">forgot_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">captcha</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Forgot password&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a forgot password widget.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the forgot password widget i.e. main or sidebar.</span>
+<span class="sd">        fields: dict, optional</span>
+<span class="sd">            Rendered names of the fields/buttons.</span>
+<span class="sd">        captcha: bool</span>
+<span class="sd">            Captcha requirement for the forgot password widget, </span>
+<span class="sd">            True: captcha required,</span>
+<span class="sd">            False: captcha removed.</span>
+<span class="sd">        clear_on_submit: bool</span>
+<span class="sd">            Clear on submit setting, </span>
+<span class="sd">            True: clears inputs on submit, </span>
+<span class="sd">            False: keeps inputs on submit.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key provided to widget to avoid duplicate WidgetID errors.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on form submission.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Username associated with the forgotten password.</span>
+<span class="sd">        str</span>
+<span class="sd">            Email associated with the forgotten password.</span>
+<span class="sd">        str</span>
+<span class="sd">            New plain text password that should be transferred to the user securely.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Form name&#39;</span><span class="p">:</span><span class="s1">&#39;Forgot password&#39;</span><span class="p">,</span> <span class="s1">&#39;Username&#39;</span><span class="p">:</span><span class="s1">&#39;Username&#39;</span><span class="p">,</span> <span class="s1">&#39;Submit&#39;</span><span class="p">:</span><span class="s1">&#39;Submit&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Captcha&#39;</span><span class="p">:</span><span class="s1">&#39;Captcha&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+            <span class="n">forgot_password_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+            <span class="n">forgot_password_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="n">forgot_password_form</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s1">&#39;Forget password&#39;</span> <span class="k">if</span> <span class="s1">&#39;Form name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                       <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Form name&#39;</span><span class="p">])</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">forgot_password_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Username&#39;</span> <span class="k">if</span> <span class="s1">&#39;Username&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                   <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Username&#39;</span><span class="p">])</span>
+        <span class="n">entered_captcha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">captcha</span><span class="p">:</span>
+            <span class="n">entered_captcha</span> <span class="o">=</span> <span class="n">forgot_password_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Captcha&#39;</span> <span class="k">if</span> <span class="s1">&#39;Captcha&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                              <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Captcha&#39;</span><span class="p">])</span>
+            <span class="n">forgot_password_form</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">Helpers</span><span class="o">.</span><span class="n">generate_captcha</span><span class="p">(</span><span class="s1">&#39;forgot_password_captcha&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">forgot_password_form</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span> <span class="k">if</span> <span class="s1">&#39;Submit&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                   <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Submit&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">forgot_password</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span>
+                                                                  <span class="n">captcha</span><span class="p">,</span> <span class="n">entered_captcha</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+<div class="viewcode-block" id="Authenticate.forgot_username"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.forgot_username">[docs]</a>    <span class="k">def</span> <span class="nf">forgot_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">captcha</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Forgot username&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a forgot username widget.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the forgot username widget i.e. main or sidebar.</span>
+<span class="sd">        fields: dict, optional</span>
+<span class="sd">            Rendered names of the fields/buttons.</span>
+<span class="sd">        captcha: bool</span>
+<span class="sd">            Captcha requirement for the forgot username widget, </span>
+<span class="sd">            True: captcha required,</span>
+<span class="sd">            False: captcha removed.</span>
+<span class="sd">        clear_on_submit: bool</span>
+<span class="sd">            Clear on submit setting, </span>
+<span class="sd">            True: clears inputs on submit, </span>
+<span class="sd">            False: keeps inputs on submit.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key provided to widget to avoid duplicate WidgetID errors.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on form submission.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Forgotten username that should be transferred to the user securely.</span>
+<span class="sd">        str</span>
+<span class="sd">            Email associated with the forgotten username.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Form name&#39;</span><span class="p">:</span><span class="s1">&#39;Forgot username&#39;</span><span class="p">,</span> <span class="s1">&#39;Email&#39;</span><span class="p">:</span><span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="s1">&#39;Submit&#39;</span><span class="p">:</span><span class="s1">&#39;Submit&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;Captcha&#39;</span><span class="p">:</span><span class="s1">&#39;Captcha&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+            <span class="n">forgot_username_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+            <span class="n">forgot_username_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="n">forgot_username_form</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s1">&#39;Forget username&#39;</span> <span class="k">if</span> <span class="s1">&#39;Form name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                       <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Form name&#39;</span><span class="p">])</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">forgot_username_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Email&#39;</span> <span class="k">if</span> <span class="s1">&#39;Email&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Email&#39;</span><span class="p">])</span>
+        <span class="n">entered_captcha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">captcha</span><span class="p">:</span>
+            <span class="n">entered_captcha</span> <span class="o">=</span> <span class="n">forgot_username_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Captcha&#39;</span> <span class="k">if</span> <span class="s1">&#39;Captcha&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                              <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Captcha&#39;</span><span class="p">])</span>
+            <span class="n">forgot_username_form</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">Helpers</span><span class="o">.</span><span class="n">generate_captcha</span><span class="p">(</span><span class="s1">&#39;forgot_username_captcha&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">forgot_username_form</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s1">&#39;Submit&#39;</span> <span class="k">if</span> <span class="s1">&#39;Submit&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                   <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Submit&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">forgot_username</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span>
+                                                                  <span class="n">captcha</span><span class="p">,</span> <span class="n">entered_captcha</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">email</span></div>
+<div class="viewcode-block" id="Authenticate.login"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.login">[docs]</a>    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">max_concurrent_users</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">max_login_attempts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">captcha</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Login&#39;</span><span class="p">,</span>
+              <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sleep_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a login widget.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the logout button i.e. main, sidebar or unrendered.</span>
+<span class="sd">        max_concurrent_users: int, optional</span>
+<span class="sd">            Maximum number of users allowed to login concurrently.</span>
+<span class="sd">        max_login_attempts: int, optional</span>
+<span class="sd">            Maximum number of failed login attempts a user can make.</span>
+<span class="sd">        fields: dict, optional</span>
+<span class="sd">            Rendered names of the fields/buttons.</span>
+<span class="sd">        captcha: bool</span>
+<span class="sd">            Captcha requirement for the login widget, </span>
+<span class="sd">            True: captcha required,</span>
+<span class="sd">            False: captcha removed.</span>
+<span class="sd">        clear_on_submit: bool</span>
+<span class="sd">            Clear on submit setting, </span>
+<span class="sd">            True: clears inputs on submit, </span>
+<span class="sd">            False: keeps inputs on submit.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key provided to widget to avoid duplicate WidgetID errors.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on form submission.</span>
+<span class="sd">        sleep_time: float, optional</span>
+<span class="sd">            Optional sleep time for the login widget.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Name of the authenticated user.</span>
+<span class="sd">        bool</span>
+<span class="sd">            Status of authentication, </span>
+<span class="sd">            None: no credentials entered, </span>
+<span class="sd">            True: correct credentials, </span>
+<span class="sd">            False: incorrect credentials.</span>
+<span class="sd">        str</span>
+<span class="sd">            Username of the authenticated user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Form name&#39;</span><span class="p">:</span><span class="s1">&#39;Login&#39;</span><span class="p">,</span> <span class="s1">&#39;Username&#39;</span><span class="p">:</span><span class="s1">&#39;Username&#39;</span><span class="p">,</span> <span class="s1">&#39;Password&#39;</span><span class="p">:</span><span class="s1">&#39;Password&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Login&#39;</span><span class="p">:</span><span class="s1">&#39;Login&#39;</span><span class="p">,</span> <span class="s1">&#39;Captcha&#39;</span><span class="p">:</span><span class="s1">&#39;Captcha&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">,</span> <span class="s1">&#39;unrendered&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39; or &#39;unrendered&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">]:</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span><span class="o">.</span><span class="n">get_cookie</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">token</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">LOGIN_SLEEP_TIME</span> <span class="k">if</span> <span class="n">sleep_time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">sleep_time</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+                    <span class="n">login_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+                    <span class="n">login_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;unrendered&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">],</span>
+                        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">])</span>
+                <span class="n">login_form</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s1">&#39;Login&#39;</span> <span class="k">if</span> <span class="s1">&#39;Form name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Form name&#39;</span><span class="p">])</span>
+                <span class="n">username</span> <span class="o">=</span> <span class="n">login_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Username&#39;</span> <span class="k">if</span> <span class="s1">&#39;Username&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                 <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Username&#39;</span><span class="p">])</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">login_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Password&#39;</span> <span class="k">if</span> <span class="s1">&#39;Password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                 <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Password&#39;</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+                <span class="n">entered_captcha</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">captcha</span><span class="p">:</span>
+                    <span class="n">entered_captcha</span> <span class="o">=</span> <span class="n">login_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Captcha&#39;</span> <span class="k">if</span> <span class="s1">&#39;Captcha&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                            <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Captcha&#39;</span><span class="p">])</span>
+                    <span class="n">login_form</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">Helpers</span><span class="o">.</span><span class="n">generate_captcha</span><span class="p">(</span><span class="s1">&#39;login_captcha&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">login_form</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s1">&#39;Login&#39;</span> <span class="k">if</span> <span class="s1">&#39;Login&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                 <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Login&#39;</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span>
+                                                            <span class="n">max_concurrent_users</span><span class="p">,</span>
+                                                            <span class="n">max_login_attempts</span><span class="p">,</span>
+                                                            <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">captcha</span><span class="o">=</span><span class="n">captcha</span><span class="p">,</span>
+                                                            <span class="n">entered_captcha</span><span class="o">=</span><span class="n">entered_captcha</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">],</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">])</span></div>
+<div class="viewcode-block" id="Authenticate.logout"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.logout">[docs]</a>    <span class="k">def</span> <span class="nf">logout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">button_name</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Logout&#39;</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Logout&#39;</span><span class="p">,</span>
+               <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a logout button.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        button_name: str</span>
+<span class="sd">            Rendered name of the logout button.</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the logout button i.e. main, sidebar or unrendered.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key to be used in multi-page applications.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on submission.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">LogoutError</span><span class="p">(</span><span class="s1">&#39;User must be logged in to use the logout button&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">,</span> <span class="s1">&#39;unrendered&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39; or &#39;unrendered&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">button_name</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span><span class="o">.</span><span class="n">delete_cookie</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+                    <span class="n">callback</span><span class="p">({})</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">button_name</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span><span class="o">.</span><span class="n">delete_cookie</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+                    <span class="n">callback</span><span class="p">({})</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;unrendered&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span><span class="o">.</span><span class="n">delete_cookie</span><span class="p">()</span></div>
+<div class="viewcode-block" id="Authenticate.register_user"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.register_user">[docs]</a>    <span class="k">def</span> <span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">pre_authorization</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">domains</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">captcha</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Register user&#39;</span><span class="p">,</span>
+                      <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a register new user widget.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the register new user widget i.e. main or sidebar.</span>
+<span class="sd">        pre-authorization: bool</span>
+<span class="sd">            Pre-authorization requirement, </span>
+<span class="sd">            True: user must be pre-authorized to register, </span>
+<span class="sd">            False: any user can register.</span>
+<span class="sd">        domains: list, optional</span>
+<span class="sd">            Required list of domains a new email must belong to i.e. [&#39;gmail.com&#39;, &#39;yahoo.com&#39;], </span>
+<span class="sd">            list: required list of domains, </span>
+<span class="sd">            None: any domain is allowed.</span>
+<span class="sd">        fields: dict, optional</span>
+<span class="sd">            Rendered names of the fields/buttons.</span>
+<span class="sd">        captcha: bool</span>
+<span class="sd">            Captcha requirement for the register user widget, </span>
+<span class="sd">            True: captcha required,</span>
+<span class="sd">            False: captcha removed.</span>
+<span class="sd">        clear_on_submit: bool</span>
+<span class="sd">            Clear on submit setting, </span>
+<span class="sd">            True: clears inputs on submit, </span>
+<span class="sd">            False: keeps inputs on submit.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key provided to widget to avoid duplicate WidgetID errors.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on form submission.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Email associated with the new user.</span>
+<span class="sd">        str</span>
+<span class="sd">            Username associated with the new user.</span>
+<span class="sd">        str</span>
+<span class="sd">            Name associated with the new user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Form name&#39;</span><span class="p">:</span><span class="s1">&#39;Register user&#39;</span><span class="p">,</span> <span class="s1">&#39;Email&#39;</span><span class="p">:</span><span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="s1">&#39;Username&#39;</span><span class="p">:</span><span class="s1">&#39;Username&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Password&#39;</span><span class="p">:</span><span class="s1">&#39;Password&#39;</span><span class="p">,</span> <span class="s1">&#39;Repeat password&#39;</span><span class="p">:</span><span class="s1">&#39;Repeat password&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Register&#39;</span><span class="p">:</span><span class="s1">&#39;Register&#39;</span><span class="p">,</span> <span class="s1">&#39;Captcha&#39;</span><span class="p">:</span><span class="s1">&#39;Captcha&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+            <span class="n">register_user_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+            <span class="n">register_user_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="n">register_user_form</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s1">&#39;Register user&#39;</span> <span class="k">if</span> <span class="s1">&#39;Form name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                     <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Form name&#39;</span><span class="p">])</span>
+        <span class="n">new_name</span> <span class="o">=</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span> <span class="k">if</span> <span class="s1">&#39;Name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                 <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">])</span>
+        <span class="n">new_email</span> <span class="o">=</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Email&#39;</span> <span class="k">if</span> <span class="s1">&#39;Email&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                  <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Email&#39;</span><span class="p">])</span>
+        <span class="n">new_username</span> <span class="o">=</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Username&#39;</span> <span class="k">if</span> <span class="s1">&#39;Username&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                     <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Username&#39;</span><span class="p">])</span>
+        <span class="n">new_password</span> <span class="o">=</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Password&#39;</span> <span class="k">if</span> <span class="s1">&#39;Password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                     <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Password&#39;</span><span class="p">],</span>
+                                                     <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">new_password_repeat</span> <span class="o">=</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Repeat password&#39;</span>
+                                                            <span class="k">if</span> <span class="s1">&#39;Repeat password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                            <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Repeat password&#39;</span><span class="p">],</span>
+                                                            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">)</span>
+        <span class="n">entered_captcha</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">captcha</span><span class="p">:</span>
+            <span class="n">entered_captcha</span> <span class="o">=</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Captcha&#39;</span> <span class="k">if</span> <span class="s1">&#39;Captcha&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                            <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Captcha&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">register_user_form</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">Helpers</span><span class="o">.</span><span class="n">generate_captcha</span><span class="p">(</span><span class="s1">&#39;register_user_captcha&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">register_user_form</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s1">&#39;Register&#39;</span> <span class="k">if</span> <span class="s1">&#39;Register&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                 <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Register&#39;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">register_user</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span> <span class="n">new_email</span><span class="p">,</span> <span class="n">new_username</span><span class="p">,</span>
+                                                                <span class="n">new_password</span><span class="p">,</span> <span class="n">new_password_repeat</span><span class="p">,</span>
+                                                                <span class="n">pre_authorization</span><span class="p">,</span> <span class="n">domains</span><span class="p">,</span>
+                                                                <span class="n">callback</span><span class="p">,</span> <span class="n">captcha</span><span class="p">,</span> <span class="n">entered_captcha</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+<div class="viewcode-block" id="Authenticate.reset_password"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.reset_password">[docs]</a>    <span class="k">def</span> <span class="nf">reset_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span>
+                       <span class="n">fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Reset password&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a password reset widget.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        username: str</span>
+<span class="sd">            Username of the user to reset the password for.</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the password reset widget i.e. main or sidebar.</span>
+<span class="sd">        fields: dict, optional</span>
+<span class="sd">            Rendered names of the fields/buttons.</span>
+<span class="sd">        clear_on_submit: bool</span>
+<span class="sd">            Clear on submit setting, </span>
+<span class="sd">            True: clears inputs on submit, </span>
+<span class="sd">            False: keeps inputs on submit.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key provided to widget to avoid duplicate WidgetID errors.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on form submission.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Status of resetting the password.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">ResetError</span><span class="p">(</span><span class="s1">&#39;User must be logged in to use the reset password widget&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Form name&#39;</span><span class="p">:</span><span class="s1">&#39;Reset password&#39;</span><span class="p">,</span> <span class="s1">&#39;Current password&#39;</span><span class="p">:</span><span class="s1">&#39;Current password&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;New password&#39;</span><span class="p">:</span><span class="s1">&#39;New password&#39;</span><span class="p">,</span><span class="s1">&#39;Repeat password&#39;</span><span class="p">:</span><span class="s1">&#39;Repeat password&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Reset&#39;</span><span class="p">:</span><span class="s1">&#39;Reset&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+            <span class="n">reset_password_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+            <span class="n">reset_password_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="n">reset_password_form</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s1">&#39;Reset password&#39;</span> <span class="k">if</span> <span class="s1">&#39;Form name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                      <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Form name&#39;</span><span class="p">])</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">username</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">reset_password_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Current password&#39;</span>
+                                                  <span class="k">if</span> <span class="s1">&#39;Current password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                  <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Current password&#39;</span><span class="p">],</span>
+                                                  <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">new_password</span> <span class="o">=</span> <span class="n">reset_password_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;New password&#39;</span>
+                                                      <span class="k">if</span> <span class="s1">&#39;New password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                      <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;New password&#39;</span><span class="p">],</span>
+                                                      <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">new_password_repeat</span> <span class="o">=</span> <span class="n">reset_password_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;Repeat password&#39;</span>
+                                                             <span class="k">if</span> <span class="s1">&#39;Repeat password&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                             <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Repeat password&#39;</span><span class="p">],</span>
+                                                             <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reset_password_form</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s1">&#39;Reset&#39;</span> <span class="k">if</span> <span class="s1">&#39;Reset&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                  <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Reset&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">reset_password</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">new_password</span><span class="p">,</span>
+                                                          <span class="n">new_password_repeat</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+<div class="viewcode-block" id="Authenticate.update_user_details"><a class="viewcode-back" href="../../../index.html#streamlit_authenticator.views.authentication_view.Authenticate.update_user_details">[docs]</a>    <span class="k">def</span> <span class="nf">update_user_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">,</span>
+                            <span class="n">fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">clear_on_submit</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Update user details&#39;</span><span class="p">,</span>
+                            <span class="n">callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a update user details widget.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        username: str</span>
+<span class="sd">            Username of the user to update user details for.</span>
+<span class="sd">        location: str</span>
+<span class="sd">            Location of the update user details widget i.e. main or sidebar.</span>
+<span class="sd">        fields: dict, optional</span>
+<span class="sd">            Rendered names of the fields/buttons.</span>
+<span class="sd">        clear_on_submit: bool</span>
+<span class="sd">            Clear on submit setting, </span>
+<span class="sd">            True: clears inputs on submit, </span>
+<span class="sd">            False: keeps inputs on submit.</span>
+<span class="sd">        key: str</span>
+<span class="sd">            Unique key provided to widget to avoid duplicate WidgetID errors.</span>
+<span class="sd">        callback: callable, optional</span>
+<span class="sd">            Optional callback function that will be invoked on form submission.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Status of updating the user details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s1">&#39;authentication_status&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">UpdateError</span><span class="p">(</span><span class="s1">&#39;User must be logged in to use the update user details widget&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Form name&#39;</span><span class="p">:</span><span class="s1">&#39;Update user details&#39;</span><span class="p">,</span> <span class="s1">&#39;Field&#39;</span><span class="p">:</span><span class="s1">&#39;Field&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">:</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;Email&#39;</span><span class="p">:</span><span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="s1">&#39;New value&#39;</span><span class="p">:</span><span class="s1">&#39;New value&#39;</span><span class="p">,</span> <span class="s1">&#39;Update&#39;</span><span class="p">:</span><span class="s1">&#39;Update&#39;</span><span class="p">}</span> 
+        <span class="k">if</span> <span class="n">location</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Location must be one of &#39;main&#39; or &#39;sidebar&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;main&#39;</span><span class="p">:</span>
+            <span class="n">update_user_details_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">location</span> <span class="o">==</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">:</span>
+            <span class="n">update_user_details_form</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">clear_on_submit</span><span class="o">=</span><span class="n">clear_on_submit</span><span class="p">)</span>
+        <span class="n">update_user_details_form</span><span class="o">.</span><span class="n">subheader</span><span class="p">(</span><span class="s1">&#39;Update user details&#39;</span> <span class="k">if</span> <span class="s1">&#39;Form name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                           <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Form name&#39;</span><span class="p">])</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">username</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">update_user_details_form_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Name&#39;</span> <span class="k">if</span> <span class="s1">&#39;Name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">],</span>
+                                           <span class="s1">&#39;Email&#39;</span> <span class="k">if</span> <span class="s1">&#39;Email&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Email&#39;</span><span class="p">]]</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">update_user_details_form</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span><span class="s1">&#39;Field&#39;</span> <span class="k">if</span> <span class="s1">&#39;Field&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                   <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Field&#39;</span><span class="p">],</span>
+                                                   <span class="n">update_user_details_form_fields</span><span class="p">)</span>
+        <span class="n">new_value</span> <span class="o">=</span> <span class="n">update_user_details_form</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span><span class="s1">&#39;New value&#39;</span> <span class="k">if</span> <span class="s1">&#39;New value&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                        <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;New value&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">update_user_details_form_fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span>
+        <span class="k">elif</span> <span class="n">update_user_details_form_fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;email&#39;</span>
+        <span class="k">if</span> <span class="n">update_user_details_form</span><span class="o">.</span><span class="n">form_submit_button</span><span class="p">(</span><span class="s1">&#39;Update&#39;</span> <span class="k">if</span> <span class="s1">&#39;Update&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+                                                       <span class="k">else</span> <span class="n">fields</span><span class="p">[</span><span class="s1">&#39;Update&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authentication_controller</span><span class="o">.</span><span class="n">update_user_details</span><span class="p">(</span><span class="n">new_value</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span>
+                                                                  <span class="n">callback</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_controller</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Streamlit Authenticator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Mohammad Khorasani.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
