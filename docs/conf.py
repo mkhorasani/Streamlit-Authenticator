@@ -67,3 +67,8 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 add_module_names = False  # This will remove the module path from class names
+
+html_theme_options = {
+    'collapse_navigation': False,
+    'navigation_depth': -1,
+}
