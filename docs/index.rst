@@ -17,7 +17,7 @@ Welcome to Streamlit Authenticator's documentation!
 .. automodule:: streamlit_authenticator.utilities.hasher
    :members:
 
-.. automodule:: streamlit_authenticator.viutilitiesews.validator
+.. automodule:: streamlit_authenticator.utilities.validator
    :members:
 
 Indices and tables
