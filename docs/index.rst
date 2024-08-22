@@ -10,7 +10,6 @@ Welcome to Streamlit Authenticator's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
 .. automodule:: streamlit_authenticator.views.authentication_view
    :members:
 
