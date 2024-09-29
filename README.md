@@ -109,7 +109,7 @@ with open('../config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
 # Pre-hashing all plain text passwords once
-# Hasher.hash_passwords(config['credentials'])
+# stauth.Hasher.hash_passwords(config['credentials'])
 
 authenticator = stauth.Authenticate(
     config['credentials'],
