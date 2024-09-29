@@ -243,7 +243,7 @@ class AuthenticationModel:
     def guest_login(self, cookie_controller: Any, provider: str='google',
                     oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
                     single_session: bool=False, roles: Optional[List[str]]=None,
-                    callback: Optional[Callable]=None) -> str:
+                    callback: Optional[Callable]=None) -> Optional[str]:
         """
         Executes the guest login by setting authentication status to true and adding the user's
         username and name to the session state.
@@ -269,7 +269,7 @@ class AuthenticationModel:
 
         Returns
         -------
-        str
+        Optional[str]
             The authorization endpoint URL for the guest login.
         """
         if not oauth2 and self.path:
@@ -289,14 +289,14 @@ class AuthenticationModel:
                 self.credentials['usernames'][result['email']] = {}
             self.credentials['usernames'][result['email']] = \
                 {'email': result['email'],
-                 'logged_in': True, 'first_name': result['given_name'],
-                 'last_name': result['family_name'],
-                 'picture': result['picture'] if 'picture' in result else None,
+                 'logged_in': True, 'first_name': result.get('given_name', ''),
+                 'last_name': result.get('family_name', ''),
+                 'picture': result.get('picture', None),
                  'roles': roles}
             if single_session and self.credentials['usernames'][result['email']]['logged_in']:
                 raise LoginError('Cannot log in multiple sessions')
             st.session_state['authentication_status'] = True
-            st.session_state['name'] = f'{result['given_name']} {result['family_name']}'
+            st.session_state['name'] = f'{result.get("given_name", "")} {result.get("family_name", "")}'
             st.session_state['email'] = result['email']
             st.session_state['username'] = result['email']
             st.session_state['roles'] = roles
