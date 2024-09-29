@@ -18,13 +18,14 @@
 - [Creating a configuration file](#3-creating-a-configuration-file)
 - [Setup](#4-setup)
 - [Creating a login widget](#5-creating-a-login-widget)
-- [Authenticating users](#6-authenticating-users)
-- [Creating a reset password widget](#7-creating-a-reset-password-widget)
-- [Creating a new user registration widget](#8-creating-a-new-user-registration-widget)
-- [Creating a forgot password widget](#9-creating-a-forgot-password-widget)
-- [Creating a forgot username widget](#10-creating-a-forgot-username-widget)
-- [Creating an update user details widget](#11-creating-an-update-user-details-widget)
-- [Updating the configuration file](#12-updating-the-configuration-file)
+- [Creating a guest login widget](#6-creating-a-guest-login-widget)
+- [Authenticating users](#7-authenticating-users)
+- [Creating a reset password widget](#8-creating-a-reset-password-widget)
+- [Creating a new user registration widget](#9-creating-a-new-user-registration-widget)
+- [Creating a forgot password widget](#10-creating-a-forgot-password-widget)
+- [Creating a forgot username widget](#11-creating-a-forgot-username-widget)
+- [Creating an update user details widget](#12-creating-an-update-user-details-widget)
+- [Updating the configuration file](#13-updating-the-configuration-file)
 - [License](#license)
 
 ### 1. Quickstart
@@ -52,7 +53,7 @@ import streamlit_authenticator as stauth
 * Initially create a YAML configuration file and add to it your users' credentials: including names, usernames, and passwords (plain text passwords will be hashed automatically).
 * In addition, enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Finally, define a list of pre-authorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
-* **_Please remember to update the config file (as shown in step 12) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
+* **_Please remember to update the config file (as shown in step 13) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
 ```python
 cookie:
@@ -183,7 +184,7 @@ authenticator.login()
 
 * **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 
-### 4. Creating a guest login widget
+### 6. Creating a guest login widget
 
 * You can render the guest login widget as follows.
 
@@ -223,7 +224,7 @@ authenticator.experimental_guest_login('Login with Microsoft', provider='microso
 * To create the client id, client secret, and tenant id parameters for Microsoft OAuth2 please refer to https://learn.microsoft.com/en-us/graph/auth-register-app-v2.
 * Please note that upon successful login, the guest user's name, email, and other information will be registered in the credentials dictionary and their re-authentication cookie will be saved automatically.
 
-### 5. Authenticating user
+### 7. Authenticating user
 
 * You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
@@ -259,7 +260,7 @@ elif st.session_state['authentication_status'] is None:
 
 * You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state['failed_login_attempts']** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
-### 7. Creating a reset password widget
+### 8. Creating a reset password widget
 
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
@@ -292,9 +293,9 @@ if st.session_state['authentication_status']:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.JPG)
 
-* **_Please remember to update the config file (as shown in step 12) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 8. Creating a new user registration widget
+### 9. Creating a new user registration widget
 
 * You may use the **register_user** widget to allow a user to sign up to your application as shown below.
 * If you require the user to be pre-authorized, define a **pre_authorized** list of emails that are allowed to register, and add it to the configuration file or provide it as a parameter to the **register_user** widget.
@@ -342,9 +343,9 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.JPG)
 
-* **_Please remember to update the config file (as shown in step 12) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 9. Creating a forgot password widget
+### 10. Creating a forgot password widget
 
 * You may use the **forgot_password** widget to allow a user to generate a new random password.
 * The new password will be automatically hashed and saved in the credentials dictionary.
@@ -386,9 +387,9 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.JPG)
 
-* **_Please remember to update the config file (as shown in step 12) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 10. Creating a forgot username widget
+### 11. Creating a forgot username widget
 
 * You may use the **forgot_username** widget to allow a user to retrieve their forgotten username.
 * The widget will return the username and email which the developer should then transfer to the user securely.
@@ -427,7 +428,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.JPG)
 
-### 11. Creating an update user details widget
+### 12. Creating an update user details widget
 
 * You may use the **update_user_details** widget to allow a logged in user to update their name and/or email.
 * The widget will automatically save the updated details in both the credentials dictionary and re-authentication cookie.
@@ -461,9 +462,9 @@ if st.session_state['authentication_status']:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.JPG)
 
-* **_Please remember to update the config file (as shown in step 12) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 12. Updating the configuration file
+### 13. Updating the configuration file
 
 * Please ensure that the configuration file is re-saved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
@@ -471,9 +472,6 @@ if st.session_state['authentication_status']:
 with open('../config.yaml', 'w') as file:
     yaml.dump(config, file, default_flow_style=False)
 ```
-
-<!--- ## Credits
-- Mohamed Abdou for the highly versatile cookie manager in [Extra-Streamlit-Components](https://github.com/Mohamed-512/Extra-Streamlit-Components). --->
 
 ## License
 
