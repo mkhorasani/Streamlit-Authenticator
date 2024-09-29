@@ -7,77 +7,79 @@ Libraries imported:
 - streamlit: Framework used to build pure Python web applications.
 """
 
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
+
 import streamlit as st
 
+from ..models.oauth2 import GoogleModel
+from ..models.oauth2 import MicrosoftModel
 from .. import params
 from ..utilities import (Hasher,
                          Helpers,
                          CredentialsError,
                          LoginError,
                          RegisterError,
-                         UpdateError,
-                         Validator)
+                         UpdateError)
 
 class AuthenticationModel:
     """
     This class executes the logic for the login, logout, register user, reset password, 
     forgot password, forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: dict, pre_authorized: Optional[List[str]]=None,
-                 validator: Optional[Validator]=None, auto_hash: bool=True):
+    def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
+                 path: Optional[str]=None):
         """
-        Create a new instance of "AuthenticationService".
+        Create a new instance of "AuthenticationModel".
 
         Parameters
         ----------
         credentials: dict
-            Dictionary of usernames, names, passwords, emails, and other user data.
-        pre-authorized: list, optional
-            List of emails of unregistered users who are authorized to register.        
-        validator: Validator, optional
-            Validator object that checks the validity of the username, name, and email fields.
+            Dictionary of usernames, names, passwords, emails, and other user data.  
         auto_hash: bool
             Automatic hashing requirement for the passwords, 
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
+        path: str
+            File path of the config file.
         """
-        self.credentials = credentials
+        self.path = path
+        if self.path:
+            self.config = Helpers.read_config_file(path)
+            self.credentials = self.config['credentials']
+        else:
+            self.credentials = credentials
         if self.credentials['usernames']:
-            if 'AuthenticationService.__init__' not in st.session_state:
-                st.session_state['AuthenticationService.__init__'] = None
-            if not st.session_state['AuthenticationService.__init__']:
-                self.credentials['usernames'] = {
-                    key.lower(): value
-                    for key, value in self.credentials['usernames'].items()
-                    }
-                if auto_hash:
-                    if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
-                        print(f"""Auto hashing in progress. To avoid runtime delays, please manually
-                              pre-hash all plain text passwords in the credentials using the
-                              Hasher.hash_passwords function, and set auto_hash=False for the
-                              Authenticate class. For more information please refer to
-                              {params.AUTO_HASH_MAX_USERS_LINK}.""")
-                    for username, _ in self.credentials['usernames'].items():
-                        if not Hasher._is_hash(self.credentials['usernames'][username]['password']):
-                            self.credentials['usernames'][username]['password'] = \
-                            Hasher._hash(self.credentials['usernames'][username]['password'])
-                st.session_state['AuthenticationService.__init__'] = True
+            self.credentials['usernames'] = {
+                key.lower(): value
+                for key, value in self.credentials['usernames'].items()
+                }
+            if auto_hash:
+                if len(self.credentials['usernames']) > params.AUTO_HASH_MAX_USERS:
+                    print(f"""Auto hashing in progress. To avoid runtime delays, please manually
+                          pre-hash all plain text passwords in the credentials using the
+                          Hasher.hash_passwords function, and set auto_hash=False for the
+                          Authenticate class. For more information please refer to
+                          {params.AUTO_HASH_MAX_USERS_LINK}.""")
+                for username, _ in self.credentials['usernames'].items():
+                    if 'password' in self.credentials['usernames'][username] and \
+                        not Hasher.is_hash(self.credentials['usernames'][username]['password']):
+                        self.credentials['usernames'][username]['password'] = \
+                        Hasher.hash(self.credentials['usernames'][username]['password'])
         else:
             self.credentials['usernames'] = {}
-        self.pre_authorized = pre_authorized
-        self.validator = validator if validator is not None else Validator()
         if 'name' not in st.session_state:
             st.session_state['name'] = None
         if 'authentication_status' not in st.session_state:
             st.session_state['authentication_status'] = None
         if 'username' not in st.session_state:
             st.session_state['username'] = None
+        if 'email' not in st.session_state:
+            st.session_state['email'] = None
+        if 'roles' not in st.session_state:
+            st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
-    def check_credentials(self, username: str, password: str,
-                          max_concurrent_users: Optional[int]=None,
-                          max_login_attempts: Optional[int]=None) -> bool:
+    def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks the validity of the entered credentials.
 
@@ -87,10 +89,6 @@ class AuthenticationModel:
             The entered username.
         password: str
             The entered password.
-        max_concurrent_users: int, optional
-            Maximum number of users allowed to login concurrently.
-        max_login_attempts: int, optional
-            Maximum number of failed login attempts a user can make.
 
         Returns
         -------
@@ -100,22 +98,15 @@ class AuthenticationModel:
             True: correct credentials,
             False: incorrect credentials.
         """
-        if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
-            max_concurrent_users - 1:
-            raise LoginError('Maximum number of concurrent users exceeded')
         if username not in self.credentials['usernames']:
             return False
-        if isinstance(max_login_attempts, int) and \
-            'failed_login_attempts' in self.credentials['usernames'][username] and \
-            self.credentials['usernames'][username]['failed_login_attempts'] >= max_login_attempts:
-            raise LoginError('Maximum number of login attempts exceeded')
         try:
             if Hasher.check_pw(password, self.credentials['usernames'][username]['password']):
                 return True
             self._record_failed_login_attempts(username)
             return False
         except (TypeError, ValueError) as e:
-            print(e)
+            print(f'{e} please hash all plain text passwords')
         return None
     def _count_concurrent_users(self) -> int:
         """
@@ -158,7 +149,7 @@ class AuthenticationModel:
         username: str
             Username associated with the forgotten password.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -170,10 +161,12 @@ class AuthenticationModel:
             New random password of the user.
         """
         if username in self.credentials['usernames']:
+            email = self.credentials['usernames'][username]['email']
+            random_password = self._set_random_password(username)
             if callback:
-                callback({'username': username})
-            return (username, self._get_credentials()[username]['email'],
-                    self._set_random_password(username))
+                callback({'widget': 'Forgot password', 'username': username, 'email': email,
+                          'random_password': random_password})
+            return (username, email, random_password)
         return False, None, None
     def forgot_username(self, email: str, callback: Optional[Callable]=None) -> tuple:
         """
@@ -184,7 +177,7 @@ class AuthenticationModel:
         email: str
             Email associated with the forgotten username.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -193,19 +186,10 @@ class AuthenticationModel:
         str
             Email of the user.
         """
+        username = self._get_username('email', email), email
         if callback:
-            callback({'email': email})
-        return self._get_username('email', email), email
-    def _get_credentials(self) -> dict:
-        """
-        Gets the user credentials dictionary.
-
-        Returns
-        -------
-        dict
-            User credentials dictionary.
-        """
-        return self.credentials['usernames']
+            callback({'widget': 'Forgot username', 'username': username, 'email': email})
+        return username
     def _get_username(self, key: str, value: str) -> str:
         """
         Gets the username based on a provided entry.
@@ -226,11 +210,109 @@ class AuthenticationModel:
             if values[key] == value:
                 return username
         return False
+    def _get_user_variables(self, username: str) -> tuple:
+        """
+        Gets the user's email, name, and roles based on a provided username.
+
+        Parameters
+        ----------
+        username: str
+            Username of the user.
+
+        Returns
+        -------
+        str
+            Email associated with the given username.
+        str
+            Name associated with the given username.
+        str
+            Roles associated with the given username.
+        """
+        if 'first_name' in self.credentials['usernames'][username] and \
+            'last_name' in self.credentials['usernames'][username]:
+            first_name = self.credentials['usernames'][username]['first_name']
+            last_name = self.credentials['usernames'][username]['last_name']
+            name = f'{first_name} {last_name}'
+        else:
+            name = self.credentials['usernames'][username]['name']
+        if 'roles' in self.credentials['usernames'][username]:
+            roles = self.credentials['usernames'][username]['roles']
+        else:
+            roles = None
+        return self.credentials['usernames'][username]['email'], name, roles
+    def guest_login(self, cookie_controller: Any, provider: str='google',
+                    oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
+                    single_session: bool=False, roles: Optional[List[str]]=None,
+                    callback: Optional[Callable]=None) -> str:
+        """
+        Executes the guest login by setting authentication status to true and adding the user's
+        username and name to the session state.
+
+        Parameters
+        ----------
+        cookie_controller: CookieController
+            Cookie controller object used to set the re-authentication cookie.
+        provider: str
+            OAuth2 provider selection i.e. google or microsoft.
+        oauth2: dict, optional
+            Configuration parameters to implement an OAuth2 authentication.
+        max_concurrent_users: int, optional
+            Maximum number of users allowed to login concurrently.
+        single_session: bool
+            Disables the ability for the same user to log in multiple sessions,
+            True: single session allowed,
+            False: multiple sessions allowed.
+        roles: list, optional
+            User roles for guest users.
+        callback: callable, optional
+            Callback function that will be invoked on button press.
+
+        Returns
+        -------
+        str
+            The authorization endpoint URL for the guest login.
+        """
+        if not oauth2 and self.path:
+            oauth2 = self.config['oauth2']
+        if provider.lower() == 'google':
+            google_model = GoogleModel(oauth2[provider])
+            result = google_model.guest_login()
+        elif provider.lower() == 'microsoft':
+            microsoft_model = MicrosoftModel(oauth2[provider])
+            result = microsoft_model.guest_login()
+        if isinstance(result, dict):
+            if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
+                max_concurrent_users - 1:
+                st.query_params.clear()
+                raise LoginError('Maximum number of concurrent users exceeded')
+            if result['email'] not in self.credentials['usernames']:
+                self.credentials['usernames'][result['email']] = {}
+            self.credentials['usernames'][result['email']] = \
+                {'email': result['email'],
+                 'logged_in': True, 'first_name': result['given_name'],
+                 'last_name': result['family_name'],
+                 'picture': result['picture'] if 'picture' in result else None,
+                 'roles': roles}
+            if single_session and self.credentials['usernames'][result['email']]['logged_in']:
+                raise LoginError('Cannot log in multiple sessions')
+            st.session_state['authentication_status'] = True
+            st.session_state['name'] = f'{result['given_name']} {result['family_name']}'
+            st.session_state['email'] = result['email']
+            st.session_state['username'] = result['email']
+            st.session_state['roles'] = roles
+            st.query_params.clear()
+            cookie_controller.set_cookie()
+            if self.path:
+                Helpers.update_config_file(self.path, 'credentials', self.credentials)
+            if callback:
+                callback({'widget': 'Guest login', 'email': result['email']})
+            return None
+        return result
     def login(self, username: str, password: str, max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, token: Optional[Dict[str, str]]=None,
-              callback: Optional[Callable]=None) -> bool:
+              single_session: bool=False, callback: Optional[Callable]=None) -> bool:
         """
-        Executes login by setting authentication status to true and adding the user's
+        Executes the login by setting authentication status to true and adding the user's
         username and name to the session state.
 
         Parameters
@@ -245,8 +327,12 @@ class AuthenticationModel:
             Maximum number of failed login attempts a user can make.
         token: dict, optional
             The re-authentication cookie to get the username from.
+        single_session: bool
+            Disables the ability for the same user to log in multiple sessions,
+            True: single session allowed,
+            False: multiple sessions allowed.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -257,34 +343,67 @@ class AuthenticationModel:
             False: incorrect credentials.
         """
         if username:
-            if self.check_credentials(username, password, max_concurrent_users, max_login_attempts):
-                st.session_state['username'] = username
-                st.session_state['name'] = self.credentials['usernames'][username]['name']
+            if self.check_credentials(username, password):
+                if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
+                    max_concurrent_users - 1:
+                    raise LoginError('Maximum number of concurrent users exceeded')
+                if isinstance(max_login_attempts, int) and \
+                    'failed_login_attempts' in self.credentials['usernames'][username] and \
+                    self.credentials['usernames'][username]['failed_login_attempts'] >= \
+                        max_login_attempts:
+                    raise LoginError('Maximum number of login attempts exceeded')
+                if single_session and self.credentials['usernames'][username]['logged_in']:
+                    raise LoginError('Cannot log in multiple sessions')
+                st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
+                    self._get_user_variables(username)
                 st.session_state['authentication_status'] = True
+                st.session_state['username'] = username
                 self._record_failed_login_attempts(username, reset=True)
                 self.credentials['usernames'][username]['logged_in'] = True
+                if 'password_hint' in st.session_state:
+                    del st.session_state['password_hint']
+                if self.path:
+                    Helpers.update_config_file(self.path, 'credentials', self.credentials)
                 if callback:
-                    callback({'username': username})
+                    callback({'widget': 'Login', 'username': username})
                 return True
             st.session_state['authentication_status'] = False
+            if username in self.credentials['usernames'] and \
+                'password_hint' in self.credentials['usernames'][username]:
+                st.session_state['password_hint'] = \
+                    self.credentials['usernames'][username]['password_hint']
             return False
         if token:
             if not token['username'] in self.credentials['usernames']:
                 raise LoginError('User not authorized')
-            st.session_state['username'] = token['username']
-            st.session_state['name'] = self.credentials['usernames'][token['username']]['name']
+            st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
+                self._get_user_variables(token['username'])
             st.session_state['authentication_status'] = True
+            st.session_state['username'] = token['username']
             self.credentials['usernames'][token['username']]['logged_in'] = True
+            if self.path:
+                Helpers.update_config_file(self.path, 'credentials', self.credentials)
         return None
-    def logout(self):
+    def logout(self, callback: Optional[Callable]=None):
         """
         Clears the cookie and session state variables associated with the logged in user.
+
+        Parameters
+        ----------
+        callback: callable, optional
+            Callback function that will be invoked on button press.
         """
         self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
         st.session_state['authentication_status'] = None
+        st.session_state['email'] = None
+        st.session_state['roles'] = None
+        if self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        if callback:
+            callback({'widget': 'Logout'})
     def _record_failed_login_attempts(self, username: str, reset: bool=False):
         """
         Records the number of failed login attempts for a given username.
@@ -304,7 +423,11 @@ class AuthenticationModel:
             self.credentials['usernames'][username]['failed_login_attempts'] = 0
         else:
             self.credentials['usernames'][username]['failed_login_attempts'] += 1
-    def _register_credentials(self, username: str, name: str, password: str, email: str):
+        if self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+    def _register_credentials(self, username: str, first_name: str, last_name: str,
+                              password: str, email: str, password_hint: str,
+                              roles: Optional[List[str]]=None):
         """
         Adds the new user's information to the credentials dictionary.
 
@@ -312,38 +435,55 @@ class AuthenticationModel:
         ----------
         username: str
             Username of the new user.
-        name: str
-            Name of the new user.
+        first_name: str
+            First name of the new user.
+        last_name: str
+            Last name of the new user.
         password: str
             Password of the new user.
         email: str
             Email of the new user.
+        password_hint: str
+            Password hint for the user to remember their password.
+        roles: list, optional
+            User roles for registered users.
         """
-        self.credentials['usernames'][username] = \
-            {'name': name, 'password': Hasher([password]).generate()[0], 'email': email,
-             'logged_in': False}
-    def register_user(self, new_name: str, new_email: str, new_username: str,
-                      new_password: str, pre_authorization: bool,
+        self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
+                                                   'first_name': first_name,
+                                                   'last_name': last_name,
+                                                   'password': Hasher.hash(password),
+                                                   'password_hint': password_hint,
+                                                   'roles': roles}
+        if self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+    def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
+                      new_username: str, new_password: str, password_hint: str,
+                      pre_authorized: Optional[List[str]]=None,
+                      roles: Optional[List[str]]=None,
                       callback: Optional[Callable]=None) -> tuple:
         """
-        Registers a new user's name, username, password, and email.
+        Registers a new user's first name, last name, username, password, email, and roles.
 
         Parameters
         ----------
-        new_name: str
-            Name of the new user.
+        new_first_name: str
+            First name of the new user.
+        new_last_name: str
+            Last name of the new user.
         new_email: str
             Email of the new user.
         new_username: str
             Username of the new user.
         new_password: str
             Password of the new user.
-        pre-authorization: bool
-            Pre-authorization requirement, 
-            True: user must be pre-authorized to register, 
-            False: any user can register.
+        password_hint: str
+            Password hint for the user to remember their password.
+        pre-authorized: list, optional
+            List of emails of unregistered users who are authorized to register.
+        roles: list, optional
+            User roles for registered users.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -358,17 +498,27 @@ class AuthenticationModel:
             raise RegisterError('Email already taken')
         if new_username in self.credentials['usernames']:
             raise RegisterError('Username already taken')
-        if callback:
-            callback({'new_name': new_name, 'new_email': new_email,
-                      'new_username': new_username})
-        if pre_authorization:
-            if new_email in self.pre_authorized['emails']:
-                self._register_credentials(new_username, new_name, new_password, new_email)
-                self.pre_authorized['emails'].remove(new_email)
-                return new_email, new_username, new_name
+        if not pre_authorized and self.path:
+            try:
+                pre_authorized = self.config['pre-authorized']['emails']
+            except (KeyError, TypeError):
+                pre_authorized = None
+        if pre_authorized and new_email in pre_authorized:
+            self._register_credentials(new_username, new_first_name, new_last_name, new_password,
+                                       new_email, password_hint, roles)
+            pre_authorized.remove(new_email)
+            if self.path:
+                Helpers.update_config_file(self.path, 'pre-authorized', pre_authorized)
+            return new_email, new_username, f'{new_first_name} {new_last_name}'
+        if pre_authorized and new_email not in pre_authorized:
             raise RegisterError('User not pre-authorized to register')
-        self._register_credentials(new_username, new_name, new_password, new_email)
-        return new_email, new_username, new_name
+        self._register_credentials(new_username, new_first_name, new_last_name, new_password,
+                                   new_email, password_hint, roles)
+        if callback:
+            callback({'widget': 'Register user', 'new_name': new_first_name,
+                      'new_last_name': new_last_name, 'new_email': new_email,
+                      'new_username': new_username})
+        return new_email, new_username, f'{new_first_name} {new_last_name}'
     def reset_password(self, username: str, password: str, new_password: str,
                        callback: Optional[Callable]=None) -> bool:
         """
@@ -384,7 +534,7 @@ class AuthenticationModel:
         new_password: str
             New password of the user.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -397,7 +547,7 @@ class AuthenticationModel:
         self._update_password(username, new_password)
         self._record_failed_login_attempts(username, reset=True)
         if callback:
-            callback({})
+            callback({'widget': 'Reset password', 'username': username})
         return True
     def _set_random_password(self, username: str) -> str:
         """
@@ -414,8 +564,9 @@ class AuthenticationModel:
             New plain text password that should be transferred to the user securely.
         """
         random_password = Helpers.generate_random_pw()
-        self.credentials['usernames'][username]['password'] = \
-            Hasher([random_password]).generate()[0]
+        self.credentials['usernames'][username]['password'] = Hasher.hash(random_password)
+        if self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
         return random_password
     def _update_entry(self, username: str, key: str, value: str):
         """
@@ -431,6 +582,8 @@ class AuthenticationModel:
             Updated entry value i.e. "jsmith@gmail.com".
         """
         self.credentials['usernames'][username][key] = value
+        if self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
     def _update_password(self, username: str, password: str):
         """
         Updates the credentials dictionary with the user's hashed reset password.
@@ -442,8 +595,10 @@ class AuthenticationModel:
         password: str
             Updated plain text password.
         """
-        self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
-    def update_user_details(self, new_value: str, username: str, field: str,
+        self.credentials['usernames'][username]['password'] = Hasher.hash(password)
+        if self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+    def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable]=None) -> bool:
         """
         Validates the user's updated name or email and subsequently modifies it in the
@@ -451,14 +606,14 @@ class AuthenticationModel:
 
         Parameters
         ----------
-        new_value: str
-            New value for the name or email.
         username: str
             Username of the user.
         field: str
             Field to update i.e. name or email.
+        new_value: str
+            New value for the name or email.
         callback: callable, optional
-            Optional callback function that will be invoked on form submission.
+            Callback function that will be invoked on form submission.
 
         Returns
         -------
@@ -469,11 +624,17 @@ class AuthenticationModel:
         if field == 'email':
             if self._credentials_contains_value(new_value):
                 raise UpdateError('Email already taken')
+        if 'first_name' not in self.credentials['usernames'][username]:
+            self.credentials['usernames'][username]['first_name'] = None
+            self.credentials['usernames'][username]['last_name'] = None
         if new_value != self.credentials['usernames'][username][field]:
             self._update_entry(username, field, new_value)
-            if field == 'name':
-                st.session_state['name'] = new_value
+            if field in {'first_name', 'last_name'}:
+                _, st.session_state['name'], _ = self._get_user_variables(username)
+                if 'name' in self.credentials['usernames'][username]:
+                    del self.credentials['usernames'][username]['name']
             if callback:
-                callback({'field': field, 'new_value': new_value})
+                callback({'widget': 'Update user details', 'username': username,
+                          'field': field, 'new_value': new_value})
             return True
         raise UpdateError('New and current values are the same')

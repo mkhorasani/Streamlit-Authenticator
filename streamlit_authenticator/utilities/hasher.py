@@ -40,7 +40,8 @@ class Hasher:
             Validity of the entered password by comparing it to the hashed password.
         """
         return bcrypt.checkpw(password.encode(), hashed_password.encode())
-    def generate(self) -> list:
+    @classmethod
+    def hash_list(self) -> list:
         """
         Hashes the list of plain text passwords.
 
@@ -49,7 +50,7 @@ class Hasher:
         list
             The list of hashed passwords.
         """
-        return [self._hash(password) for password in self.passwords]
+        return [self.hash(password) for password in self.passwords]
     @classmethod
     def hash_passwords(cls, credentials: dict) -> dict:
         """
@@ -68,12 +69,12 @@ class Hasher:
 
         for _, user in usernames.items():
             password = user['password']
-            if not cls._is_hash(password):
-                hashed_password = cls._hash(password)
+            if not cls.is_hash(password):
+                hashed_password = cls.hash(password)
                 user['password'] = hashed_password
         return credentials
     @classmethod
-    def _hash(cls, password: str) -> str:
+    def hash(cls, password: str) -> str:
         """
         Hashes the plain text password.
 
@@ -88,7 +89,7 @@ class Hasher:
         """
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     @classmethod
-    def _is_hash(cls, hash_string: str) -> bool:
+    def is_hash(cls, hash_string: str) -> bool:
         """
         Determines if a string is a hash.
 

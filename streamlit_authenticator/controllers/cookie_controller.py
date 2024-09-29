@@ -1,7 +1,12 @@
 """
 Script description: This module controls requests made to the cookie model for password-less
-re-authentication. 
+re-authentication.
+
+Libraries imported:
+- typing: Module implementing standard typing notations for Python functions.
 """
+
+from typing import Optional
 
 from ..models import CookieModel
 
@@ -10,7 +15,8 @@ class CookieController:
     This class controls all requests made to the cookie model for password-less re-authentication, 
     including deleting, getting, and setting the cookie.
     """
-    def __init__(self, cookie_name: str, cookie_key: str, cookie_expiry_days: float):
+    def __init__(self, cookie_name: Optional[str]=None, cookie_key: Optional[str]=None,
+                 cookie_expiry_days: Optional[float]=None, path: Optional[str]=None):
         """
         Create a new instance of "CookieController".
 
@@ -23,10 +29,13 @@ class CookieController:
         cookie_expiry_days: float
             Number of days before the re-authentication cookie automatically expires on the client's 
             browser.
+        path: str
+            File path of the config file.
         """
         self.cookie_model = CookieModel(cookie_name,
                                         cookie_key,
-                                        cookie_expiry_days)
+                                        cookie_expiry_days,
+                                        path)
     def delete_cookie(self):
         """
         Deletes the re-authentication cookie.

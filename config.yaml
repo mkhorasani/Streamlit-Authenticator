@@ -1,6 +1,6 @@
 cookie:
   expiry_days: 30
-  key: some_signature_key
+  key: some_key
   name: some_cookie_name
 credentials:
   usernames:
@@ -28,6 +28,16 @@ credentials:
       logged_in: false
       name: Ross Couper
       password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu
+oauth2:
+  google:
+    client_id: null
+    client_secret: null
+    redirect_uri: null
+  microsoft:
+    client_id: null
+    client_secret: null
+    redirect_uri: null
+    tenant_id: null
 pre-authorized:
   emails:
   - melsby@gmail.com

@@ -3,12 +3,15 @@ Script description: This module executes the logic for miscellaneous functions f
 library.
 
 Libraries imported:
+- yaml: Module implementing the data serialization used for human readable documents.
 - string: Module providing support for ASCII character encoding.
 - random: Module generating random characters.
 - streamlit: Framework used to build pure Python web applications.
 - captcha: Module generating captcha images.
 """
 
+import yaml
+from yaml.loader import SafeLoader
 import string
 import random
 import streamlit as st
@@ -70,12 +73,63 @@ class Helpers:
         Parameters
         ----------
         length: int
-            Length of the returned password.
+            Length of the randomly generated password.
 
         Returns
         -------
         str
             Randomly generated password.
         """
-        letters = string.ascii_letters + string.digits
+        letters = string.ascii_letters + string.digits + string.punctuation
         return ''.join(random.choice(letters) for i in range(length)).replace(' ','')
+    #@st.cache
+    @classmethod
+    def read_config_file(cls, path: str) -> tuple:
+        """
+        Reads the config file.
+
+        Parameters
+        ----------
+        path: str
+            File path of the config file.
+
+        Returns
+        -------
+        dict
+            Config file dict.
+        """
+        with open(path, 'r', encoding='utf-8') as file:
+            return yaml.load(file, Loader=SafeLoader)
+    @classmethod
+    def write_config_file(cls, path: str, config: dict) -> tuple:
+        """
+        Write to the config file.
+
+        Parameters
+        ----------
+        path: str
+            File path of the config file.
+        config: dict
+            Config file dict.
+        """
+        with open(path, 'w', encoding='utf-8') as file:
+            yaml.dump(config, file, default_flow_style=False)
+    @classmethod
+    def update_config_file(cls, path: str, key: str, items: dict) -> tuple:
+        """
+        Write to the config file.
+
+        Parameters
+        ----------
+        path: str
+            File path of the config file.
+        key: str
+            Key to update.
+        items: dict
+            Items to update.
+        """
+        with open(path, 'r', encoding='utf-8') as file:
+            config = yaml.load(file, Loader=SafeLoader)
+        config[key] = items
+        with open(path, 'w', encoding='utf-8') as file:
+            yaml.dump(config, file, default_flow_style=False)

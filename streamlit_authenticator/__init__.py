@@ -36,9 +36,12 @@ if not _RELEASE:
         config['credentials'],
         config['cookie']['name'],
         config['cookie']['key'],
-        config['cookie']['expiry_days'],
-        config['pre-authorized']
+        config['cookie']['expiry_days']
     )
+
+    # authenticator = Authenticate(
+    #     '../config.yaml'
+    # )
 
     # Creating a login widget
     try:
@@ -46,6 +49,16 @@ if not _RELEASE:
     except LoginError as e:
         st.error(e)
 
+    # Creating a guest login button
+    try:
+        authenticator.experimental_guest_login('Login with Google', provider='google',
+                                               oauth2=config['oauth2'])
+        authenticator.experimental_guest_login('Login with Microsoft', provider='microsoft',
+                                               oauth2=config['oauth2'])
+    except LoginError as e:
+        st.error(e)
+
+    # Authenticating user
     if st.session_state['authentication_status']:
         authenticator.logout()
         st.write(f'Welcome *{st.session_state["name"]}*')
@@ -67,7 +80,7 @@ if not _RELEASE:
     try:
         (email_of_registered_user,
          username_of_registered_user,
-         name_of_registered_user) = authenticator.register_user(pre_authorization=False)
+         name_of_registered_user) = authenticator.register_user()
         if email_of_registered_user:
             st.success('User registered successfully')
     except RegisterError as e:
@@ -102,7 +115,7 @@ if not _RELEASE:
     if st.session_state['authentication_status']:
         try:
             if authenticator.update_user_details(st.session_state['username']):
-                st.success('Entries updated successfully')
+                st.success('Entry updated successfully')
         except UpdateError as e:
             st.error(e)
 

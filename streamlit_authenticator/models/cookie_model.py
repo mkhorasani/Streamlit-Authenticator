@@ -3,26 +3,31 @@ Script description: This module executes the logic for the cookies for password-
 re-authentication. 
 
 Libraries imported:
+- typing: Module implementing standard typing notations for Python functions.
 - datetime: Module implementing DateTime data types.
 - jwt: Module implementing JSON Web Tokens for Python.
 - streamlit: Framework used to build pure Python web applications.
 - extra_streamlit_components: Module implementing cookies for Streamlit.
 """
 
+from typing import Optional
 from datetime import datetime, timedelta
 import jwt
 from jwt import DecodeError, InvalidSignatureError
 import streamlit as st
 import extra_streamlit_components as stx
 
+from ..utilities import Helpers
+
 class CookieModel:
     """
     This class executes the logic for the cookies for password-less re-authentication, 
     including deleting, getting, and setting the cookie.
     """
-    def __init__(self, cookie_name: str, cookie_key: str, cookie_expiry_days: float):
+    def __init__(self, cookie_name: Optional[str]=None, cookie_key: Optional[str]=None,
+                 cookie_expiry_days: Optional[float]=None, path: Optional[str]=None):
         """
-        Create a new instance of "CookieService".
+        Create a new instance of "CookieModel".
 
         Parameters
         ----------
@@ -33,10 +38,18 @@ class CookieModel:
         cookie_expiry_days: float
             Number of days before the re-authentication cookie automatically expires on the client's 
             browser.
+        path: str
+            File path of the config file.
         """
-        self.cookie_name            =   cookie_name
-        self.cookie_key             =   cookie_key
-        self.cookie_expiry_days     =   cookie_expiry_days
+        if path:
+            config = Helpers.read_config_file(path)
+            self.cookie_name        = config['cookie']['name']
+            self.cookie_key         = config['cookie']['key']
+            self.cookie_expiry_days = config['cookie']['expiry_days']
+        else:
+            self.cookie_name            =   cookie_name
+            self.cookie_key             =   cookie_key
+            self.cookie_expiry_days     =   cookie_expiry_days
         self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
@@ -59,7 +72,9 @@ class CookieModel:
         """
         if st.session_state['logout']:
             return False
-        self.token = self.cookie_manager.get(self.cookie_name)
+        # self.token = self.cookie_manager.get(self.cookie_name)
+        self.token = st.context.cookies[self.cookie_name] if self.cookie_name in \
+            st.context.cookies else None
         if self.token is not None:
             self.token = self._token_decode()
             if (self.token is not False and 'username' in self.token and
