@@ -296,7 +296,7 @@ class AuthenticationModel:
             if single_session and self.credentials['usernames'][result['email']]['logged_in']:
                 raise LoginError('Cannot log in multiple sessions')
             st.session_state['authentication_status'] = True
-            st.session_state['name'] = f'{result['given_name']} {result['family_name']}'
+            st.session_state['name'] = f"{result['given_name']} {result['family_name']}"
             st.session_state['email'] = result['email']
             st.session_state['username'] = result['email']
             st.session_state['roles'] = roles
