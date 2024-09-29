@@ -177,8 +177,6 @@ authenticator.login()
 >    - Unique key provided to widget to avoid duplicate WidgetID errors.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on form submission with a dict as a parameter.
->  - **sleep_time:** _float, optional, default None_
->    - Sleep time for the login widget.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
