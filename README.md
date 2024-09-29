@@ -212,11 +212,11 @@ authenticator.experimental_guest_login('Login with Microsoft', provider='microso
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on button press with a dict as a parameter.
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_1.JPG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_buttons.JPG)
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_2.JPG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_google.JPG)
 
-![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_3.JPG)
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_microsoft.JPG)
 
 
 * You may implement the guest login widget using both Google and Microsoft OAuth2 handles.
