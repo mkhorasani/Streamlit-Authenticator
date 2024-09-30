@@ -5,13 +5,11 @@ forgot password, forgot username, and modify user details widgets.
 Libraries imported:
 - time: Module implementing the sleep function.
 - typing: Module implementing standard typing notations for Python functions.
-- webbrowser: Module displaying web-based documents to users.
 - streamlit: Framework used to build pure Python web applications.
 """
 
 import time
 from typing import Any, Callable, Dict, List, Optional, Union
-import webbrowser
 
 import streamlit as st
 
@@ -230,12 +228,10 @@ class Authenticate:
                                                                 single_session=single_session,
                                                                 roles=roles,
                                                                 callback=callback)
-                if location == 'main':
-                    if st.button(button_name, key=provider):
-                        webbrowser.open(auth_endpoint)
-                if location == 'sidebar':
-                    if st.sidebar.button(button_name, key=provider):
-                        webbrowser.open(auth_endpoint)
+                if location == 'main' and auth_endpoint:
+                    st.link_button(button_name, url=auth_endpoint)
+                if location == 'sidebar' and auth_endpoint:
+                    st.sidebar.link_button(button_name, url=auth_endpoint)
     def login(self, location: str='main', max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
               captcha: bool=False, single_session: bool=False, clear_on_submit: bool=False,

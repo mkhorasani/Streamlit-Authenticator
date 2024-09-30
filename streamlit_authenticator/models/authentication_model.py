@@ -17,8 +17,10 @@ from .. import params
 from ..utilities import (Hasher,
                          Helpers,
                          CredentialsError,
+                         ForgotError,
                          LoginError,
                          RegisterError,
+                         ResetError,
                          UpdateError)
 
 class AuthenticationModel:
@@ -160,6 +162,8 @@ class AuthenticationModel:
         str
             New random password of the user.
         """
+        if self._is_guest_user(username):
+            raise ForgotError('Guest user cannot use forgot password widget')
         if username in self.credentials['usernames']:
             email = self.credentials['usernames'][username]['email']
             random_password = self._set_random_password(username)
@@ -287,6 +291,9 @@ class AuthenticationModel:
                 raise LoginError('Maximum number of concurrent users exceeded')
             if result['email'] not in self.credentials['usernames']:
                 self.credentials['usernames'][result['email']] = {}
+            else:
+                st.query_params.clear()
+                raise LoginError('User already exists')
             self.credentials['usernames'][result['email']] = \
                 {'email': result['email'],
                  'logged_in': True, 'first_name': result.get('given_name', ''),
@@ -296,7 +303,8 @@ class AuthenticationModel:
             if single_session and self.credentials['usernames'][result['email']]['logged_in']:
                 raise LoginError('Cannot log in multiple sessions')
             st.session_state['authentication_status'] = True
-            st.session_state['name'] = f'{result.get("given_name", "")} {result.get("family_name", "")}'
+            st.session_state['name'] = f'{result.get("given_name", "")} ' \
+                f'{result.get("family_name", "")}'
             st.session_state['email'] = result['email']
             st.session_state['username'] = result['email']
             st.session_state['roles'] = roles
@@ -308,6 +316,23 @@ class AuthenticationModel:
                 callback({'widget': 'Guest login', 'email': result['email']})
             return None
         return result
+    def _is_guest_user(self, username: str) -> bool:
+        """
+        Checks if a username is associated with a guest user.
+
+        Parameters
+        ----------
+        username: str
+            Provided username.
+
+        Returns
+        -------
+        bool
+            Type of user,
+            True: guest user,
+            False: non-guest user.
+        """
+        return False if 'password' in self.credentials['usernames'][username] else True
     def login(self, username: str, password: str, max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, token: Optional[Dict[str, str]]=None,
               single_session: bool=False, callback: Optional[Callable]=None) -> bool:
@@ -497,7 +522,7 @@ class AuthenticationModel:
         if self._credentials_contains_value(new_email):
             raise RegisterError('Email already taken')
         if new_username in self.credentials['usernames']:
-            raise RegisterError('Username already taken')
+            raise RegisterError('Username/email already taken')
         if not pre_authorized and self.path:
             try:
                 pre_authorized = self.config['pre-authorized']['emails']
@@ -542,6 +567,8 @@ class AuthenticationModel:
             State of resetting the password, 
             True: password reset successfully.
         """
+        if self._is_guest_user(username):
+            raise ResetError('Guest user cannot reset password')
         if not self.check_credentials(username, password):
             raise CredentialsError('password')
         self._update_password(username, new_password)
