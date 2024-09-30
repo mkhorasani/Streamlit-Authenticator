@@ -291,7 +291,7 @@ class AuthenticationModel:
                 raise LoginError('Maximum number of concurrent users exceeded')
             if result['email'] not in self.credentials['usernames']:
                 self.credentials['usernames'][result['email']] = {}
-            else:
+            if not self._is_guest_user(result['email']):
                 st.query_params.clear()
                 raise LoginError('User already exists')
             self.credentials['usernames'][result['email']] = \
@@ -332,7 +332,7 @@ class AuthenticationModel:
             True: guest user,
             False: non-guest user.
         """
-        return False if 'password' in self.credentials['usernames'][username] else True
+        return 'password' not in self.credentials['usernames'].get(username, {'password': None})
     def login(self, username: str, password: str, max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, token: Optional[Dict[str, str]]=None,
               single_session: bool=False, callback: Optional[Callable]=None) -> bool:
