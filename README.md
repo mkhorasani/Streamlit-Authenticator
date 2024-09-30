@@ -31,7 +31,7 @@
 ### 1. Quickstart
 
 * Check out the [demo app](https://demo-app-v0-3-3.streamlit.app/).
-* Please refer to the [API reference](https://streamlit-authenticator.readthedocs.io/en/latest/).
+* Please refer to the [API reference](https://streamlit-authenticator.readthedocs.io/en/stable/).
 
 ### 2. Installation
 
