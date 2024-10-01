@@ -18,7 +18,7 @@
 - [Creating a configuration file](#3-creating-a-configuration-file)
 - [Setup](#4-setup)
 - [Creating a login widget](#5-creating-a-login-widget)
-- [Creating a guest login widget](#6-creating-a-guest-login-widget)
+- [Creating a guest login widget](#6-creating-a-guest-login-widget) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
 - [Creating a reset password widget](#8-creating-a-reset-password-widget)
 - [Creating a new user registration widget](#9-creating-a-new-user-registration-widget)
@@ -222,7 +222,7 @@ authenticator.experimental_guest_login('Login with Microsoft', provider='microso
 * To create the client id, client secret, and tenant id parameters for Microsoft OAuth2 please refer to https://learn.microsoft.com/en-us/graph/auth-register-app-v2.
 * Please note that upon successful login, the guest user's name, email, and other information will be registered in the credentials dictionary and their re-authentication cookie will be saved automatically.
 
-### 7. Authenticating user
+### 7. Authenticating users
 
 * You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
