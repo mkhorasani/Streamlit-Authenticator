@@ -69,7 +69,7 @@ credentials:
       last_name: Smith
       logged_in: False # Will be managed automatically
       password: abc # Will be hashed automatically
-      roles:
+      roles: # Optional
       - admin
       - editor
       - viewer
@@ -80,7 +80,7 @@ credentials:
       last_name: Briggs
       logged_in: False # Will be managed automatically
       password: def # Will be hashed automatically
-      roles:
+      roles: # Optional
       - viewer
 oauth2: # Optional
   google: # Follow instructions: https://developers.google.com/identity/protocols/oauth2
