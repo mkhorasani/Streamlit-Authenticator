@@ -65,8 +65,9 @@ credentials:
     jsmith:
       email: jsmith@gmail.com
       failed_login_attempts: 0 # Will be managed automatically
+      first_name: John
+      last_name: Smith
       logged_in: False # Will be managed automatically
-      name: John Smith
       password: abc # Will be hashed automatically
       roles:
       - admin
@@ -75,8 +76,9 @@ credentials:
     rbriggs:
       email: rbriggs@gmail.com
       failed_login_attempts: 0 # Will be managed automatically
+      first_name: Rebecca
+      last_name: Briggs
       logged_in: False # Will be managed automatically
-      name: Rebecca Briggs
       password: def # Will be hashed automatically
       roles:
       - viewer
