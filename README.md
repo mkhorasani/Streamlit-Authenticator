@@ -80,7 +80,7 @@ credentials:
       password: def # Will be hashed automatically
       roles:
       - viewer
-oauth2:
+oauth2: # Optional
   google: # Follow instructions: https://developers.google.com/identity/protocols/oauth2
     client_id: # To be filled
     client_secret: # To be filled
@@ -90,7 +90,7 @@ oauth2:
     client_secret: # To be filled
     redirect_uri: # URL to redirect to after OAuth2 authentication
     tenant_id: # To be filled
-pre-authorized:
+pre-authorized: # Optional
   emails:
   - melsby@gmail.com
 ```
