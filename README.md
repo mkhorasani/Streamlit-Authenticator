@@ -196,9 +196,11 @@ except LoginError as e:
 
 ```python
 try:
-    authenticator.experimental_guest_login('Login with Google', provider='google',
+    authenticator.experimental_guest_login('Login with Google',
+                                           provider='google',
                                            oauth2=config['oauth2'])
-    authenticator.experimental_guest_login('Login with Microsoft', provider='microsoft',
+    authenticator.experimental_guest_login('Login with Microsoft',
+                                           provider='microsoft',
                                            oauth2=config['oauth2'])
 except LoginError as e:
     st.error(e)
@@ -311,7 +313,9 @@ if st.session_state['authentication_status']:
 
 ```python
 try:
-    email_of_registered_user, username_of_registered_user, name_of_registered_user = authenticator.register_user(pre_authorized=config['pre-authorized'])
+    email_of_registered_user, \
+    username_of_registered_user, \
+    name_of_registered_user = authenticator.register_user(pre_authorized=config['pre-authorized'])
     if email_of_registered_user:
         st.success('User registered successfully')
 except Exception as e:
@@ -360,7 +364,9 @@ except Exception as e:
 
 ```python
 try:
-    username_of_forgotten_password, email_of_forgotten_password, new_random_password = authenticator.forgot_password()
+    username_of_forgotten_password, \
+    email_of_forgotten_password, \
+    new_random_password = authenticator.forgot_password()
     if username_of_forgotten_password:
         st.success('New password to be sent securely')
         # The developer should securely transfer the new password to the user.
@@ -403,7 +409,8 @@ except Exception as e:
 
 ```python
 try:
-    username_of_forgotten_username, email_of_forgotten_username = authenticator.forgot_username()
+    username_of_forgotten_username, \
+    email_of_forgotten_username = authenticator.forgot_username()
     if username_of_forgotten_username:
         st.success('Username to be sent securely')
         # The developer should securely transfer the username to the user.
