@@ -156,7 +156,10 @@ authenticator = stauth.Authenticate(
 * You can render the **login** widget as follows.
 
 ```python
-authenticator.login()
+try:
+    authenticator.login()
+except LoginError as e:
+    st.error(e)
 ```
 
 > ### Authenticate.login
@@ -192,8 +195,13 @@ authenticator.login()
 * Once you have created the OAuth2 configuration parameters, add them to the configuration file as shown in step 3.
 
 ```python
-authenticator.experimental_guest_login('Login with Google', provider='google', oauth2=config['oauth2'])
-authenticator.experimental_guest_login('Login with Microsoft', provider='microsoft', oauth2=config['oauth2'])
+try:
+    authenticator.experimental_guest_login('Login with Google', provider='google',
+                                           oauth2=config['oauth2'])
+    authenticator.experimental_guest_login('Login with Microsoft', provider='microsoft',
+                                           oauth2=config['oauth2'])
+except LoginError as e:
+    st.error(e)
 ```
 
 > ### Authenticate.experimental_guest_login
