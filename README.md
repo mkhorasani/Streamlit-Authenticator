@@ -187,8 +187,8 @@ authenticator.login()
 ### 6. Creating a guest login button
 
 * You may use the **experimental_guest_login** button to log in non-registered users with their Google or Microsoft accounts using OAuth2.
-* To create the client id and client secret parameters for Google OAuth2 please refer to https://developers.google.com/identity/protocols/oauth2.
-* To create the client id, client secret, and tenant id parameters for Microsoft OAuth2 please refer to https://learn.microsoft.com/en-us/graph/auth-register-app-v2.
+* To create the client ID and client secret parameters for Google OAuth2 please refer to https://developers.google.com/identity/protocols/oauth2.
+* To create the client ID, client secret, and tenant ID parameters for Microsoft OAuth2 please refer to https://learn.microsoft.com/en-us/graph/auth-register-app-v2.
 * Once you have created the OAuth2 configuration parameters, add them to the configuration file as shown in step 3.
 
 ```python
