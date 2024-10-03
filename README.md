@@ -232,7 +232,7 @@ except LoginError as e:
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_microsoft.JPG)
 
 * Please note that upon successful login, the guest user's name, email, and other information will be registered in the credentials dictionary and their re-authentication cookie will be saved automatically.
-* In addition you may access the user's roles through **st.session_state['roles']**.
+* In addition, you may access the user's roles through **st.session_state['roles']**.
 
 ### 7. Authenticating users
 
