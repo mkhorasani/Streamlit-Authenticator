@@ -18,7 +18,7 @@
 - [Creating a config file](#3-creating-a-config-file)
 - [Setup](#4-setup)
 - [Creating a login widget](#5-creating-a-login-widget)
-- [Creating a guest login widget](#6-creating-a-guest-login-button) 🚀 **NEW**
+- [Creating a guest login button](#6-creating-a-guest-login-button) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
 - [Creating a reset password widget](#8-creating-a-reset-password-widget)
 - [Creating a new user registration widget](#9-creating-a-new-user-registration-widget)
