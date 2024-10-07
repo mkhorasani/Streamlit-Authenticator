@@ -54,7 +54,7 @@ import streamlit_authenticator as stauth
 * Create a YAML config file and add to it your user's credentials: including username, email, first name, last name, and password (plain text passwords will be hashed automatically).
 * Enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Define an optional list of pre-authorized emails of users who are allowed to register and add their credentials to the config file using the **register_user** button.
-* Add the optional configuration parameters for OAuth2 if you wish to use the **experimental_guest_login** widget.
+* Add the optional configuration parameters for OAuth2 if you wish to use the **experimental_guest_login** button.
 * **_Please remember to update the config file (as shown in step 13) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
 ```python
