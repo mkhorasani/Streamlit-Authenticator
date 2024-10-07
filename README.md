@@ -15,7 +15,7 @@
 ## Table of Contents
 - [Quickstart](#1-quickstart)
 - [Installation](#2-installation)
-- [Creating a configuration file](#3-creating-a-configuration-file)
+- [Creating a config file](#3-creating-a-config-file)
 - [Setup](#4-setup)
 - [Creating a login widget](#5-creating-a-login-widget)
 - [Creating a guest login widget](#6-creating-a-guest-login-button) 🚀 **NEW**
@@ -25,7 +25,7 @@
 - [Creating a forgot password widget](#10-creating-a-forgot-password-widget)
 - [Creating a forgot username widget](#11-creating-a-forgot-username-widget)
 - [Creating an update user details widget](#12-creating-an-update-user-details-widget)
-- [Updating the configuration file](#13-updating-the-configuration-file)
+- [Updating the config file](#13-updating-the-config-file)
 - [License](#license)
 
 ### 1. Quickstart
@@ -49,11 +49,12 @@ import streamlit as st
 import streamlit_authenticator as stauth
 ```
 
-### 3. Creating a configuration file
+### 3. Creating a config file
 
-* Initially create a YAML configuration file and add to it your users' credentials: including names, usernames, and passwords (plain text passwords will be hashed automatically).
-* In addition, enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
-* Finally, define a list of pre-authorized emails of users who can register and add their credentials to the configuration file with the use of the **register_user** widget.
+* Create a YAML config file and add to it your user's credentials: including username, email, first name, last name, and password (plain text passwords will be hashed automatically).
+* Enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
+* Define an optional list of pre-authorized emails of users who are allowed to register and add their credentials to the config file using the **register_user** widget.
+* Add the optional configuration parameters for OAuth2 if you wish to use the **experimental_guest_login** widget.
 * **_Please remember to update the config file (as shown in step 13) after you use the reset_password, register_user, forgot_password, or update_user_details widgets._**
 
 ```python
@@ -102,7 +103,7 @@ pre-authorized: # Optional
 
 ### 4. Setup
 
-* Subsequently import the configuration file into your script and create an authentication object.
+* Subsequently import the config file into your script and create an authentication object.
 
 ```python
 import yaml
@@ -193,7 +194,7 @@ except LoginError as e:
 * You may use the **experimental_guest_login** button to log in non-registered users with their Google or Microsoft accounts using OAuth2.
 * To create the client ID and client secret parameters for Google OAuth2 please refer to [Google's documentation](https://developers.google.com/identity/protocols/oauth2).
 * To create the client ID, client secret, and tenant ID parameters for Microsoft OAuth2 please refer to [Microsoft's documentation](https://learn.microsoft.com/en-us/graph/auth-register-app-v2).
-* Once you have created the OAuth2 configuration parameters, add them to the configuration file as shown in step 3.
+* Once you have created the OAuth2 configuration parameters, add them to the config file as shown in step 3.
 
 ```python
 try:
@@ -309,7 +310,7 @@ if st.session_state['authentication_status']:
 ### 9. Creating a new user registration widget
 
 * You may use the **register_user** widget to allow a user to sign up to your application as shown below.
-* If you require the user to be pre-authorized, define a **pre_authorized** list of emails that are allowed to register, and add it to the configuration file or provide it as a parameter to the **register_user** widget.
+* If you require the user to be pre-authorized, define a **pre_authorized** list of emails that are allowed to register, and add it to the config file or provide it as a parameter to the **register_user** widget.
 * Once they have registered, their email will be automatically removed from the **pre_authorized** list.
 * Alternatively, to allow anyone to sign up, do not provide a **pre_authorized** list.
 
@@ -481,9 +482,9 @@ if st.session_state['authentication_status']:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 13. Updating the configuration file
+### 13. Updating the config file
 
-* Please ensure that the configuration file is re-saved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
+* Please ensure that the config file is re-saved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
 ```python
 with open('../config.yaml', 'w') as file:
