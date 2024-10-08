@@ -238,7 +238,7 @@ except LoginError as e:
 
 ### 7. Authenticating users
 
-* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, and **st.session_state['username']** to allow a verified user to access restricted content.
+* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, **st.session_state['username']**, and **st.session_state['roles']** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
 * The optional **key** parameter for the logout button should be used with multi-page applications to prevent Streamlit from throwing duplicate key errors.
 
