@@ -14,6 +14,34 @@ class Validator:
     """
     def __init__(self):
         pass
+    def diagnose_password(self, password: str) -> str:
+        """
+        Diagnoses the validity of the entered password.
+    
+        Parameters
+        ----------
+        password: str
+            The password to be diagnosed.
+            
+        Returns
+        -------
+        str
+            Error message.
+        """
+        min_length = 8
+        max_length = 20
+        errors = []
+        if not min_length <= len(password) <= max_length:
+            errors.append(f'Password must be between {min_length} and {max_length} characters long')
+        if not re.search(r'[a-z]', password):
+            errors.append('Password must contain at least one lowercase letter')
+        if not re.search(r'[A-Z]', password):
+            errors.append('Password must contain at least one uppercase letter')
+        if not re.search(r'\d', password):
+            errors.append('Password must contain at least one digit')
+        if not re.search(r'[@$!%*?&]', password):
+            errors.append('Password must contain at least one special character (@$!%*?&)')
+        return 'Password is not valid: ' + '; '.join(errors)
     def validate_email(self, email: str) -> bool:
         """
         Checks the validity of the entered email.

@@ -308,7 +308,7 @@ class AuthenticationController:
         if not self.validator.validate_length(password_hint, 1):
             raise RegisterError('Password hint cannot be empty')
         if not self.validator.validate_password(new_password):
-            raise RegisterError('Password does not meet criteria')
+            raise RegisterError(self.validator.diagnose_password(new_password))
         if roles and not isinstance(roles, list):
             raise LoginError('Roles must be provided as a list')
         if captcha:
@@ -351,7 +351,7 @@ class AuthenticationController:
         if password == new_password:
             raise ResetError('New and current passwords are the same')
         if not self.validator.validate_password(new_password):
-            raise ResetError('Password does not meet criteria')
+            raise ResetError(self.validator.diagnose_password(new_password))
         return self.authentication_model.reset_password(username, password, new_password,
                                                         callback)
     def update_user_details(self, username: str, field: str, new_value: str,
