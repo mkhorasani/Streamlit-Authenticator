@@ -528,15 +528,20 @@ class AuthenticationModel:
                 pre_authorized = self.config['pre-authorized']['emails']
             except (KeyError, TypeError):
                 pre_authorized = None
-        if pre_authorized and new_email in pre_authorized:
-            self._register_credentials(new_username, new_first_name, new_last_name, new_password,
-                                       new_email, password_hint, roles)
-            pre_authorized.remove(new_email)
-            if self.path:
-                Helpers.update_config_file(self.path, 'pre-authorized', pre_authorized)
-            return new_email, new_username, f'{new_first_name} {new_last_name}'
-        if pre_authorized and new_email not in pre_authorized:
-            raise RegisterError('User not pre-authorized to register')
+        if pre_authorized:
+            if new_email in pre_authorized:
+                self._register_credentials(new_username, new_first_name, new_last_name, new_password,
+                                           new_email, password_hint, roles)
+                pre_authorized.remove(new_email)
+                if self.path:
+                    Helpers.update_config_file(self.path, 'pre-authorized', pre_authorized)
+                    if callback:
+                        callback({'widget': 'Register user', 'new_name': new_first_name,
+                                  'new_last_name': new_last_name, 'new_email': new_email,
+                                  'new_username': new_username})
+                return new_email, new_username, f'{new_first_name} {new_last_name}'
+            else:
+                raise RegisterError('User not pre-authorized to register')
         self._register_credentials(new_username, new_first_name, new_last_name, new_password,
                                    new_email, password_hint, roles)
         if callback:
