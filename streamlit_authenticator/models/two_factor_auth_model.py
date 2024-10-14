@@ -21,7 +21,7 @@ class TwoFactorAuthModel:
         self.API_key = API_key
         self.server_url = self.get_remote_variable(params['REMOTE_VARIABLES_LINK'], 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
     @st.cache_data(show_spinner=False)
-    def get_remote_variable(self, url, variable_name):
+    def get_remote_variable(self, url: str=None, variable_name: str=None) -> str:
         """
         Gets a remote variable.
 
