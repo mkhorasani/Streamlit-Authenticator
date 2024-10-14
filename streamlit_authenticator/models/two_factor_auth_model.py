@@ -2,26 +2,24 @@ import json
 import requests
 import streamlit as st
 
-from exceptions import CloudError
+from .. import params
+from ..utilities import TwoFactorAuthError
 
 class TwoFactorAuthModel:
     """
-    This class will read and write the config file to the cloud.
+    This class executes the logic for two factoru authentication.
     """
-    def __init__(self, cloud_credentials: dict=None):
+    def __init__(self, API_key: str=None):
         """
-        Create a new instance of "Cloud".
+        Create a new instance of "TwoFactorAuthModel".
 
         Parameters
         ----------
-        cloud: dict
-            The dictionary containing the registered email and API key that enables connection to the cloud.
+        API_key: str
+            The API key used to connect to the two factor authentication server.
         """
-        self.email = cloud_credentials['email']
-        self.API_key = cloud_credentials['API_key']
-        self.github_file_url = 'https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_variables/main/variables' #add to params.py
-        self.variable_name_to_read = 'server_address'
-        self.url = self.get_remote_variable(self.github_file_url, self.variable_name_to_read)
+        self.API_key = API_key
+        self.server_url = self.get_remote_variable(params['REMOTE_VARIABLES_LINK'], 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
     @st.cache_data(show_spinner=False)
     def get_remote_variable(self, url, variable_name):
         """
@@ -35,7 +33,7 @@ class TwoFactorAuthModel:
             Name of variable.
         """
         try:
-            response = requests.get(url)
+            response = requests.get(server_url)
             if response.status_code == 200:
                 content = response.text
                 exec(content)
