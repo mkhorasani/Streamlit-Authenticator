@@ -7,7 +7,7 @@ from ..utilities import TwoFactorAuthError
 
 class TwoFactorAuthModel:
     """
-    This class executes the logic for two factoru authentication.
+    This class executes the logic for two factor authentication.
     """
     def __init__(self, API_key: str=None):
         """
