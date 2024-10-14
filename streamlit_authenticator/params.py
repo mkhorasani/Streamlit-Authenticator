@@ -3,7 +3,7 @@ Configuration parameters and links for the Streamlit-Authenticator package.
 """
 # GENERAL
 AUTO_HASH_MAX_USERS:        int     =   30
-AUTO_HASH_MAX_USERS_LINK:   str     =   "https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#2-setup"
+AUTO_HASH_MAX_USERS_LINK:   str     =   "https://github.com/mkhorasani/Streamlit-Authenticator?tab=readme-ov-file#4-setup"
 PASSWORD_INSTRUCTIONS:      str     =   """
                                         **Password must be:**
                                         - Between 8 and 20 characters long.
