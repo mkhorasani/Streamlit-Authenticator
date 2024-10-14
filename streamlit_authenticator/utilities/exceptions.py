@@ -106,6 +106,19 @@ class ResetError(Exception):
         self.message = message
         super().__init__(self.message)
 
+class TwoFactorAuthError(Exception):
+    """
+    Exceptions raised for two factor authentication.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
 class UpdateError(Exception):
     """
     Exceptions raised for the update user details widget.
