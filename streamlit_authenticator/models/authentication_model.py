@@ -595,7 +595,7 @@ class AuthenticationModel:
         str
             New plain text password that should be transferred to the user securely.
         """
-        random_password = Helpers.generate_random_pw()
+        random_password = Helpers.generate_random_string()
         self.credentials['usernames'][username]['password'] = Hasher.hash(random_password)
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)

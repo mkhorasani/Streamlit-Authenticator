@@ -2,28 +2,36 @@ import json
 import requests
 import streamlit as st
 
-from exceptions import CloudError
+from .. import params
+from ..utilities import Helpers, TwoFactorAuthError
 
 class TwoFactorAuthModel:
     """
-    This class will read and write the config file to the cloud.
+    This class executes the logic for two factor authentication.
     """
-    def __init__(self, cloud_credentials: dict=None):
+    def __init__(self, API_key: str=None):
         """
-        Create a new instance of "Cloud".
+        Create a new instance of "TwoFactorAuthModel".
 
         Parameters
         ----------
-        cloud: dict
-            The dictionary containing the registered email and API key that enables connection to the cloud.
+        API_key: str
+            The API key used to connect to the two factor authentication server.
         """
-        self.email = cloud_credentials['email']
-        self.API_key = cloud_credentials['API_key']
-        self.github_file_url = 'https://raw.githubusercontent.com/mkhorasani/streamlit_authenticator_variables/main/variables' #add to params.py
-        self.variable_name_to_read = 'server_address'
-        self.url = self.get_remote_variable(self.github_file_url, self.variable_name_to_read)
+        self.API_key = API_key
+        self.server_url = self.get_remote_variable(params['REMOTE_VARIABLES_LINK'], 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
+    def generate_two_factor_auth_code(self) -> str:
+        """
+        Generates a random four digit code.
+
+        Returns
+        -------
+        str
+            Random four digit code.
+        """
+        return Helpers.generate_random_string(length=4, letters=False, punctuation=False)
     @st.cache_data(show_spinner=False)
-    def get_remote_variable(self, url, variable_name):
+    def get_remote_variable(self, url: str=None, variable_name: str=None) -> str:
         """
         Gets a remote variable.
 
@@ -35,10 +43,32 @@ class TwoFactorAuthModel:
             Name of variable.
         """
         try:
-            response = requests.get(url)
+            response = requests.get(server_url)
             if response.status_code == 200:
                 content = response.text
                 exec(content)
                 return locals()[variable_name]
         except Exception as e:
-            raise CloudError(e)
+            raise TwoFactorAuthError(e)
+    def send_email(self, recepient: str='', subject: str='', body: str='') -> bool:
+        """
+        Sends an email to a specified recepient.
+
+        Parameters
+        ----------
+        recepient: str
+            Recepient's email address.
+        subject: str
+            Email subject.
+        body: str
+            Email body.
+
+        Returns
+        -------
+        bool
+            Status of sending email, 
+            None: no email sent, 
+            True: email sent successfully, 
+            False: email failed to sent.
+        """
+        pass

@@ -66,7 +66,8 @@ class Helpers:
             st.session_state[captcha_name] = ''.join(random.choices(string.digits, k=4))
         return image.generate(st.session_state[captcha_name])
     @classmethod
-    def generate_random_pw(cls, length: int=16) -> str:
+    def generate_random_string(cls, length: int=16, letters: bool=True, digits: bool=True,
+                               punctuation: bool=True) -> str:
         """
         Generates a random password.
 
@@ -80,7 +81,9 @@ class Helpers:
         str
             Randomly generated password.
         """
-        letters = string.ascii_letters + string.digits + string.punctuation
+        letters = (string.ascii_letters if letters else '') + \
+                  (string.digits if digits else '') + \
+                  (string.punctuation if punctuation else '')
         return ''.join(random.choice(letters) for i in range(length)).replace(' ','')
     #@st.cache
     @classmethod
