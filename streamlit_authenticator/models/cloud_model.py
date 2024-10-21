@@ -15,7 +15,7 @@ class CloudModel:
 
         Parameters
         ----------
-        API_key: str
+        API_KEY: str
             The API key used to connect to the cloud server.
         """
         self.API_KEY = API_KEY
