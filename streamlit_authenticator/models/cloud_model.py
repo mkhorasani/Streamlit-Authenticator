@@ -9,7 +9,7 @@ class CloudModel:
     """
     This class executes the logic for cloud related transactions.
     """
-    def __init__(self, API_key: str=None):
+    def __init__(self, API_KEY: str=None):
         """
         Create a new instance of "CloudModel".
 
@@ -18,8 +18,8 @@ class CloudModel:
         API_key: str
             The API key used to connect to the cloud server.
         """
-        self.API_key = API_key
-        self.server_url = self.get_remote_variable(params['REMOTE_VARIABLES_LINK'], 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
+        self.API_KEY = API_KEY
+        self.SERVER_URL = self.get_remote_variable(params['REMOTE_VARIABLES_LINK'], 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
     @st.cache_data(show_spinner=False)
     def get_remote_variable(self, url: str=None, variable_name: str=None) -> str:
         """
@@ -33,7 +33,7 @@ class CloudModel:
             Name of variable.
         """
         try:
-            response = requests.get(server_url)
+            response = requests.get(self.SERVER_URL)
             if response.status_code == 200:
                 content = response.text
                 exec(content)
@@ -58,7 +58,21 @@ class CloudModel:
         bool
             Status of sending email, 
             None: no email sent, 
-            True: email sent successfully, 
-            False: email failed to sent.
+            True: email sent successfully.
         """
-        pass
+        try:
+            email_data = {
+                "recepient": recepient,
+                "subject": subject,
+                "body": body
+            }
+            url = self.SERVER_URL + 'send_email'
+            headers = {'Authorization': f'Bearer {self.API_KEY}'}
+            response = requests.post(url, headers=headers, json=email_data)
+        except Exception as e:
+            raise CloudError(e)
+        if 'error' in json.loads(response.text).keys():
+            raise CloudError(list(json.loads(response.text).values())[0])
+        else:
+            return True
+        return None
