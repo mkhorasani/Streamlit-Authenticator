@@ -25,7 +25,7 @@ class AuthenticationController:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, validator: Optional[Validator]=None,
-                 auto_hash: bool=True, path: Optional[str]=None):
+                 auto_hash: bool=True, path: Optional[str]=None, API_KEY: Optional[str]=None):
         """
         Create a new instance of "AuthenticationController".
 
@@ -41,8 +41,11 @@ class AuthenticationController:
             False: plain text passwords will not be automatically hashed.
         path: str
             File path of the config file.
+        API_KEY: str, optional
+            The API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
         """
-        self.authentication_model = AuthenticationModel(credentials, auto_hash, path)
+        self.authentication_model = AuthenticationModel(credentials, auto_hash, path, API_KEY)
         self.validator = validator if validator is not None else Validator()
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
