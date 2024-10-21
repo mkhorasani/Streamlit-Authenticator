@@ -3,11 +3,11 @@ import requests
 import streamlit as st
 
 from .. import params
-from ..utilities import Helpers, CloudModel
+from ..utilities import Helpers, CloudError
 
 class CloudModel:
     """
-    This class executes the logic for cloud based transactions.
+    This class executes the logic for cloud related transactions.
     """
     def __init__(self, API_key: str=None):
         """
@@ -39,7 +39,7 @@ class CloudModel:
                 exec(content)
                 return locals()[variable_name]
         except Exception as e:
-            raise TwoFactorAuthError(e)
+            raise CloudError(e)
     def send_email(self, recepient: str='', subject: str='', body: str='') -> bool:
         """
         Sends an email to a specified recepient.
