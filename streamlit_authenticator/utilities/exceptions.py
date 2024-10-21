@@ -28,6 +28,18 @@ class CredentialsError(Exception):
         else:
             super().__init__('Username/password is incorrect')
 
+class CloudError(Exception):
+    """
+    Exception raised for cloud related erros.
+    """
+    def __init__(self, credential_type: str=''):
+        if credential_type == 'username':
+            super().__init__('Username is incorrect')
+        elif credential_type == 'password':
+            super().__init__('Password is incorrect')
+        else:
+            super().__init__('Username/password is incorrect')
+
 class DeprecationError(Exception):
     """
     Exceptions raised for deprecations.
