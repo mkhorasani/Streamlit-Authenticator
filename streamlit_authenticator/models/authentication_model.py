@@ -194,6 +194,16 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Forgot username', 'username': username, 'email': email})
         return username
+    def generate_two_factor_auth_code(self) -> str:
+        """
+        Generates a random four digit code.
+
+        Returns
+        -------
+        str
+            Random four digit code.
+        """
+        return Helpers.generate_random_string(length=4, letters=False, punctuation=False)
     def _get_username(self, key: str, value: str) -> str:
         """
         Gets the username based on a provided entry.
