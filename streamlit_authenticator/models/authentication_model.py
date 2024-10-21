@@ -11,6 +11,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import streamlit as st
 
+from ..models import CloudModel
 from ..models.oauth2 import GoogleModel
 from ..models.oauth2 import MicrosoftModel
 from .. import params
@@ -29,7 +30,7 @@ class AuthenticationModel:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
-                 path: Optional[str]=None):
+                 path: Optional[str]=None, API_KEY: Optional[str]=None):
         """
         Create a new instance of "AuthenticationModel".
 
@@ -43,6 +44,9 @@ class AuthenticationModel:
             False: plain text passwords will not be automatically hashed.
         path: str
             File path of the config file.
+        API_KEY: str, optional
+            The API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
         """
         self.path = path
         if self.path:
@@ -81,6 +85,9 @@ class AuthenticationModel:
             st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
+        self.API_KEY = API_KEY
+        if self.API_KEY:
+          self.cloud_model = CloudModel(API_KEY)
     def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks the validity of the entered credentials.
@@ -142,7 +149,8 @@ class AuthenticationModel:
             False value absent.
         """
         return any(value in d.values() for d in self.credentials['usernames'].values())
-    def forgot_password(self, username: str, callback: Optional[Callable]=None) -> tuple:
+    def forgot_password(self, username: str, callback: Optional[Callable]=None,
+                        **kwargs: Optional[Dict[str, Any]]) -> tuple:
         """
         Creates a new random password for the user.
 
@@ -152,6 +160,8 @@ class AuthenticationModel:
             Username associated with the forgotten password.
         callback: callable, optional
             Callback function that will be invoked on form submission.
+        **kwargs : dict, optional
+            Arguments to pass to the forgot password widget.
 
         Returns
         -------
@@ -167,6 +177,11 @@ class AuthenticationModel:
         if username in self.credentials['usernames']:
             email = self.credentials['usernames'][username]['email']
             random_password = self._set_random_password(username)
+            if self.API_KEY:
+                subject = 'Forgot password' if 'subject' not in kwargs else kwargs['subject']
+                body = random_password if 'body' not in kwargs else kwargs['body'] \
+                    + random_password
+                self.cloud_model.send_email(email, subject, body)
             if callback:
                 callback({'widget': 'Forgot password', 'username': username, 'email': email,
                           'random_password': random_password})
