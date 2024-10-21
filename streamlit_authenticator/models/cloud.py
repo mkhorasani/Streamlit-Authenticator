@@ -3,33 +3,23 @@ import requests
 import streamlit as st
 
 from .. import params
-from ..utilities import Helpers, TwoFactorAuthError
+from ..utilities import Helpers, CloudModel
 
-class TwoFactorAuthModel:
+class CloudModel:
     """
-    This class executes the logic for two factor authentication.
+    This class executes the logic for cloud based transactions.
     """
     def __init__(self, API_key: str=None):
         """
-        Create a new instance of "TwoFactorAuthModel".
+        Create a new instance of "CloudModel".
 
         Parameters
         ----------
         API_key: str
-            The API key used to connect to the two factor authentication server.
+            The API key used to connect to the cloud server.
         """
         self.API_key = API_key
         self.server_url = self.get_remote_variable(params['REMOTE_VARIABLES_LINK'], 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
-    def generate_two_factor_auth_code(self) -> str:
-        """
-        Generates a random four digit code.
-
-        Returns
-        -------
-        str
-            Random four digit code.
-        """
-        return Helpers.generate_random_string(length=4, letters=False, punctuation=False)
     @st.cache_data(show_spinner=False)
     def get_remote_variable(self, url: str=None, variable_name: str=None) -> str:
         """
