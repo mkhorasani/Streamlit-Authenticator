@@ -25,7 +25,7 @@ class Authenticate:
     def __init__(self, credentials: Union[dict, str], cookie_name: str='some_cookie_name',
                  cookie_key: str='some_key', cookie_expiry_days: float=30.0,
                  validator: Optional[Validator]=None, auto_hash: bool=True,
-                 **kwargs: Optional[Dict[str, Any]]):
+                 API_KEY: Optional[str]=None, **kwargs: Optional[Dict[str, Any]]):
         """
         Create a new instance of "Authenticate".
 
@@ -48,6 +48,9 @@ class Authenticate:
             Automatic hashing requirement for passwords, 
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
+        API_KEY: str, optional
+            The API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
         **kwargs : dict, optional
             Arguments to pass to the Authenticate class.
         """
@@ -64,11 +67,13 @@ class Authenticate:
         self.authentication_controller  =   AuthenticationController(credentials,
                                                                      validator,
                                                                      auto_hash,
-                                                                     self.path)
+                                                                     self.path,
+                                                                     API_KEY)
         self.attrs = kwargs
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
-                        key: str='Forgot password', callback: Optional[Callable]=None) -> tuple:
+                        two_factor_auth: Optional[bool]=None, key: str='Forgot password',
+                        callback: Optional[Callable]=None) -> tuple:
         """
         Renders a forgot password widget.
 
