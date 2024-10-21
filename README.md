@@ -148,6 +148,8 @@ authenticator = stauth.Authenticate(
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
+>  - **API_KEY:** _str, optional, default None_
+>    - The API key used to connect to the cloud server to send reset passwords and two factor authorization codes to the user by email.
 >  - ****kwargs:** _dict, optional_
 >    - Arguments to pass to the Authenticate class.
 
