@@ -2,8 +2,8 @@ import json
 import requests
 import streamlit as st
 
-from .. import params
-from ..utilities import Helpers, CloudError
+import params
+from utilities import CloudError
 
 class CloudModel:
     """

@@ -10,8 +10,8 @@ Libraries imported:
 from typing import Any, Callable, Dict, List, Optional
 import streamlit as st
 
-from ..models import AuthenticationModel
-from ..utilities import (ForgotError,
+from models import AuthenticationModel
+from utilities import (ForgotError,
                          Helpers,
                          LoginError,
                          RegisterError,

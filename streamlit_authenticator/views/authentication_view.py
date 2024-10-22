@@ -13,9 +13,9 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 import streamlit as st
 
-from ..controllers import AuthenticationController, CookieController
-from .. import params
-from ..utilities import DeprecationError, Helpers, LogoutError, ResetError, UpdateError, Validator
+from controllers import AuthenticationController, CookieController
+import params
+from utilities import DeprecationError, Helpers, LogoutError, ResetError, UpdateError, Validator
 
 class Authenticate:
     """

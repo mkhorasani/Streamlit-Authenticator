@@ -11,11 +11,11 @@ from typing import Any, Callable, Dict, List, Optional
 
 import streamlit as st
 
-from ..models import CloudModel
-from ..models.oauth2 import GoogleModel
-from ..models.oauth2 import MicrosoftModel
-from .. import params
-from ..utilities import (Hasher,
+from models.cloud import CloudModel
+from models.oauth2 import GoogleModel
+from models.oauth2 import MicrosoftModel
+import params
+from utilities import (Hasher,
                          Helpers,
                          CredentialsError,
                          ForgotError,

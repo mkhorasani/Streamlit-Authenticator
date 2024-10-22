@@ -17,7 +17,7 @@ from jwt import DecodeError, InvalidSignatureError
 import streamlit as st
 import extra_streamlit_components as stx
 
-from ..utilities import Helpers
+from utilities import Helpers
 
 class CookieModel:
     """

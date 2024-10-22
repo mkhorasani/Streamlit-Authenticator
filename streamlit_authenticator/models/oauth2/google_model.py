@@ -21,8 +21,8 @@ from typing import Union
 import requests
 import streamlit as st
 
-from ... import params
-from ...utilities import LoginError
+import params
+from utilities import LoginError
 
 class GoogleModel:
     """
