@@ -49,11 +49,12 @@ class Authenticate:
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
         API_KEY: str, optional
-            The API key used to connect to the cloud server to send reset passwords and two
+            API key used to connect to the cloud server to send reset passwords and two
             factor authorization codes to the user by email.
         **kwargs : dict, optional
             Arguments to pass to the Authenticate class.
         """
+        self.attrs = kwargs
         if isinstance(validator, dict):
             raise DeprecationError(f"""Please note that the 'pre_authorized' parameter has been
                                    removed from the Authenticate class and added directly to the
@@ -68,12 +69,13 @@ class Authenticate:
                                                                      validator,
                                                                      auto_hash,
                                                                      self.path,
-                                                                     API_KEY)
-        self.attrs = kwargs
+                                                                     API_KEY,
+                                                                     self.attrs['SERVER_URL'] \
+                                                                        if 'SERVER_URL' \
+                                                                            in self.attrs else None)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
-                        two_factor_auth: Optional[bool]=None, key: str='Forgot password',
-                        callback: Optional[Callable]=None) -> tuple:
+                        key: str='Forgot password', callback: Optional[Callable]=None) -> tuple:
         """
         Renders a forgot password widget.
 
