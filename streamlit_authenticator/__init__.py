@@ -80,7 +80,7 @@ if not _RELEASE:
     try:
         (email_of_registered_user,
          username_of_registered_user,
-         name_of_registered_user) = authenticator.register_user(captcha=False)
+         name_of_registered_user) = authenticator.register_user(pre_authorized=config['pre-authorized']['emails'])
         if email_of_registered_user:
             st.success('User registered successfully')
     except RegisterError as e:

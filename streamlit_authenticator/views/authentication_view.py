@@ -354,7 +354,8 @@ class Authenticate:
                       domains: Optional[List[str]]=None, fields: Optional[Dict[str, str]]=None,
                       captcha: bool=True, roles: Optional[List[str]]=None,
                       merge_username_email: bool=False, clear_on_submit: bool=False,
-                      key: str='Register user', callback: Optional[Callable]=None) -> tuple:
+                      password_hint: bool=True, key: str='Register user',
+                      callback: Optional[Callable]=None) -> tuple:
         """
         Renders a register new user widget.
 
@@ -380,6 +381,10 @@ class Authenticate:
             Merges username into email field,
             True: username will be the same as the email,
             False: username and email will be independent.
+        password_hint: bool
+            Requirement for entering a password hint,
+            True: password hint field added,
+            False: password hint field removed.
         clear_on_submit: bool
             Clear on submit setting, 
             True: clears inputs on submit, 
@@ -437,8 +442,9 @@ class Authenticate:
                                        help=password_instructions)
         new_password_repeat = col2_2.text_input('Repeat password' if 'Repeat password' not in fields
                                               else fields['Repeat password'], type='password')
-        password_hint = register_user_form.text_input('Password hint' if 'Password hint' not in
-                                                      fields else fields['Password hint'])
+        if password_hint:
+            password_hint = register_user_form.text_input('Password hint' if 'Password hint' not in
+                                                        fields else fields['Password hint'])
         entered_captcha = None
         if captcha:
             entered_captcha = register_user_form.text_input('Captcha' if 'Captcha' not in fields

@@ -342,6 +342,8 @@ except Exception as e:
 >    - User roles for registered users.
 >  - **merge_username_email:** _bool, default False_
 >    - Merges username into email field, True: username will be the same as the email, False: username and email will be independent.
+>  - **password_hint:** _bool, default True_
+>    - Requirement for entering a password hint, True: password hint field added, False: password hint field removed.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Register user'_

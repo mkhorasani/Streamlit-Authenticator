@@ -501,12 +501,17 @@ class AuthenticationModel:
         roles: list, optional
             User roles for registered users.
         """
-        self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
-                                                   'first_name': first_name,
-                                                   'last_name': last_name,
-                                                   'password': Hasher.hash(password),
-                                                   'password_hint': password_hint,
-                                                   'roles': roles}
+        user_data = {
+            'email': email,
+            'logged_in': False,
+            'first_name': first_name,
+            'last_name': last_name,
+            'password': Hasher.hash(password),
+            'roles': roles
+        }
+        if password_hint:
+            user_data['password_hint'] = password_hint
+        self.credentials['usernames'][username] = user_data
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)
     def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
