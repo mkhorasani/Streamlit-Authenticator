@@ -318,7 +318,7 @@ if st.session_state['authentication_status']:
 try:
     email_of_registered_user, \
     username_of_registered_user, \
-    name_of_registered_user = authenticator.register_user(pre_authorized=config['pre-authorized'])
+    name_of_registered_user = authenticator.register_user(pre_authorized=config['pre-authorized']['emails'])
     if email_of_registered_user:
         st.success('User registered successfully')
 except Exception as e:
