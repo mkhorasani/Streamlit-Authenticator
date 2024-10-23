@@ -449,8 +449,7 @@ class Authenticate:
             return self.authentication_controller.register_user(new_first_name, new_last_name,
                                                                 new_email, new_username,
                                                                 new_password, new_password_repeat,
-                                                                password_hint, pre_authorized if \
-                                                                    pre_authorized else None,
+                                                                password_hint, pre_authorized,
                                                                 domains, roles, callback, captcha,
                                                                 entered_captcha)
         return None, None, None

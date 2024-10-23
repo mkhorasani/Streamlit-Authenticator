@@ -552,14 +552,11 @@ class AuthenticationModel:
         if new_username in self.credentials['usernames']:
             raise RegisterError('Username/email already taken')
         if not pre_authorized and self.path:
-            try:
-                pre_authorized = self.config['pre-authorized']['emails']
-            except (KeyError, TypeError):
-                pre_authorized = None
-        if pre_authorized:
+            pre_authorized = self.config.get('pre-authorized', {}).get('emails', None)
+        if isinstance(pre_authorized, list):
             if new_email in pre_authorized:
-                self._register_credentials(new_username, new_first_name, new_last_name, new_password,
-                                           new_email, password_hint, roles)
+                self._register_credentials(new_username, new_first_name, new_last_name,
+                                           new_password, new_email, password_hint, roles)
                 pre_authorized.remove(new_email)
                 if self.path:
                     Helpers.update_config_file(self.path, 'pre-authorized', pre_authorized)
@@ -568,8 +565,7 @@ class AuthenticationModel:
                               'new_last_name': new_last_name, 'new_email': new_email,
                               'new_username': new_username})
                 return new_email, new_username, f'{new_first_name} {new_last_name}'
-            else:
-                raise RegisterError('User not pre-authorized to register')
+            raise RegisterError('User not pre-authorized to register')
         self._register_credentials(new_username, new_first_name, new_last_name, new_password,
                                    new_email, password_hint, roles)
         if callback:

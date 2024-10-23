@@ -23,11 +23,6 @@ from utilities import (CredentialsError,
 
 _RELEASE = False
 
-from models.cloud import CloudModel
-cloud_model = CloudModel(API_KEY='123', SERVER_URL='http://localhost:5000')
-if st.button('test'):
-    cloud_model.send_email('khorasani.mohammad@gmail.com', 'test', 'test2')
-
 if not _RELEASE:
     # Loading config file
     with open('../config.yaml', 'r', encoding='utf-8') as file:
@@ -85,7 +80,7 @@ if not _RELEASE:
     try:
         (email_of_registered_user,
          username_of_registered_user,
-         name_of_registered_user) = authenticator.register_user()
+         name_of_registered_user) = authenticator.register_user(captcha=False)
         if email_of_registered_user:
             st.success('User registered successfully')
     except RegisterError as e:
