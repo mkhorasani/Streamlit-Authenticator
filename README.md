@@ -236,7 +236,6 @@ except LoginError as e:
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_microsoft.JPG)
 
 * Please note that upon successful login, the guest user's name, email, and other information will be registered in the credentials dictionary and their re-authentication cookie will be saved automatically.
-* **_Please remember to update the config file (as shown in step 13) after you use this button._**
 
 ### 7. Authenticating users
 
@@ -487,7 +486,7 @@ if st.session_state['authentication_status']:
 
 ### 13. Updating the config file
 
-* Please ensure that the config file is re-saved anytime the credentials are updated or whenever the **experimental_guest_login**, **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
+* Please ensure that the config file is re-saved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
 ```python
 with open('../config.yaml', 'w') as file:
