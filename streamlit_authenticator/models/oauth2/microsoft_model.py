@@ -137,7 +137,7 @@ class MicrosoftModel:
                 print('No access token received')
                 st.rerun()
             token_json = self.decode_jwt(token_json['access_token'])
-            keys = {'email', 'family_name', 'given_name'}
+            keys = {'email', 'upn', 'family_name', 'given_name'}
             return {key: token_json[key] for key in keys if key in token_json}
             # user_info_url = "https://graph.microsoft.com/v1.0/me"
             # user_info_headers = {
