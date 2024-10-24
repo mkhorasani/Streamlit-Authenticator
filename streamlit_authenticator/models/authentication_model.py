@@ -317,6 +317,7 @@ class AuthenticationModel:
                 max_concurrent_users - 1:
                 st.query_params.clear()
                 raise LoginError('Maximum number of concurrent users exceeded')
+            result['email'] = result.get('email', result['mail'])
             if result['email'] not in self.credentials['usernames']:
                 self.credentials['usernames'][result['email']] = {}
             if not self._is_guest_user(result['email']):
