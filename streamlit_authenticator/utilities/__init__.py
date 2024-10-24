@@ -1,4 +1,5 @@
 from .exceptions import (AuthenticateError,
+                         CloudError,
                          CredentialsError,
                          DeprecationError,
                          ForgotError,

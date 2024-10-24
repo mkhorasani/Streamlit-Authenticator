@@ -10,8 +10,8 @@ Libraries imported:
 from typing import Any, Callable, Dict, List, Optional
 import streamlit as st
 
-from ..models import AuthenticationModel
-from ..utilities import (ForgotError,
+from models import AuthenticationModel
+from utilities import (ForgotError,
                          Helpers,
                          LoginError,
                          RegisterError,
@@ -25,7 +25,8 @@ class AuthenticationController:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, validator: Optional[Validator]=None,
-                 auto_hash: bool=True, path: Optional[str]=None):
+                 auto_hash: bool=True, path: Optional[str]=None, API_KEY: Optional[str]=None,
+                 SERVER_URL: Optional[str]=None):
         """
         Create a new instance of "AuthenticationController".
 
@@ -41,8 +42,14 @@ class AuthenticationController:
             False: plain text passwords will not be automatically hashed.
         path: str
             File path of the config file.
+        API_KEY: str, optional
+            API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
+        SERVER_URL: str, optional
+            Cloud server URL used for cloud related transactions.
         """
-        self.authentication_model = AuthenticationModel(credentials, auto_hash, path)
+        self.authentication_model = AuthenticationModel(credentials, auto_hash, path, API_KEY,
+                                                        SERVER_URL)
         self.validator = validator if validator is not None else Validator()
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
@@ -288,7 +295,7 @@ class AuthenticationController:
         new_username = new_username.lower().strip()
         new_password = new_password.strip()
         new_password_repeat = new_password_repeat.strip()
-        password_hint = password_hint.strip()
+        password_hint = password_hint.strip() if password_hint else None
         if not self.validator.validate_name(new_first_name):
             raise RegisterError('First name is not valid')
         if not self.validator.validate_name(new_last_name):
@@ -305,10 +312,10 @@ class AuthenticationController:
             raise RegisterError('Password/repeat password fields cannot be empty')
         if new_password != new_password_repeat:
             raise RegisterError('Passwords do not match')
-        if not self.validator.validate_length(password_hint, 1):
+        if password_hint and not self.validator.validate_length(password_hint, 1):
             raise RegisterError('Password hint cannot be empty')
         if not self.validator.validate_password(new_password):
-            raise RegisterError('Password does not meet criteria')
+            raise RegisterError(self.validator.diagnose_password(new_password))
         if roles and not isinstance(roles, list):
             raise LoginError('Roles must be provided as a list')
         if captcha:
@@ -351,7 +358,7 @@ class AuthenticationController:
         if password == new_password:
             raise ResetError('New and current passwords are the same')
         if not self.validator.validate_password(new_password):
-            raise ResetError('Password does not meet criteria')
+            raise ResetError(self.validator.diagnose_password(new_password))
         return self.authentication_model.reset_password(username, password, new_password,
                                                         callback)
     def update_user_details(self, username: str, field: str, new_value: str,

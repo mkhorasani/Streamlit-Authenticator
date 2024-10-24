@@ -12,8 +12,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 from yaml.loader import SafeLoader
 
-from .views import Authenticate
-from .utilities import (CredentialsError,
+from views import Authenticate
+from utilities import (CredentialsError,
                         ForgotError,
                         Hasher,
                         LoginError,
@@ -21,7 +21,7 @@ from .utilities import (CredentialsError,
                         ResetError,
                         UpdateError)
 
-_RELEASE = True
+_RELEASE = False
 
 if not _RELEASE:
     # Loading config file
@@ -80,7 +80,7 @@ if not _RELEASE:
     try:
         (email_of_registered_user,
          username_of_registered_user,
-         name_of_registered_user) = authenticator.register_user()
+         name_of_registered_user) = authenticator.register_user(pre_authorized=config['pre-authorized']['emails'])
         if email_of_registered_user:
             st.success('User registered successfully')
     except RegisterError as e:

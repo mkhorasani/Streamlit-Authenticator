@@ -28,6 +28,14 @@ class CredentialsError(Exception):
         else:
             super().__init__('Username/password is incorrect')
 
+class CloudError(Exception):
+    """
+    Exception raised for cloud related erros.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
 class DeprecationError(Exception):
     """
     Exceptions raised for deprecations.
@@ -96,6 +104,19 @@ class RegisterError(Exception):
 class ResetError(Exception):
     """
     Exceptions raised for the password reset widget.
+
+    Attributes
+    ----------
+    message: str
+        The custom error message to display.
+    """
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+class TwoFactorAuthError(Exception):
+    """
+    Exceptions raised for two factor authentication.
 
     Attributes
     ----------

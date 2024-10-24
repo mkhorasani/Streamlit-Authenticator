@@ -11,10 +11,11 @@ from typing import Any, Callable, Dict, List, Optional
 
 import streamlit as st
 
-from ..models.oauth2 import GoogleModel
-from ..models.oauth2 import MicrosoftModel
-from .. import params
-from ..utilities import (Hasher,
+from models.cloud import CloudModel
+from models.oauth2 import GoogleModel
+from models.oauth2 import MicrosoftModel
+import params
+from utilities import (Hasher,
                          Helpers,
                          CredentialsError,
                          ForgotError,
@@ -29,7 +30,8 @@ class AuthenticationModel:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
-                 path: Optional[str]=None):
+                 path: Optional[str]=None, API_KEY: Optional[str]=None,
+                 SERVER_URL: Optional[str]=None):
         """
         Create a new instance of "AuthenticationModel".
 
@@ -43,6 +45,11 @@ class AuthenticationModel:
             False: plain text passwords will not be automatically hashed.
         path: str
             File path of the config file.
+        API_KEY: str, optional
+            API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
+        SERVER_URL: str, optional
+            Cloud server URL used for cloud related transactions.
         """
         self.path = path
         if self.path:
@@ -81,6 +88,9 @@ class AuthenticationModel:
             st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
+        self.API_KEY = API_KEY
+        if self.API_KEY:
+          self.cloud_model = CloudModel(API_KEY, SERVER_URL)
     def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks the validity of the entered credentials.
@@ -142,7 +152,8 @@ class AuthenticationModel:
             False value absent.
         """
         return any(value in d.values() for d in self.credentials['usernames'].values())
-    def forgot_password(self, username: str, callback: Optional[Callable]=None) -> tuple:
+    def forgot_password(self, username: str, callback: Optional[Callable]=None,
+                        **kwargs: Optional[Dict[str, Any]]) -> tuple:
         """
         Creates a new random password for the user.
 
@@ -152,6 +163,8 @@ class AuthenticationModel:
             Username associated with the forgotten password.
         callback: callable, optional
             Callback function that will be invoked on form submission.
+        **kwargs : dict, optional
+            Arguments to pass to the forgot password widget.
 
         Returns
         -------
@@ -167,6 +180,11 @@ class AuthenticationModel:
         if username in self.credentials['usernames']:
             email = self.credentials['usernames'][username]['email']
             random_password = self._set_random_password(username)
+            if self.API_KEY:
+                subject = 'Forgot password' if 'subject' not in kwargs else kwargs['subject']
+                body = random_password if 'body' not in kwargs else kwargs['body'] \
+                    + random_password
+                self.cloud_model.send_email(email, subject, body)
             if callback:
                 callback({'widget': 'Forgot password', 'username': username, 'email': email,
                           'random_password': random_password})
@@ -194,6 +212,16 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Forgot username', 'username': username, 'email': email})
         return username
+    def generate_two_factor_auth_code(self) -> str:
+        """
+        Generates a random four digit code.
+
+        Returns
+        -------
+        str
+            Random four digit code.
+        """
+        return Helpers.generate_random_string(length=4, letters=False, punctuation=False)
     def _get_username(self, key: str, value: str) -> str:
         """
         Gets the username based on a provided entry.
@@ -474,12 +502,17 @@ class AuthenticationModel:
         roles: list, optional
             User roles for registered users.
         """
-        self.credentials['usernames'][username] = {'email': email, 'logged_in': False,
-                                                   'first_name': first_name,
-                                                   'last_name': last_name,
-                                                   'password': Hasher.hash(password),
-                                                   'password_hint': password_hint,
-                                                   'roles': roles}
+        user_data = {
+            'email': email,
+            'logged_in': False,
+            'first_name': first_name,
+            'last_name': last_name,
+            'password': Hasher.hash(password),
+            'roles': roles
+        }
+        if password_hint:
+            user_data['password_hint'] = password_hint
+        self.credentials['usernames'][username] = user_data
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)
     def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
@@ -525,14 +558,11 @@ class AuthenticationModel:
         if new_username in self.credentials['usernames']:
             raise RegisterError('Username/email already taken')
         if not pre_authorized and self.path:
-            try:
-                pre_authorized = self.config['pre-authorized']['emails']
-            except (KeyError, TypeError):
-                pre_authorized = None
-        if pre_authorized:
+            pre_authorized = self.config.get('pre-authorized', {}).get('emails', None)
+        if isinstance(pre_authorized, list):
             if new_email in pre_authorized:
-                self._register_credentials(new_username, new_first_name, new_last_name, new_password,
-                                           new_email, password_hint, roles)
+                self._register_credentials(new_username, new_first_name, new_last_name,
+                                           new_password, new_email, password_hint, roles)
                 pre_authorized.remove(new_email)
                 if self.path:
                     Helpers.update_config_file(self.path, 'pre-authorized', pre_authorized)
@@ -541,8 +571,7 @@ class AuthenticationModel:
                               'new_last_name': new_last_name, 'new_email': new_email,
                               'new_username': new_username})
                 return new_email, new_username, f'{new_first_name} {new_last_name}'
-            else:
-                raise RegisterError('User not pre-authorized to register')
+            raise RegisterError('User not pre-authorized to register')
         self._register_credentials(new_username, new_first_name, new_last_name, new_password,
                                    new_email, password_hint, roles)
         if callback:
@@ -596,7 +625,7 @@ class AuthenticationModel:
         str
             New plain text password that should be transferred to the user securely.
         """
-        random_password = Helpers.generate_random_pw()
+        random_password = Helpers.generate_random_string()
         self.credentials['usernames'][username]['password'] = Hasher.hash(random_password)
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)

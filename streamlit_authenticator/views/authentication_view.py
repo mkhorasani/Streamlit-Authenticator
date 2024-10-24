@@ -13,9 +13,9 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 import streamlit as st
 
-from ..controllers import AuthenticationController, CookieController
-from .. import params
-from ..utilities import DeprecationError, Helpers, LogoutError, ResetError, UpdateError, Validator
+from controllers import AuthenticationController, CookieController
+import params
+from utilities import DeprecationError, Helpers, LogoutError, ResetError, UpdateError, Validator
 
 class Authenticate:
     """
@@ -25,7 +25,7 @@ class Authenticate:
     def __init__(self, credentials: Union[dict, str], cookie_name: str='some_cookie_name',
                  cookie_key: str='some_key', cookie_expiry_days: float=30.0,
                  validator: Optional[Validator]=None, auto_hash: bool=True,
-                 **kwargs: Optional[Dict[str, Any]]):
+                 API_KEY: Optional[str]=None, **kwargs: Optional[Dict[str, Any]]):
         """
         Create a new instance of "Authenticate".
 
@@ -48,9 +48,13 @@ class Authenticate:
             Automatic hashing requirement for passwords, 
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
+        API_KEY: str, optional
+            API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
         **kwargs : dict, optional
             Arguments to pass to the Authenticate class.
         """
+        self.attrs = kwargs
         if isinstance(validator, dict):
             raise DeprecationError(f"""Please note that the 'pre_authorized' parameter has been
                                    removed from the Authenticate class and added directly to the
@@ -64,8 +68,11 @@ class Authenticate:
         self.authentication_controller  =   AuthenticationController(credentials,
                                                                      validator,
                                                                      auto_hash,
-                                                                     self.path)
-        self.attrs = kwargs
+                                                                     self.path,
+                                                                     API_KEY,
+                                                                     self.attrs['SERVER_URL'] \
+                                                                        if 'SERVER_URL' \
+                                                                            in self.attrs else None)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
                         key: str='Forgot password', callback: Optional[Callable]=None) -> tuple:
@@ -347,7 +354,8 @@ class Authenticate:
                       domains: Optional[List[str]]=None, fields: Optional[Dict[str, str]]=None,
                       captcha: bool=True, roles: Optional[List[str]]=None,
                       merge_username_email: bool=False, clear_on_submit: bool=False,
-                      key: str='Register user', callback: Optional[Callable]=None) -> tuple:
+                      password_hint: bool=True, key: str='Register user',
+                      callback: Optional[Callable]=None) -> tuple:
         """
         Renders a register new user widget.
 
@@ -373,6 +381,10 @@ class Authenticate:
             Merges username into email field,
             True: username will be the same as the email,
             False: username and email will be independent.
+        password_hint: bool
+            Requirement for entering a password hint,
+            True: password hint field added,
+            False: password hint field removed.
         clear_on_submit: bool
             Clear on submit setting, 
             True: clears inputs on submit, 
@@ -430,8 +442,9 @@ class Authenticate:
                                        help=password_instructions)
         new_password_repeat = col2_2.text_input('Repeat password' if 'Repeat password' not in fields
                                               else fields['Repeat password'], type='password')
-        password_hint = register_user_form.text_input('Password hint' if 'Password hint' not in
-                                                      fields else fields['Password hint'])
+        if password_hint:
+            password_hint = register_user_form.text_input('Password hint' if 'Password hint' not in
+                                                        fields else fields['Password hint'])
         entered_captcha = None
         if captcha:
             entered_captcha = register_user_form.text_input('Captcha' if 'Captcha' not in fields
@@ -442,8 +455,7 @@ class Authenticate:
             return self.authentication_controller.register_user(new_first_name, new_last_name,
                                                                 new_email, new_username,
                                                                 new_password, new_password_repeat,
-                                                                password_hint, pre_authorized if \
-                                                                    pre_authorized else None,
+                                                                password_hint, pre_authorized,
                                                                 domains, roles, callback, captcha,
                                                                 entered_captcha)
         return None, None, None
