@@ -397,15 +397,15 @@ class AuthenticationModel:
             False: incorrect credentials.
         """
         if username:
+            if (isinstance(max_login_attempts, int) and
+                self.credentials['usernames'].get(username,
+                                                  {}).get('failed_login_attempts',
+                                                          0) >= max_login_attempts):
+                raise LoginError('Maximum number of login attempts exceeded')
             if self.check_credentials(username, password):
                 if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
                     max_concurrent_users - 1:
                     raise LoginError('Maximum number of concurrent users exceeded')
-                if isinstance(max_login_attempts, int) and \
-                    'failed_login_attempts' in self.credentials['usernames'][username] and \
-                    self.credentials['usernames'][username]['failed_login_attempts'] >= \
-                        max_login_attempts:
-                    raise LoginError('Maximum number of login attempts exceeded')
                 if single_session and self.credentials['usernames'][username]['logged_in']:
                     raise LoginError('Cannot log in multiple sessions')
                 st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
