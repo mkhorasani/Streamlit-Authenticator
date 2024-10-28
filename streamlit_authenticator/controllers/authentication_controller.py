@@ -361,6 +361,16 @@ class AuthenticationController:
             raise ResetError(self.validator.diagnose_password(new_password))
         return self.authentication_model.reset_password(username, password, new_password,
                                                         callback)
+    def two_factor_auth(self, email: str):
+        """
+        Controls the request for two factor authentication.
+
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
+        """
+        self.authentication_model.two_factor_auth(email)
     def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable]=None) -> bool:
         """

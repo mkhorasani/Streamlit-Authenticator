@@ -15,7 +15,13 @@ import streamlit as st
 
 from controllers import AuthenticationController, CookieController
 import params
-from utilities import DeprecationError, Helpers, LogoutError, ResetError, UpdateError, Validator
+from utilities import (CloudError,
+                       DeprecationError,
+                       Helpers,
+                       LogoutError,
+                       ResetError,
+                       UpdateError,
+                       Validator)
 
 class Authenticate:
     """
@@ -54,6 +60,7 @@ class Authenticate:
         **kwargs : dict, optional
             Arguments to pass to the Authenticate class.
         """
+        self.API_KEY = API_KEY
         self.attrs = kwargs
         if isinstance(validator, dict):
             raise DeprecationError(f"""Please note that the 'pre_authorized' parameter has been
@@ -69,13 +76,14 @@ class Authenticate:
                                                                      validator,
                                                                      auto_hash,
                                                                      self.path,
-                                                                     API_KEY,
+                                                                     self.API_KEY,
                                                                      self.attrs['SERVER_URL'] \
                                                                         if 'SERVER_URL' \
                                                                             in self.attrs else None)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
-                        captcha: bool=False, clear_on_submit: bool=False,
-                        key: str='Forgot password', callback: Optional[Callable]=None) -> tuple:
+                        captcha: bool=False, two_factor_auth: bool=False,
+                        clear_on_submit: bool=False, key: str='Forgot password',
+                        callback: Optional[Callable]=None) -> tuple:
         """
         Renders a forgot password widget.
 
@@ -89,6 +97,10 @@ class Authenticate:
             Captcha requirement for the forgot password widget, 
             True: captcha required,
             False: captcha removed.
+        two_factor_auth: bool
+            Two factor authentication requirement for the forgot password widget,
+            True: two factor authentication required,
+            False: two factor authentication not required.
         clear_on_submit: bool
             Clear on submit setting, 
             True: clears inputs on submit, 
@@ -116,6 +128,10 @@ class Authenticate:
             forgot_password_form = st.form(key=key, clear_on_submit=clear_on_submit)
         elif location == 'sidebar':
             forgot_password_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
+        if two_factor_auth and not self.API_KEY:
+            raise CloudError(f"""Please provide an API key to use the two factor authentication 
+                             feature. For further information please refer to 
+                             {params.TWO_FACTOR_AUTH_LINK}.""")
         forgot_password_form.subheader('Forget password' if 'Form name' not in fields
                                        else fields['Form name'])
         username = forgot_password_form.text_input('Username' if 'Username' not in fields
@@ -127,8 +143,11 @@ class Authenticate:
             forgot_password_form.image(Helpers.generate_captcha('forgot_password_captcha'))
         if forgot_password_form.form_submit_button('Submit' if 'Submit' not in fields
                                                    else fields['Submit']):
-            return self.authentication_controller.forgot_password(username, callback,
+            result = self.authentication_controller.forgot_password(username, callback,
                                                                   captcha, entered_captcha)
+            if two_factor_auth:
+                self.__two_factor_auth(result[1])
+            return result
         return None, None, None
     def forgot_username(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
@@ -522,6 +541,29 @@ class Authenticate:
                                                           new_password_repeat, callback):
                 return True
         return None
+    def __two_factor_auth(self, email: str, fields: Optional[Dict[str, str]]=None):
+        """
+        Renders a two factor authentication widget.
+
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
+        fields: dict, optional
+            Rendered names of the fields/buttons.
+        """
+        if fields is None:
+            fields = {'Form name':'Two factor code', 'Code':'Code', 'Submit':'Submit'}
+        self.authentication_controller.two_factor_auth(email)
+        @st.dialog('Two factor code' if 'Form name' not in fields else fields['Form name'])
+        def two_factor_auth_form():
+            code = st.text_input('Code' if 'Code' not in fields else fields['Code'],
+                                 help='Please enter the code sent to your email'
+                                 if 'Instructions' not in fields else fields['Instructions'])
+            if st.button('Submit' if 'Submit' not in fields else fields['Submit']):
+                st.session_state['two_factor_auth_code'] = code
+                st.rerun()
+        two_factor_auth_form()
     def update_user_details(self, username: str, location: str='main',
                             fields: Optional[Dict[str, str]]=None,
                             clear_on_submit: bool=False, key: str='Update user details',

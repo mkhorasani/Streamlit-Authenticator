@@ -630,6 +630,16 @@ class AuthenticationModel:
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)
         return random_password
+    def two_factor_auth(self, email: str):
+        """
+        Implements the logic for two factor authentication.
+
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
+        """
+        pass
     def _update_entry(self, username: str, key: str, value: str):
         """
         Updates the credentials dictionary with the user's updated entry.
