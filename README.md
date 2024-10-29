@@ -188,7 +188,7 @@ except Exception as e:
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
 * **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
-* * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
 ### 6. Creating a guest login button
 
