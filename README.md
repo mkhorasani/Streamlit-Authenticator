@@ -47,6 +47,7 @@ Using Streamlit-Authenticator is as simple as importing the module and calling i
 ```python
 import streamlit as st
 import streamlit_authenticator as stauth
+from streamlit_authenticator.utilities import *
 ```
 
 ### 3. Creating a config file
