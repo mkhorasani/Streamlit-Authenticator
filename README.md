@@ -47,7 +47,6 @@ Using Streamlit-Authenticator is as simple as importing the module and calling i
 ```python
 import streamlit as st
 import streamlit_authenticator as stauth
-from streamlit_authenticator.utilities import *
 ```
 
 ### 3. Creating a config file
@@ -161,7 +160,7 @@ authenticator = stauth.Authenticate(
 ```python
 try:
     authenticator.login()
-except LoginError as e:
+except Exception as e:
     st.error(e)
 ```
 
@@ -205,7 +204,7 @@ try:
     authenticator.experimental_guest_login('Login with Microsoft',
                                            provider='microsoft',
                                            oauth2=config['oauth2'])
-except LoginError as e:
+except Exception as e:
     st.error(e)
 ```
 
