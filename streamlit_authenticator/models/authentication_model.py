@@ -639,7 +639,10 @@ class AuthenticationModel:
         email: str
             Email to send two factor authentication code to.
         """
-        pass
+        two_factor_auth_code = self.generate_two_factor_auth_code()
+        st.session_state['two_factor_auth_code'] = two_factor_auth_code
+        # self.cloud_model.send_email(email, 'Two Factor Authentication Code',
+        #                             two_factor_auth_code)
     def _update_entry(self, username: str, key: str, value: str):
         """
         Updates the credentials dictionary with the user's updated entry.

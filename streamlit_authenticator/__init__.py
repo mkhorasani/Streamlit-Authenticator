@@ -13,13 +13,7 @@ import streamlit.components.v1 as components
 from yaml.loader import SafeLoader
 
 from views import Authenticate
-from utilities import (CredentialsError,
-                        ForgotError,
-                        Hasher,
-                        LoginError,
-                        RegisterError,
-                        ResetError,
-                        UpdateError)
+from utilities import *
 
 _RELEASE = False
 

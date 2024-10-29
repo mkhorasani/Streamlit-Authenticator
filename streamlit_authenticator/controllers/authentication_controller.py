@@ -11,7 +11,9 @@ from typing import Any, Callable, Dict, List, Optional
 import streamlit as st
 
 from models import AuthenticationModel
-from utilities import (ForgotError,
+import params
+from utilities import (CloudError,
+                         ForgotError,
                          Helpers,
                          LoginError,
                          RegisterError,
@@ -361,7 +363,7 @@ class AuthenticationController:
             raise ResetError(self.validator.diagnose_password(new_password))
         return self.authentication_model.reset_password(username, password, new_password,
                                                         callback)
-    def two_factor_auth(self, email: str):
+    def two_factor_auth(self, email: str, API_KEY: str):
         """
         Controls the request for two factor authentication.
 
@@ -369,7 +371,14 @@ class AuthenticationController:
         ----------
         email: str
             Email to send two factor authentication code to.
+        API_KEY: str
+            API key used to connect to the cloud server to send reset passwords and two
+            factor authorization codes to the user by email.
         """
+        # if not API_KEY:
+        #     raise CloudError(f"""Please provide an API key to use the two factor authentication 
+        #                      feature. For further information please refer to 
+        #                      {params.TWO_FACTOR_AUTH_LINK}.""")
         self.authentication_model.two_factor_auth(email)
     def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable]=None) -> bool:

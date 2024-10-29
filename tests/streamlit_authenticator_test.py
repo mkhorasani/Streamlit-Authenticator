@@ -10,13 +10,7 @@ import yaml
 import streamlit as st
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
-from streamlit_authenticator.utilities import (CredentialsError,
-                                               ForgotError,
-                                               Hasher,
-                                               LoginError,
-                                               RegisterError,
-                                               ResetError,
-                                               UpdateError)
+from streamlit_authenticator.utilities import *
 
 # Loading config file
 with open('../config.yaml', 'r', encoding='utf-8') as file:
