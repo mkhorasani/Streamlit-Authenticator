@@ -55,7 +55,7 @@ import streamlit_authenticator as stauth
 * Enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Define an optional list of pre-authorized emails of users who are allowed to register and add their credentials to the config file using the **register_user** widget.
 * Add the optional configuration parameters for OAuth2 if you wish to use the **experimental_guest_login** button.
-* **_Please remember to update the config file (as shown in step 13) whenever the contents are updated or after using any of the widgets or buttons._**
+* **_Please remember to update the config file (as shown in step 13) whenever the contents are modified or after using any of the widgets or buttons._**
 
 ```python
 cookie:
@@ -484,7 +484,7 @@ if st.session_state['authentication_status']:
 
 ### 13. Updating the config file
 
-* Please ensure that the config file is re-saved whenever the contents are updated or after using any of the widgets or buttons.
+* Please ensure that the config file is re-saved whenever the contents are modified or after using any of the widgets or buttons.
 
 ```python
 with open('../config.yaml', 'w') as file:
