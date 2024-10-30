@@ -490,7 +490,8 @@ if st.session_state['authentication_status']:
 with open('../config.yaml', 'w') as file:
     yaml.dump(config, file, default_flow_style=False)
 ```
-
+* Please note that this step is not required if you are providing the config file as a path to the **Authenticate** class.
+  
 ## License
 
 This project is proprietary software. The use of this software is governed by the terms specified in the [LICENSE](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/LICENSE) file. Unauthorized copying, modification, or distribution of this software is prohibited.
