@@ -93,7 +93,7 @@ class AuthenticationController:
             del st.session_state['two_factor_auth_code']
             return True
         else:
-            st.session_state['two_factor_auth_check'] = True
+            st.session_state['two_factor_auth_check'] = False
             return False
     def forgot_password(self, username: str, callback: Optional[Callable]=None,
                         captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
