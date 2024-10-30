@@ -212,16 +212,19 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Forgot username', 'username': username, 'email': email})
         return username
-    def generate_two_factor_auth_code(self) -> str:
+    def generate_two_factor_auth_code(self, email: str) -> str:
         """
-        Generates a random four digit code.
-
-        Returns
-        -------
-        str
-            Random four digit code.
+        Generates and sends a two factor authentication code.
+        
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
         """
-        return Helpers.generate_random_string(length=4, letters=False, punctuation=False)
+        two_factor_auth_code = Helpers.generate_random_string(length=4, letters=False,
+                                                              punctuation=False)
+        st.session_state['two_factor_auth_code'] = two_factor_auth_code
+        # self._send_email(email, 'Two Factor Authentication Code', two_factor_auth_code)
     def _get_username(self, key: str, value: str) -> str:
         """
         Gets the username based on a provided entry.
@@ -611,6 +614,27 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Reset password', 'username': username})
         return True
+    def _send_email(self, email: str, subject: str, body: str) -> bool:
+        """
+        Implements the logic to send an email.
+
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
+        subject: str
+            Email subject.
+        body: str
+            Email body.
+
+        Returns
+        -------
+        bool
+            Status of sending email, 
+            None: no email sent, 
+            True: email sent successfully.
+        """
+        return self.cloud_model.send_email(email, subject, body)
     def _set_random_password(self, username: str) -> str:
         """
         Updates the credentials dictionary with the user's hashed random password.
@@ -630,19 +654,6 @@ class AuthenticationModel:
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)
         return random_password
-    def two_factor_auth(self, email: str):
-        """
-        Implements the logic for two factor authentication.
-
-        Parameters
-        ----------
-        email: str
-            Email to send two factor authentication code to.
-        """
-        two_factor_auth_code = self.generate_two_factor_auth_code()
-        st.session_state['two_factor_auth_code'] = two_factor_auth_code
-        # self.cloud_model.send_email(email, 'Two Factor Authentication Code',
-        #                             two_factor_auth_code)
     def _update_entry(self, username: str, key: str, value: str):
         """
         Updates the credentials dictionary with the user's updated entry.

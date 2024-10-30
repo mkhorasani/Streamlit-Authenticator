@@ -11,9 +11,7 @@ from typing import Any, Callable, Dict, List, Optional
 import streamlit as st
 
 from models import AuthenticationModel
-import params
-from utilities import (CloudError,
-                         ForgotError,
+from utilities import (ForgotError,
                          Helpers,
                          LoginError,
                          RegisterError,
@@ -50,8 +48,8 @@ class AuthenticationController:
         SERVER_URL: str, optional
             Cloud server URL used for cloud related transactions.
         """
-        self.authentication_model = AuthenticationModel(credentials, auto_hash, path, API_KEY,
-                                                        SERVER_URL)
+        self.authentication_model = AuthenticationModel(credentials, auto_hash, path,
+                                                        API_KEY, SERVER_URL)
         self.validator = validator if validator is not None else Validator()
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
@@ -70,6 +68,33 @@ class AuthenticationController:
             del st.session_state[captcha_name]
         else:
             raise exception('Captcha entered incorrectly')
+    def check_two_factor_auth_code(self, code: str, content: Optional[Dict]=None) -> bool:
+        """
+        Controls the request to check the two factor authentication code.
+        
+        Parameters
+        ----------
+        code: str
+            Entered two factor authentication code to check.
+        content: dict, optional
+            Optional content to save in session state.
+
+        Returns
+        -------
+        bool
+            Status of two factor authentication code check, 
+            None: no two factor authentication code entered, 
+            True: two factor authentication code correct, 
+            False: two factor authentication code incorrect.
+        """
+        if code == st.session_state['two_factor_auth_code']:
+            st.session_state['two_factor_auth_check'] = True
+            st.session_state['two_factor_auth_content'] = content if content else None
+            del st.session_state['two_factor_auth_code']
+            return True
+        else:
+            st.session_state['two_factor_auth_check'] = True
+            return False
     def forgot_password(self, username: str, callback: Optional[Callable]=None,
                         captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
         """
@@ -140,6 +165,16 @@ class AuthenticationController:
         if not self.validator.validate_length(email, 1):
             raise ForgotError('Email not provided')
         return self.authentication_model.forgot_username(email, callback)
+    def generate_two_factor_auth_code(self, email: str) -> str:
+        """
+        Controls the request to generate a two factor authentication code.
+        
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
+        """
+        self.authentication_model.generate_two_factor_auth_code(email)
     def guest_login(self, cookie_controller: Any, provider: str='google',
                     oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
                     single_session: bool=False, roles: Optional[List[str]]=None,
@@ -363,23 +398,6 @@ class AuthenticationController:
             raise ResetError(self.validator.diagnose_password(new_password))
         return self.authentication_model.reset_password(username, password, new_password,
                                                         callback)
-    def two_factor_auth(self, email: str, API_KEY: str):
-        """
-        Controls the request for two factor authentication.
-
-        Parameters
-        ----------
-        email: str
-            Email to send two factor authentication code to.
-        API_KEY: str
-            API key used to connect to the cloud server to send reset passwords and two
-            factor authorization codes to the user by email.
-        """
-        # if not API_KEY:
-        #     raise CloudError(f"""Please provide an API key to use the two factor authentication 
-        #                      feature. For further information please refer to 
-        #                      {params.TWO_FACTOR_AUTH_LINK}.""")
-        self.authentication_model.two_factor_auth(email)
     def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable]=None) -> bool:
         """

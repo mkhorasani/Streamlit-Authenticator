@@ -15,7 +15,8 @@ import streamlit as st
 
 from controllers import AuthenticationController, CookieController
 import params
-from utilities import (DeprecationError,
+from utilities import (CloudError,
+                       DeprecationError,
                        Helpers,
                        LogoutError,
                        ResetError,
@@ -123,6 +124,10 @@ class Authenticate:
                       'Submit':'Submit'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
+        # if two_factor_auth and not self.API_KEY:
+        #     raise CloudError(f"""Please provide an API key to use the two factor authentication 
+        #                      feature. For further information please refer to 
+        #                      {params.TWO_FACTOR_AUTH_LINK}.""")
         if location == 'main':
             forgot_password_form = st.form(key=key, clear_on_submit=clear_on_submit)
         elif location == 'sidebar':
@@ -133,14 +138,17 @@ class Authenticate:
         if captcha:
             entered_captcha = forgot_password_form.text_input(fields.get('Captcha', 'Captcha'))
             forgot_password_form.image(Helpers.generate_captcha('forgot_password_captcha'))
+        result = (None, None, None)
         if forgot_password_form.form_submit_button(fields.get('Submit', 'Submit')):
             result = self.authentication_controller.forgot_password(username, callback, captcha,
                                                                     entered_captcha)
-            a = self.__two_factor_auth(result[1])
-            print(a)
-            if not two_factor_auth or not a:
+            if not two_factor_auth:
                 return result
-            return None, None, None
+            self.__two_factor_auth(result[1], result)
+        if two_factor_auth and 'two_factor_auth_check' in st.session_state and \
+            st.session_state['two_factor_auth_check']:
+            del st.session_state['two_factor_auth_check']
+            return st.session_state['two_factor_auth_content']
         return None, None, None
     def forgot_username(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
@@ -534,7 +542,8 @@ class Authenticate:
                                                           new_password_repeat, callback):
                 return True
         return None
-    def __two_factor_auth(self, email: str, fields: Optional[Dict[str, str]]=None):
+    def __two_factor_auth(self, email: str, content: Optional[Dict]=None,
+                          fields: Optional[Dict[str, str]]=None):
         """
         Renders a two factor authentication widget.
 
@@ -542,20 +551,15 @@ class Authenticate:
         ----------
         email: str
             Email to send two factor authentication code to.
+        content: dict, optional
+            Optional content to save in session state.
         fields: dict, optional
             Rendered names of the fields/buttons.
-
-        Returns
-        -------
-        bool
-            Validity of the entered two factor authentication code,
-            None: no code entered, 
-            True: entered code is correct.
         """
         if fields is None:
             fields = {'Form name':'Two factor code', 'Code':'Code', 'Submit':'Submit',
                       'Success':'Code is correct', 'Error':'Code is incorrect'}
-        self.authentication_controller.two_factor_auth(email, self.API_KEY)
+        self.authentication_controller.generate_two_factor_auth_code(email)
         @st.dialog('Two factor code' if 'Form name' not in fields else fields['Form name'])
         def two_factor_auth_form():
             st.write(st.session_state['two_factor_auth_code'])
@@ -563,13 +567,12 @@ class Authenticate:
                                  help='Please enter the code sent to your email'
                                  if 'Instructions' not in fields else fields['Instructions'])
             if st.button('Submit' if 'Submit' not in fields else fields['Submit']):
-                if code == st.session_state['two_factor_auth_code']:
+                if self.authentication_controller.check_two_factor_auth_code(code, content):
                     st.success('Code is correct' if 'Success' not in fields else fields['Success'])
                     time.sleep(params.TWO_FACTOR_AUTH_SLEEP_TIME)
-                    return True
+                    st.rerun()
                 else:
                     st.error('Code is incorrect' if 'Error' not in fields else fields['Error'])
-            return None
         two_factor_auth_form()
     def update_user_details(self, username: str, location: str='main',
                             fields: Optional[Dict[str, str]]=None,

@@ -84,7 +84,8 @@ if not _RELEASE:
     try:
         (username_of_forgotten_password,
          email_of_forgotten_password,
-         new_random_password) = authenticator.forgot_password()
+         new_random_password) = authenticator.forgot_password(two_factor_auth=True)
+        print(username_of_forgotten_password)
         if username_of_forgotten_password:
             st.success('New password sent securely')
             # Random password to be transferred to the user securely
