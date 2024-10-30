@@ -568,8 +568,6 @@ class Authenticate:
                                  if 'Instructions' not in fields else fields['Instructions'])
             if st.button('Submit' if 'Submit' not in fields else fields['Submit']):
                 if self.authentication_controller.check_two_factor_auth_code(code, content):
-                    st.success('Code is correct' if 'Success' not in fields else fields['Success'])
-                    time.sleep(params.TWO_FACTOR_AUTH_SLEEP_TIME)
                     st.rerun()
                 else:
                     st.error('Code is incorrect' if 'Error' not in fields else fields['Error'])
