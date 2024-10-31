@@ -68,7 +68,8 @@ class AuthenticationController:
             del st.session_state[captcha_name]
         else:
             raise exception('Captcha entered incorrectly')
-    def check_two_factor_auth_code(self, code: str, content: Optional[Dict]=None) -> bool:
+    def check_two_factor_auth_code(self, code: str, content: Optional[dict]=None,
+                                   widget: Optional[str]=None) -> bool:
         """
         Controls the request to check the two factor authentication code.
         
@@ -77,7 +78,9 @@ class AuthenticationController:
         code: str
             Entered two factor authentication code to check.
         content: dict, optional
-            Optional content to save in session state.
+            Content to save in session state.
+        widget: str, optional
+            Widget name to append to session state variable name.
 
         Returns
         -------
@@ -87,13 +90,13 @@ class AuthenticationController:
             True: two factor authentication code correct, 
             False: two factor authentication code incorrect.
         """
-        if code == st.session_state['two_factor_auth_code']:
-            st.session_state['two_factor_auth_check'] = True
-            st.session_state['two_factor_auth_content'] = content if content else None
-            del st.session_state['two_factor_auth_code']
+        if code == st.session_state[f'2FA_code_{widget}']:
+            st.session_state[f'2FA_check_{widget}'] = True
+            st.session_state[f'2FA_content_{widget}'] = content if content else None
+            del st.session_state[f'2FA_code_{widget}']
             return True
         else:
-            st.session_state['two_factor_auth_check'] = False
+            st.session_state[f'2FA_check_{widget}'] = False
             return False
     def forgot_password(self, username: str, callback: Optional[Callable]=None,
                         captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
@@ -165,7 +168,7 @@ class AuthenticationController:
         if not self.validator.validate_length(email, 1):
             raise ForgotError('Email not provided')
         return self.authentication_model.forgot_username(email, callback)
-    def generate_two_factor_auth_code(self, email: str) -> str:
+    def generate_two_factor_auth_code(self, email: str, widget: Optional[str]=None) -> str:
         """
         Controls the request to generate a two factor authentication code.
         
@@ -173,8 +176,10 @@ class AuthenticationController:
         ----------
         email: str
             Email to send two factor authentication code to.
+        widget: str, optional
+            Widget name to append to session state variable name.
         """
-        self.authentication_model.generate_two_factor_auth_code(email)
+        self.authentication_model.generate_two_factor_auth_code(email, widget)
     def guest_login(self, cookie_controller: Any, provider: str='google',
                     oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
                     single_session: bool=False, roles: Optional[List[str]]=None,
@@ -398,6 +403,44 @@ class AuthenticationController:
             raise ResetError(self.validator.diagnose_password(new_password))
         return self.authentication_model.reset_password(username, password, new_password,
                                                         callback)
+    def send_email(self, email: str, subject: str, body: str) -> bool:
+        """
+        Controls the request to send an email.
+
+        Parameters
+        ----------
+        email: str
+            Email to send two factor authentication code to.
+        subject: str
+            Email subject.
+        body: str
+            Email body.
+
+        Returns
+        -------
+        bool
+            Status of sending email, 
+            None: no email sent, 
+            True: email sent successfully.
+        """
+        return self.authentication_model.send_email(email, subject, body)
+    def send_password(self, result: Optional[dict]=None) -> bool:
+        """
+        Controls the request to send the password by email.
+
+        Parameters
+        ----------
+        result: dict, optional
+            Dict containing user's email, password and generated password.
+
+        Returns
+        -------
+        bool
+            Status of sending email, 
+            None: no email sent, 
+            True: email sent successfully.
+        """
+        return self.authentication_model.send_email(result)
     def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable]=None) -> bool:
         """

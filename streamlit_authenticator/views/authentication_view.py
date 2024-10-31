@@ -81,7 +81,7 @@ class Authenticate:
                                                                         if 'SERVER_URL' \
                                                                             in self.attrs else None)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
-                        captcha: bool=False, two_factor_auth: bool=False,
+                        captcha: bool=False, send_email: bool=False, two_factor_auth: bool=False,
                         clear_on_submit: bool=False, key: str='Forgot password',
                         callback: Optional[Callable]=None) -> tuple:
         """
@@ -97,10 +97,14 @@ class Authenticate:
             Captcha requirement for the forgot password widget, 
             True: captcha required,
             False: captcha removed.
+        send_email:
+            Send generated password to user's email,
+            True: password will be sent to user's email,
+            False: password will not be sent to user's email.
         two_factor_auth: bool
-            Two factor authentication requirement for the forgot password widget,
-            True: two factor authentication required,
-            False: two factor authentication not required.
+            Enable two factor authentication for the forgot password widget,
+            True: two factor authentication enabled,
+            False: two factor authentication disabled.
         clear_on_submit: bool
             Clear on submit setting, 
             True: clears inputs on submit, 
@@ -124,10 +128,13 @@ class Authenticate:
                       'Submit':'Submit'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-        # if two_factor_auth and not self.API_KEY:
-        #     raise CloudError(f"""Please provide an API key to use the two factor authentication 
-        #                      feature. For further information please refer to 
-        #                      {params.TWO_FACTOR_AUTH_LINK}.""")
+        if send_email and not self.API_KEY:
+            raise CloudError(f"""Please provide an API key to use the send email feature. For 
+                             further information please refer to {params.SEND_EMAIL_LINK}.""")
+        if two_factor_auth and not self.API_KEY:
+            raise CloudError(f"""Please provide an API key to use the two factor authentication 
+                             feature. For further information please refer to 
+                             {params.TWO_FACTOR_AUTH_LINK}.""")
         if location == 'main':
             forgot_password_form = st.form(key=key, clear_on_submit=clear_on_submit)
         elif location == 'sidebar':
@@ -143,12 +150,15 @@ class Authenticate:
             result = self.authentication_controller.forgot_password(username, callback, captcha,
                                                                     entered_captcha)
             if not two_factor_auth:
+                if send_email:
+                    self.authentication_controller.send_password(result)
                 return result
-            self.__two_factor_auth(result[1], result)
-        if two_factor_auth and 'two_factor_auth_check' in st.session_state and \
-            st.session_state['two_factor_auth_check']:
-            del st.session_state['two_factor_auth_check']
-            return st.session_state['two_factor_auth_content']
+            self.__two_factor_auth(result[1], result, 'forgot_password')
+        if two_factor_auth and st.session_state.get('2FA_check_forgot_password'):
+            if send_email:
+                self.authentication_controller.send_password()
+            del st.session_state['2FA_check_forgot_password']
+            return st.session_state['2FA_content_forgot_password']
         return None, None, None
     def forgot_username(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, clear_on_submit: bool=False,
@@ -542,8 +552,8 @@ class Authenticate:
                                                           new_password_repeat, callback):
                 return True
         return None
-    def __two_factor_auth(self, email: str, content: Optional[Dict]=None,
-                          fields: Optional[Dict[str, str]]=None):
+    def __two_factor_auth(self, email: str, content: Optional[dict]=None,
+                          fields: Optional[dict[str, str]]=None, widget: Optional[str]=None):
         """
         Renders a two factor authentication widget.
 
@@ -553,21 +563,23 @@ class Authenticate:
             Email to send two factor authentication code to.
         content: dict, optional
             Optional content to save in session state.
+        widget: str, optional
+            Widget name to append to session state variable name.
         fields: dict, optional
             Rendered names of the fields/buttons.
         """
         if fields is None:
             fields = {'Form name':'Two factor code', 'Code':'Code', 'Submit':'Submit',
                       'Success':'Code is correct', 'Error':'Code is incorrect'}
-        self.authentication_controller.generate_two_factor_auth_code(email)
+        self.authentication_controller.generate_two_factor_auth_code(email, widget)
         @st.dialog('Two factor code' if 'Form name' not in fields else fields['Form name'])
         def two_factor_auth_form():
-            st.write(st.session_state['two_factor_auth_code'])
+            st.write(st.session_state[f'2FA_code_{widget}'])
             code = st.text_input('Code' if 'Code' not in fields else fields['Code'],
                                  help='Please enter the code sent to your email'
                                  if 'Instructions' not in fields else fields['Instructions'])
             if st.button('Submit' if 'Submit' not in fields else fields['Submit']):
-                if self.authentication_controller.check_two_factor_auth_code(code, content):
+                if self.authentication_controller.check_two_factor_auth_code(code, content, widget):
                     st.rerun()
                 else:
                     st.error('Code is incorrect' if 'Error' not in fields else fields['Error'])

@@ -152,8 +152,7 @@ class AuthenticationModel:
             False value absent.
         """
         return any(value in d.values() for d in self.credentials['usernames'].values())
-    def forgot_password(self, username: str, callback: Optional[Callable]=None,
-                        **kwargs: Optional[Dict[str, Any]]) -> tuple:
+    def forgot_password(self, username: str, callback: Optional[Callable]=None) -> tuple:
         """
         Creates a new random password for the user.
 
@@ -163,8 +162,6 @@ class AuthenticationModel:
             Username associated with the forgotten password.
         callback: callable, optional
             Callback function that will be invoked on form submission.
-        **kwargs : dict, optional
-            Arguments to pass to the forgot password widget.
 
         Returns
         -------
@@ -180,11 +177,6 @@ class AuthenticationModel:
         if username in self.credentials['usernames']:
             email = self.credentials['usernames'][username]['email']
             random_password = self._set_random_password(username)
-            if self.API_KEY:
-                subject = 'Forgot password' if 'subject' not in kwargs else kwargs['subject']
-                body = random_password if 'body' not in kwargs else kwargs['body'] \
-                    + random_password
-                self.cloud_model.send_email(email, subject, body)
             if callback:
                 callback({'widget': 'Forgot password', 'username': username, 'email': email,
                           'random_password': random_password})
@@ -212,7 +204,7 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Forgot username', 'username': username, 'email': email})
         return username
-    def generate_two_factor_auth_code(self, email: str) -> str:
+    def generate_two_factor_auth_code(self, email: str, widget: Optional[str]=None) -> str:
         """
         Generates and sends a two factor authentication code.
         
@@ -220,11 +212,13 @@ class AuthenticationModel:
         ----------
         email: str
             Email to send two factor authentication code to.
+        widget: str, optional
+            Widget name to append to session state variable name.
         """
         two_factor_auth_code = Helpers.generate_random_string(length=4, letters=False,
                                                               punctuation=False)
-        st.session_state['two_factor_auth_code'] = two_factor_auth_code
-        # self._send_email(email, 'Two Factor Authentication Code', two_factor_auth_code)
+        st.session_state[f'2FA_code_{widget}'] = two_factor_auth_code
+        self.send_email(email, 'Two Factor Authentication Code', two_factor_auth_code)
     def _get_username(self, key: str, value: str) -> str:
         """
         Gets the username based on a provided entry.
@@ -614,7 +608,7 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Reset password', 'username': username})
         return True
-    def _send_email(self, email: str, subject: str, body: str) -> bool:
+    def send_email(self, email: str, subject: str, body: str) -> bool:
         """
         Implements the logic to send an email.
 
@@ -635,6 +629,28 @@ class AuthenticationModel:
             True: email sent successfully.
         """
         return self.cloud_model.send_email(email, subject, body)
+    def send_password(self, result: Optional[dict]=None) -> bool:
+        """
+        Implements the logic to send the password by email.
+
+        Parameters
+        ----------
+        result: dict, optional
+            Dict containing user's email, password and generated password.
+
+        Returns
+        -------
+        bool
+            Status of sending email, 
+            None: no email sent, 
+            True: email sent successfully.
+        """
+        if not result and '2FA_content_forgot_password' in st.session_state:
+            email = st.session_state['2FA_content_forgot_password'][1]
+            password = st.session_state['2FA_content_forgot_password'][2]
+            return self.send_email(email, 'Your password', password)
+        else:
+            return self.send_email(result[1], 'Your password', result[2])
     def _set_random_password(self, username: str) -> str:
         """
         Updates the credentials dictionary with the user's hashed random password.
