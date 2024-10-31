@@ -636,14 +636,14 @@ class AuthenticationModel:
         Parameters
         ----------
         result: dict, optional
-            Dict containing user's email, password and generated password.
+            Dict containing user's username, email, and generated password.
 
         Returns
         -------
         bool
-            Status of sending email, 
-            None: no email sent, 
-            True: email sent successfully.
+            Status of sending password, 
+            None: no password sent, 
+            True: password sent successfully.
         """
         if not result and '2FA_content_forgot_password' in st.session_state:
             email = st.session_state['2FA_content_forgot_password'][1]
@@ -651,6 +651,28 @@ class AuthenticationModel:
             return self.send_email(email, 'Your password', password)
         else:
             return self.send_email(result[1], 'Your password', result[2])
+    def send_username(self, result: Optional[dict]=None) -> bool:
+        """
+        Implements the logic to send the username by email.
+
+        Parameters
+        ----------
+        result: dict, optional
+            Dict containing user's username and email.
+
+        Returns
+        -------
+        bool
+            Status of sending username, 
+            None: no username sent, 
+            True: username sent successfully.
+        """
+        if not result and '2FA_content_forgot_username' in st.session_state:
+            username = st.session_state['2FA_content_forgot_username'][0]
+            email = st.session_state['2FA_content_forgot_username'][1]
+            return self.send_email(email, 'Your username', username)
+        else:
+            return self.send_email(result[1], 'Your username', result[0])
     def _set_random_password(self, username: str) -> str:
         """
         Updates the credentials dictionary with the user's hashed random password.

@@ -431,14 +431,31 @@ class AuthenticationController:
         Parameters
         ----------
         result: dict, optional
-            Dict containing user's email, password and generated password.
+            Dict containing user's username, email, and generated password.
 
         Returns
         -------
         bool
-            Status of sending email, 
-            None: no email sent, 
-            True: email sent successfully.
+            Status of sending password, 
+            None: no password sent, 
+            True: password sent successfully.
+        """
+        return self.authentication_model.send_email(result)
+    def send_username(self, result: Optional[dict]=None) -> bool:
+        """
+        Controls the request to send the username by email.
+
+        Parameters
+        ----------
+        result: dict, optional
+            Dict containing user's username and email.
+
+        Returns
+        -------
+        bool
+            Status of sending username, 
+            None: no username sent, 
+            True: username sent successfully.
         """
         return self.authentication_model.send_email(result)
     def update_user_details(self, username: str, field: str, new_value: str,

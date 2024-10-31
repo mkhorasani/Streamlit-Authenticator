@@ -161,8 +161,9 @@ class Authenticate:
             return st.session_state['2FA_content_forgot_password']
         return None, None, None
     def forgot_username(self, location: str='main', fields: Optional[Dict[str, str]]=None,
-                        captcha: bool=False, clear_on_submit: bool=False,
-                        key: str='Forgot username', callback: Optional[Callable]=None) -> tuple:
+                        captcha: bool=False, send_email: bool=False, two_factor_auth: bool=False,
+                        clear_on_submit: bool=False, key: str='Forgot username',
+                        callback: Optional[Callable]=None) -> tuple:
         """
         Renders a forgot username widget.
 
@@ -176,6 +177,14 @@ class Authenticate:
             Captcha requirement for the forgot username widget, 
             True: captcha required,
             False: captcha removed.
+        send_email:
+            Send generated password to user's email,
+            True: password will be sent to user's email,
+            False: password will not be sent to user's email.
+        two_factor_auth: bool
+            Enable two factor authentication for the forgot password widget,
+            True: two factor authentication enabled,
+            False: two factor authentication disabled.
         clear_on_submit: bool
             Clear on submit setting, 
             True: clears inputs on submit, 
@@ -212,8 +221,18 @@ class Authenticate:
             forgot_username_form.image(Helpers.generate_captcha('forgot_username_captcha'))
         if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields
                                                    else fields['Submit']):
-            return self.authentication_controller.forgot_username(email, callback,
+            result = self.authentication_controller.forgot_username(email, callback,
                                                                   captcha, entered_captcha)
+            if not two_factor_auth:
+                if send_email:
+                    self.authentication_controller.send_username(result)
+                return result
+            self.__two_factor_auth(result[1], result, 'forgot_username')
+        if two_factor_auth and st.session_state.get('2FA_check_forgot_username'):
+            if send_email:
+                self.authentication_controller.send_username()
+            del st.session_state['2FA_check_forgot_username']
+            return st.session_state['2FA_content_forgot_username']
         return None, email
     def experimental_guest_login(self, button_name: str='Guest login', location: str='main',
                                  provider: str='google', oauth2: Optional[dict]=None,
