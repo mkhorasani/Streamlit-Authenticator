@@ -86,10 +86,9 @@ class CloudModel:
             url = _self.SERVER_URL + params.SEND_EMAIL
             headers = {'Authorization': f'Bearer {_self.API_KEY}'}
             response = requests.post(url, headers=headers, json=email_data)
+            print(response.text)
         except Exception as e:
             raise CloudError(e)
         if 'error' in json.loads(response.text).keys():
             raise CloudError(list(json.loads(response.text).values())[0])
-        else:
-            return True
-        return None
+        return True

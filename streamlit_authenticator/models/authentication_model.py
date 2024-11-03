@@ -1,6 +1,6 @@
 """
 Script description: This module executes the logic for the login, logout, register user,
-reset password, forgot password, forgot username, and modify user details widgets. 
+reset password, forgot password, forgot username, and modify user details widgets.
 
 Libraries imported:
 - typing: Module implementing standard typing notations for Python functions.
@@ -26,7 +26,7 @@ from utilities import (Hasher,
 
 class AuthenticationModel:
     """
-    This class executes the logic for the login, logout, register user, reset password, 
+    This class executes the logic for the login, logout, register user, reset password,
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
@@ -38,9 +38,9 @@ class AuthenticationModel:
         Parameters
         ----------
         credentials: dict
-            Dictionary of usernames, names, passwords, emails, and other user data.  
+            Dictionary of usernames, names, passwords, emails, and other user data.
         auto_hash: bool
-            Automatic hashing requirement for the passwords, 
+            Automatic hashing requirement for the passwords,
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
         path: str
@@ -106,7 +106,7 @@ class AuthenticationModel:
         -------
         bool
             Validity of entered credentials,
-            None: no credentials entered, 
+            None: no credentials entered,
             True: correct credentials,
             False: incorrect credentials.
         """
@@ -147,8 +147,8 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            Presence/absence of the value, 
-            True: value present, 
+            Presence/absence of the value,
+            True: value present,
             False value absent.
         """
         return any(value in d.values() for d in self.credentials['usernames'].values())
@@ -166,7 +166,7 @@ class AuthenticationModel:
         Returns
         -------
         str
-            Username of the user. 
+            Username of the user.
         str
             Email of the user.
         str
@@ -207,7 +207,7 @@ class AuthenticationModel:
     def generate_two_factor_auth_code(self, email: str, widget: Optional[str]=None) -> str:
         """
         Generates and sends a two factor authentication code.
-        
+
         Parameters
         ----------
         email: str
@@ -388,9 +388,9 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            Status of authentication, 
-            None: no credentials entered, 
-            True: correct credentials, 
+            Status of authentication,
+            None: no credentials entered,
+            True: correct credentials,
             False: incorrect credentials.
         """
         if username:
@@ -458,14 +458,14 @@ class AuthenticationModel:
     def _record_failed_login_attempts(self, username: str, reset: bool=False):
         """
         Records the number of failed login attempts for a given username.
-        
+
         Parameters
         ----------
         username: str
             The entered username.
-        reset: bool            
-            Reset failed login attempts option, 
-            True: number of failed login attempts for the user will be reset to 0, 
+        reset: bool
+            Reset failed login attempts option,
+            True: number of failed login attempts for the user will be reset to 0,
             False: number of failed login attempts for the user will be incremented.
         """
         if 'failed_login_attempts' not in self.credentials['usernames'][username]:
@@ -579,7 +579,7 @@ class AuthenticationModel:
     def reset_password(self, username: str, password: str, new_password: str,
                        callback: Optional[Callable]=None) -> bool:
         """
-        Validates the user's current password and subsequently saves their new password to the 
+        Validates the user's current password and subsequently saves their new password to the
         credentials dictionary.
 
         Parameters
@@ -596,7 +596,7 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            State of resetting the password, 
+            State of resetting the password,
             True: password reset successfully.
         """
         if self._is_guest_user(username):
@@ -624,8 +624,8 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            Status of sending email, 
-            None: no email sent, 
+            Status of sending email,
+            None: no email sent,
             True: email sent successfully.
         """
         return self.cloud_model.send_email(email, subject, body)
@@ -641,8 +641,8 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            Status of sending password, 
-            None: no password sent, 
+            Status of sending password,
+            None: no password sent,
             True: password sent successfully.
         """
         if not result and '2FA_content_forgot_password' in st.session_state:
@@ -663,8 +663,8 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            Status of sending username, 
-            None: no username sent, 
+            Status of sending username,
+            None: no username sent,
             True: username sent successfully.
         """
         if not result and '2FA_content_forgot_username' in st.session_state:
@@ -742,7 +742,7 @@ class AuthenticationModel:
         Returns
         -------
         bool
-            State of updating the user's detail, 
+            State of updating the user's detail,
             True: details updated successfully.
         """
         if field == 'email':

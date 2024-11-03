@@ -30,7 +30,8 @@ if not _RELEASE:
         config['credentials'],
         config['cookie']['name'],
         config['cookie']['key'],
-        config['cookie']['expiry_days']
+        config['cookie']['expiry_days'],
+        API_KEY='b8dbybxg566zbswbx8gd8s6dtvi3q52i'
     )
 
     # authenticator = Authenticate(

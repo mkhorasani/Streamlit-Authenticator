@@ -21,4 +21,4 @@ TWO_FACTOR_AUTH_LINK:       str     =   "" #TODO
 
 # CLOUD
 SEND_EMAIL:                 str     =   "/send_email"
-SERVER_URL:                 str     =   "https://mkhorasani.pythonanywhere.com/"
+SERVER_URL:                 str     =   "https://mkhorasani.pythonanywhere.com"

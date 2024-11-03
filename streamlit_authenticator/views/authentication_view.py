@@ -1,6 +1,6 @@
 """
 Script description: This module renders the login, logout, register user, reset password,
-forgot password, forgot username, and modify user details widgets. 
+forgot password, forgot username, and modify user details widgets.
 
 Libraries imported:
 - time: Module implementing the sleep function.
@@ -25,7 +25,7 @@ from utilities import (CloudError,
 
 class Authenticate:
     """
-    This class renders login, logout, register user, reset password, forgot password, 
+    This class renders login, logout, register user, reset password, forgot password,
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Union[dict, str], cookie_name: str='some_cookie_name',
@@ -41,17 +41,17 @@ class Authenticate:
             Dictionary of usernames, names, passwords, emails, and other user data; or path
             pointing to the location of the config file.
         cookie_name: str
-            Name of the re-authentication cookie stored on the client's browser for password-less 
+            Name of the re-authentication cookie stored on the client's browser for password-less
             re-authentication.
         cookie_key: str
             Key to be used to hash the signature of the re-authentication cookie.
         cookie_expiry_days: float
-            Number of days before the re-authentication cookie automatically expires on the client's 
-            browser.       
+            Number of days before the re-authentication cookie automatically expires on the client's
+            browser.
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
         auto_hash: bool
-            Automatic hashing requirement for passwords, 
+            Automatic hashing requirement for passwords,
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
         API_KEY: str, optional
@@ -94,7 +94,7 @@ class Authenticate:
         fields: dict, optional
             Rendered names of the fields/buttons.
         captcha: bool
-            Captcha requirement for the forgot password widget, 
+            Captcha requirement for the forgot password widget,
             True: captcha required,
             False: captcha removed.
         send_email:
@@ -106,8 +106,8 @@ class Authenticate:
             True: two factor authentication enabled,
             False: two factor authentication disabled.
         clear_on_submit: bool
-            Clear on submit setting, 
-            True: clears inputs on submit, 
+            Clear on submit setting,
+            True: clears inputs on submit,
             False: keeps inputs on submit.
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
@@ -129,11 +129,11 @@ class Authenticate:
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if send_email and not self.API_KEY:
-            raise CloudError(f"""Please provide an API key to use the send email feature. For 
+            raise CloudError(f"""Please provide an API key to use the send email feature. For
                              further information please refer to {params.SEND_EMAIL_LINK}.""")
         if two_factor_auth and not self.API_KEY:
-            raise CloudError(f"""Please provide an API key to use the two factor authentication 
-                             feature. For further information please refer to 
+            raise CloudError(f"""Please provide an API key to use the two factor authentication
+                             feature. For further information please refer to
                              {params.TWO_FACTOR_AUTH_LINK}.""")
         if location == 'main':
             forgot_password_form = st.form(key=key, clear_on_submit=clear_on_submit)
@@ -174,7 +174,7 @@ class Authenticate:
         fields: dict, optional
             Rendered names of the fields/buttons.
         captcha: bool
-            Captcha requirement for the forgot username widget, 
+            Captcha requirement for the forgot username widget,
             True: captcha required,
             False: captcha removed.
         send_email:
@@ -186,8 +186,8 @@ class Authenticate:
             True: two factor authentication enabled,
             False: two factor authentication disabled.
         clear_on_submit: bool
-            Clear on submit setting, 
-            True: clears inputs on submit, 
+            Clear on submit setting,
+            True: clears inputs on submit,
             False: keeps inputs on submit.
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
@@ -306,7 +306,7 @@ class Authenticate:
         fields: dict, optional
             Rendered names of the fields/buttons.
         captcha: bool
-            Captcha requirement for the login widget, 
+            Captcha requirement for the login widget,
             True: captcha required,
             False: captcha removed.
         single_session: bool
@@ -314,8 +314,8 @@ class Authenticate:
             True: single session allowed,
             False: multiple sessions allowed.
         clear_on_submit: bool
-            Clear on submit setting, 
-            True: clears inputs on submit, 
+            Clear on submit setting,
+            True: clears inputs on submit,
             False: keeps inputs on submit.
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
@@ -413,15 +413,15 @@ class Authenticate:
         location: str
             Location of the register new user widget i.e. main or sidebar.
         pre-authorized: list, optional
-            List of emails of unregistered users who are authorized to register. 
+            List of emails of unregistered users who are authorized to register.
         domains: list, optional
-            Required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'], 
-            list: required list of domains, 
+            Required list of domains a new email must belong to i.e. ['gmail.com', 'yahoo.com'],
+            list: required list of domains,
             None: any domain is allowed.
         fields: dict, optional
             Rendered names of the fields/buttons.
         captcha: bool
-            Captcha requirement for the register user widget, 
+            Captcha requirement for the register user widget,
             True: captcha required,
             False: captcha removed.
         roles: list, optional
@@ -435,8 +435,8 @@ class Authenticate:
             True: password hint field added,
             False: password hint field removed.
         clear_on_submit: bool
-            Clear on submit setting, 
-            True: clears inputs on submit, 
+            Clear on submit setting,
+            True: clears inputs on submit,
             False: keeps inputs on submit.
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
@@ -523,8 +523,8 @@ class Authenticate:
         fields: dict, optional
             Rendered names of the fields/buttons.
         clear_on_submit: bool
-            Clear on submit setting, 
-            True: clears inputs on submit, 
+            Clear on submit setting,
+            True: clears inputs on submit,
             False: keeps inputs on submit.
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
@@ -593,7 +593,6 @@ class Authenticate:
         self.authentication_controller.generate_two_factor_auth_code(email, widget)
         @st.dialog('Two factor code' if 'Form name' not in fields else fields['Form name'])
         def two_factor_auth_form():
-            st.write(st.session_state[f'2FA_code_{widget}'])
             code = st.text_input('Code' if 'Code' not in fields else fields['Code'],
                                  help='Please enter the code sent to your email'
                                  if 'Instructions' not in fields else fields['Instructions'])
@@ -619,8 +618,8 @@ class Authenticate:
         fields: dict, optional
             Rendered names of the fields/buttons.
         clear_on_submit: bool
-            Clear on submit setting, 
-            True: clears inputs on submit, 
+            Clear on submit setting,
+            True: clears inputs on submit,
             False: keeps inputs on submit.
         key: str
             Unique key provided to widget to avoid duplicate WidgetID errors.
@@ -637,7 +636,7 @@ class Authenticate:
         if fields is None:
             fields = {'Form name':'Update user details', 'Field':'Field', 'First name':'First name',
                       'Last name':'Last name', 'Email':'Email', 'New value':'New value',
-                      'Update':'Update'} 
+                      'Update':'Update'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
