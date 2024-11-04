@@ -7,7 +7,7 @@ Libraries imported:
 - streamlit: Framework used to build pure Python web applications.
 """
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 import streamlit as st
 
@@ -218,7 +218,7 @@ class AuthenticationModel:
         two_factor_auth_code = Helpers.generate_random_string(length=4, letters=False,
                                                               punctuation=False)
         st.session_state[f'2FA_code_{widget}'] = two_factor_auth_code
-        self.send_email(email, 'Two Factor Authentication Code', two_factor_auth_code)
+        self.send_email('2FA', email, two_factor_auth_code)
     def _get_username(self, key: str, value: str) -> str:
         """
         Gets the username based on a provided entry.
@@ -608,18 +608,22 @@ class AuthenticationModel:
         if callback:
             callback({'widget': 'Reset password', 'username': username})
         return True
-    def send_email(self, email: str, subject: str, body: str) -> bool:
+    def send_email(self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str,
+                   content: str) -> bool:
         """
         Implements the logic to send an email.
 
         Parameters
         ----------
-        email: str
+        email_type: str
+            Type of email to send,
+            2FA: two factor authentication code,
+            PWD: reset password,
+            USERNAME: forgotten username.
+        recipient: str
             Email to send two factor authentication code to.
-        subject: str
-            Email subject.
-        body: str
-            Email body.
+        content: str
+            Email content.
 
         Returns
         -------
@@ -628,7 +632,7 @@ class AuthenticationModel:
             None: no email sent,
             True: email sent successfully.
         """
-        return self.cloud_model.send_email(email, subject, body)
+        return self.cloud_model.send_email(email_type, recipient, content)
     def send_password(self, result: Optional[dict]=None) -> bool:
         """
         Implements the logic to send the password by email.
@@ -648,9 +652,9 @@ class AuthenticationModel:
         if not result and '2FA_content_forgot_password' in st.session_state:
             email = st.session_state['2FA_content_forgot_password'][1]
             password = st.session_state['2FA_content_forgot_password'][2]
-            return self.send_email(email, 'Your password', password)
+            return self.send_email('PWD', email, password)
         else:
-            return self.send_email(result[1], 'Your password', result[2])
+            return self.send_email('PWD', result[1], result[2])
     def send_username(self, result: Optional[dict]=None) -> bool:
         """
         Implements the logic to send the username by email.
@@ -670,9 +674,9 @@ class AuthenticationModel:
         if not result and '2FA_content_forgot_username' in st.session_state:
             username = st.session_state['2FA_content_forgot_username'][0]
             email = st.session_state['2FA_content_forgot_username'][1]
-            return self.send_email(email, 'Your username', username)
+            return self.send_email('USERNAME', email, username)
         else:
-            return self.send_email(result[1], 'Your username', result[0])
+            return self.send_email('USERNAME', result[1], result[0])
     def _set_random_password(self, username: str) -> str:
         """
         Updates the credentials dictionary with the user's hashed random password.

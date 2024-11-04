@@ -12,7 +12,7 @@ import json
 import requests
 import streamlit as st
 
-from typing import Optional
+from typing import Literal, Optional
 
 import params
 from utilities import CloudError
@@ -57,17 +57,21 @@ class CloudModel:
             print(f"""Cannot find server URL, please enter it manually into the 'Authenticate' class 
                   as SERVER_URL='{params.SERVER_URL}'""")
             raise CloudError(e)
-    def send_email(_self, recepient: str='', subject: str='', body: str='') -> bool:
+    def send_email(_self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str='',
+                   content: str='') -> bool:
         """
-        Sends an email to a specified recepient.
+        Sends an email to a specified recipient.
 
         Parameters
         ----------
-        recepient: str
-            Recepient's email address.
-        subject: str
-            Email subject.
-        body: str
+        email_type: str
+            Type of email to send,
+            2FA: two factor authentication code,
+            PWD: reset password,
+            USERNAME: forgotten username.
+        recipient: str
+            recipient's email address.
+        content: str
             Email body.
 
         Returns
@@ -79,14 +83,14 @@ class CloudModel:
         """
         try:
             email_data = {
-                "recepient": recepient,
-                "subject": subject,
-                "body": body
+                "content": content,
+                "recipient": recipient,
+                "email_type": email_type
             }
             url = _self.SERVER_URL + params.SEND_EMAIL
             headers = {'Authorization': f'Bearer {_self.API_KEY}'}
             response = requests.post(url, headers=headers, json=email_data)
-            print(response.text)
+            print(response)
         except Exception as e:
             raise CloudError(e)
         if 'error' in json.loads(response.text).keys():
