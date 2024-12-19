@@ -418,7 +418,8 @@ class AuthenticationModel:
         callback: callable, optional
             Callback function that will be invoked on button press.
         """
-        self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
+        if st.session_state.get('username') in self.credentials['usernames']:
+            self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
