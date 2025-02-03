@@ -30,7 +30,7 @@ class CredentialsError(Exception):
 
 class CloudError(Exception):
     """
-    Exception raised for cloud related erros.
+    Exception raised for cloud related errors.
     """
     def __init__(self, message: str):
         self.message = message

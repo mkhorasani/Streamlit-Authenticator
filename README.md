@@ -226,6 +226,8 @@ except LoginError as e:
 >    - Disables the ability for the same user to log in multiple sessions, True: single session allowed, False: multiple sessions allowed.
 >  - **roles:** _list, optional, default None_
 >    - User roles for guest users.
+>  - **use_container_width:** _bool, default False_
+>    - Button width setting, True: width will match container, False: width will fit to button contents.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on button press with a dict as a parameter.
 
@@ -262,6 +264,8 @@ elif st.session_state['authentication_status'] is None:
 >    - Specifies the location of the logout button. If 'unrendered' is passed, the logout logic will be executed without rendering the button.
 >  - **key:** _str, default None_
 >    - Unique key that should be used in multi-page applications.
+>  - **use_container_width:** _bool, default False_
+>    - Button width setting, True: width will match container, False: width will fit to button contents.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on form submission with a dict as a parameter.
 

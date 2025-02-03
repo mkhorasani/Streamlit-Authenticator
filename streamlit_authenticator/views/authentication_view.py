@@ -238,6 +238,7 @@ class Authenticate:
                                  provider: str='google', oauth2: Optional[dict]=None,
                                  max_concurrent_users: Optional[int]=None,
                                  single_session: bool=False, roles: Optional[List[str]]=None,
+                                 use_container_width: bool=False,
                                  callback: Optional[Callable]=None):
         """
         Renders a guest login button.
@@ -260,6 +261,10 @@ class Authenticate:
             False: multiple sessions allowed.
         roles: list, optional
             User roles for guest users.
+        use_container_width: bool
+            Button width setting,
+            True: width will match container,
+            False width will fit to button contents.
         callback: callable, optional
             Callback function that will be invoked on button press.
         """
@@ -285,9 +290,11 @@ class Authenticate:
                                                                 roles=roles,
                                                                 callback=callback)
                 if location == 'main' and auth_endpoint:
-                    st.link_button(button_name, url=auth_endpoint)
+                    st.link_button(button_name, url=auth_endpoint,
+                                   use_container_width=use_container_width)
                 if location == 'sidebar' and auth_endpoint:
-                    st.sidebar.link_button(button_name, url=auth_endpoint)
+                    st.sidebar.link_button(button_name, url=auth_endpoint,
+                                           use_container_width=use_container_width)
     def login(self, location: str='main', max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
               captcha: bool=False, single_session: bool=False, clear_on_submit: bool=False,
@@ -368,7 +375,7 @@ class Authenticate:
                         if self.path and self.cookie_controller.get_cookie():
                             st.rerun()
     def logout(self, button_name: str='Logout', location: str='main', key: str='Logout',
-               callback: Optional[Callable]=None):
+               use_container_width: bool=False, callback: Optional[Callable]=None):
         """
         Renders a logout button.
 
@@ -380,6 +387,10 @@ class Authenticate:
             Location of the logout button i.e. main, sidebar or unrendered.
         key: str
             Unique key to be used in multi-page applications.
+        use_container_width: bool
+            Button width setting,
+            True: width will match container,
+            False width will fit to button contents.
         callback: callable, optional
             Callback function that will be invoked on button press.
         """
@@ -388,11 +399,11 @@ class Authenticate:
         if location not in ['main', 'sidebar', 'unrendered']:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
         if location == 'main':
-            if st.button(button_name, key=key):
+            if st.button(button_name, key=key, use_container_width=use_container_width):
                 self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
         elif location == 'sidebar':
-            if st.sidebar.button(button_name, key=key):
+            if st.sidebar.button(button_name, key=key, use_container_width=use_container_width):
                 self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
         elif location == 'unrendered':

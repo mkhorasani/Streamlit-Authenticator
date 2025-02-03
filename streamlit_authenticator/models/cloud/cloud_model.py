@@ -21,7 +21,7 @@ class CloudModel:
     """
     This class executes the logic for cloud related transactions.
     """
-    def __init__(_self, API_KEY: str=None, SERVER_URL: Optional[str]=None):
+    def __init__(_self, api_key: str=None, server_url: Optional[str]=None):
         """
         Create a new instance of "CloudModel".
 
@@ -32,9 +32,11 @@ class CloudModel:
         SERVER_URL: str, optional
             Cloud server URL used for cloud related transactions.
         """
-        _self.API_KEY = API_KEY
-        _self.SERVER_URL = SERVER_URL if SERVER_URL else \
-            _self.get_remote_variable(params.REMOTE_VARIABLES_LINK, 'TWO_FACTOR_AUTH_SERVER_ADDRESS')
+        _self.API_KEY = api_key
+        _self.SERVER_URL = server_url if server_url else \
+            _self.get_remote_variable(params.REMOTE_VARIABLES_LINK,
+                                      'TWO_FACTOR_AUTH_SERVER_ADDRESS')
+        print(_self.SERVER_URL)
     @st.cache_data(show_spinner=False)
     def get_remote_variable(_self, url: str=None, variable_name: str=None) -> str:
         """
@@ -48,15 +50,20 @@ class CloudModel:
             Name of variable.
         """
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=params.TIMEOUT)
             if response.status_code == 200:
                 content = response.text
-                exec(content)
-                return locals()[variable_name]
+                variables = {}
+                for line in content.splitlines():
+                    if "=" in line:
+                        key, value = line.split("=", 1)
+                        variables[key.strip()] = value.strip()
+                if variable_name in variables:
+                    return variables[variable_name]
         except Exception as e:
-            print(f"""Cannot find server URL, please enter it manually into the 'Authenticate' class 
+            print(f"""Cannot find server URL, please enter it manually into the 'Authenticate' class
                   as SERVER_URL='{params.SERVER_URL}'""")
-            raise CloudError(e)
+            raise CloudError(str(e)) from e
     def send_email(_self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str='',
                    content: str='') -> bool:
         """
@@ -89,10 +96,9 @@ class CloudModel:
             }
             url = _self.SERVER_URL + params.SEND_EMAIL
             headers = {'Authorization': f'Bearer {_self.API_KEY}'}
-            response = requests.post(url, headers=headers, json=email_data)
-            print(response)
+            response = requests.post(url, headers=headers, json=email_data, timeout=params.TIMEOUT)
         except Exception as e:
-            raise CloudError(e)
+            raise CloudError(str(e)) from e
         if 'error' in json.loads(response.text).keys():
             raise CloudError(list(json.loads(response.text).values())[0])
         return True
