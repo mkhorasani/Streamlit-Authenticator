@@ -153,10 +153,10 @@ class Authenticate:
                 if send_email:
                     self.authentication_controller.send_password(result)
                 return result
-            self.__two_factor_auth(result[1], result, 'forgot_password')
+            self.__two_factor_auth(result[1], result, widget='forgot_password')
         if two_factor_auth and st.session_state.get('2FA_check_forgot_password'):
             if send_email:
-                self.authentication_controller.send_password()
+                self.authentication_controller.send_password(st.session_state['2FA_content_forgot_password'])
             del st.session_state['2FA_check_forgot_password']
             return st.session_state['2FA_content_forgot_password']
         return None, None, None
@@ -227,10 +227,10 @@ class Authenticate:
                 if send_email:
                     self.authentication_controller.send_username(result)
                 return result
-            self.__two_factor_auth(result[1], result, 'forgot_username')
+            self.__two_factor_auth(result[1], result, widget='forgot_username')
         if two_factor_auth and st.session_state.get('2FA_check_forgot_username'):
             if send_email:
-                self.authentication_controller.send_username()
+                self.authentication_controller.send_username(st.session_state['2FA_content_forgot_username'])
             del st.session_state['2FA_check_forgot_username']
             return st.session_state['2FA_content_forgot_username']
         return None, email

@@ -440,7 +440,7 @@ class AuthenticationController:
             None: no password sent, 
             True: password sent successfully.
         """
-        return self.authentication_model.send_email(result)
+        return self.authentication_model.send_email('PWD', result[1], result[2])
     def send_username(self, result: Optional[dict]=None) -> bool:
         """
         Controls the request to send the username by email.

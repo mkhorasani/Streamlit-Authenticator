@@ -36,7 +36,6 @@ class CloudModel:
         _self.SERVER_URL = server_url if server_url else \
             _self.get_remote_variable(params.REMOTE_VARIABLES_LINK,
                                       'TWO_FACTOR_AUTH_SERVER_ADDRESS')
-        print(_self.SERVER_URL)
     @st.cache_data(show_spinner=False)
     def get_remote_variable(_self, url: str=None, variable_name: str=None) -> str:
         """
