@@ -178,11 +178,11 @@ class Authenticate:
             True: captcha required,
             False: captcha removed.
         send_email:
-            Send generated password to user's email,
-            True: password will be sent to user's email,
-            False: password will not be sent to user's email.
+            Send retrieved username to user's email,
+            True: username will be sent to user's email,
+            False: username will not be sent to user's email.
         two_factor_auth: bool
-            Enable two factor authentication for the forgot password widget,
+            Enable two factor authentication for the forgot username widget,
             True: two factor authentication enabled,
             False: two factor authentication disabled.
         clear_on_submit: bool
@@ -297,8 +297,8 @@ class Authenticate:
                                            use_container_width=use_container_width)
     def login(self, location: str='main', max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
-              captcha: bool=False, single_session: bool=False, clear_on_submit: bool=False,
-              key: str='Login', callback: Optional[Callable]=None):
+              captcha: bool=False, single_session: bool=False, two_factor_auth: bool=False,
+              clear_on_submit: bool=False, key: str='Login', callback: Optional[Callable]=None):
         """
         Renders a login widget.
 
@@ -320,6 +320,10 @@ class Authenticate:
             Disables the ability for the same user to log in multiple sessions,
             True: single session allowed,
             False: multiple sessions allowed.
+        two_factor_auth: bool
+            Enable two factor authentication for the login widget,
+            True: two factor authentication enabled,
+            False: two factor authentication disabled.
         clear_on_submit: bool
             Clear on submit setting,
             True: clears inputs on submit,

@@ -394,6 +394,10 @@ except Exception as e:
 >    - Customizes the text of headers, buttons and other fields.
 >  - **captcha:** _bool, default False_
 >    - Specifies the captcha requirement for the forgot password widget, True: captcha required, False: captcha removed.
+>  - **send_email:** _bool, default False_
+>    - Specifies whether to send the generated password to the user's email, True: password will be sent to user's email, False: password will not be sent to user's email.
+>  - **two_factor_auth:** _bool, default False_
+>    - Specifies whether to enable two factor authentication for the forgot password widget, True: two factor authentication enabled, False: two factor authentication disabled.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Forgot password'_
@@ -438,6 +442,10 @@ except Exception as e:
 >    - Customizes the text of headers, buttons and other fields.
 >  - **captcha:** _bool, default False_
 >    - Specifies the captcha requirement for the forgot username widget, True: captcha required, False: captcha removed.
+>  - **send_email:** _bool, default False_
+>    - Specifies whether to send the retrieved username to the user's email, True: username will be sent to user's email, False: username will not be sent to user's email.
+>  - **two_factor_auth:** _bool, default False_
+>    - Specifies whether to enable two factor authentication for the forgot username widget, True: two factor authentication enabled, False: two factor authentication disabled.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Forgot username'_

@@ -457,7 +457,7 @@ class AuthenticationController:
             None: no username sent, 
             True: username sent successfully.
         """
-        return self.authentication_model.send_email(result)
+        return self.authentication_model.send_email('USERNAME', result[1], result[0])
     def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable]=None) -> bool:
         """
