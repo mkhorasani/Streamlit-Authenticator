@@ -272,13 +272,13 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if provider not in ['google', 'microsoft']:
             raise ValueError("Provider must be one of 'google' or 'microsoft'")
-        if not st.session_state['authentication_status']:
+        if not st.session_state.get('authentication_status'):
             token = self.cookie_controller.get_cookie()
             if token:
                 self.authentication_controller.login(token=token)
             time.sleep(params.PRE_LOGIN_SLEEP_TIME if 'login_sleep_time' not in self.attrs \
                        else self.attrs['login_sleep_time'])
-            if not st.session_state['authentication_status']:
+            if not st.session_state.get('authentication_status'):
                 auth_endpoint = \
                     self.authentication_controller.guest_login(cookie_controller=\
                                                                 self.cookie_controller,
@@ -297,8 +297,8 @@ class Authenticate:
                                            use_container_width=use_container_width)
     def login(self, location: str='main', max_concurrent_users: Optional[int]=None,
               max_login_attempts: Optional[int]=None, fields: Optional[Dict[str, str]]=None,
-              captcha: bool=False, single_session: bool=False, two_factor_auth: bool=False,
-              clear_on_submit: bool=False, key: str='Login', callback: Optional[Callable]=None):
+              captcha: bool=False, single_session: bool=False, clear_on_submit: bool=False,
+              key: str='Login', callback: Optional[Callable]=None):
         """
         Renders a login widget.
 
@@ -320,10 +320,6 @@ class Authenticate:
             Disables the ability for the same user to log in multiple sessions,
             True: single session allowed,
             False: multiple sessions allowed.
-        two_factor_auth: bool
-            Enable two factor authentication for the login widget,
-            True: two factor authentication enabled,
-            False: two factor authentication disabled.
         clear_on_submit: bool
             Clear on submit setting,
             True: clears inputs on submit,
@@ -338,13 +334,13 @@ class Authenticate:
                       'Login':'Login', 'Captcha':'Captcha'}
         if location not in ['main', 'sidebar', 'unrendered']:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
-        if not st.session_state['authentication_status']:
+        if not st.session_state.get('authentication_status'):
             token = self.cookie_controller.get_cookie()
             if token:
                 self.authentication_controller.login(token=token)
             time.sleep(params.PRE_LOGIN_SLEEP_TIME if 'login_sleep_time' not in self.attrs \
                        else self.attrs['login_sleep_time'])
-            if not st.session_state['authentication_status']:
+            if not st.session_state.get('authentication_status'):
                 if location == 'main':
                     login_form = st.form(key=key, clear_on_submit=clear_on_submit)
                 elif location == 'sidebar':
@@ -398,7 +394,7 @@ class Authenticate:
         callback: callable, optional
             Callback function that will be invoked on button press.
         """
-        if not st.session_state['authentication_status']:
+        if not st.session_state.get('authentication_status'):
             raise LogoutError('User must be logged in to use the logout button')
         if location not in ['main', 'sidebar', 'unrendered']:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
@@ -411,7 +407,7 @@ class Authenticate:
                 self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
         elif location == 'unrendered':
-            if st.session_state['authentication_status']:
+            if st.session_state.get('authentication_status'):
                 self.authentication_controller.logout()
                 self.cookie_controller.delete_cookie()
     def register_user(self, location: str='main', pre_authorized: Optional[List[str]]=None,
@@ -551,7 +547,7 @@ class Authenticate:
         bool
             Status of resetting the password.
         """
-        if not st.session_state['authentication_status']:
+        if not st.session_state.get('authentication_status'):
             raise ResetError('User must be logged in to use the reset password widget')
         if fields is None:
             fields = {'Form name':'Reset password', 'Current password':'Current password',
@@ -646,7 +642,7 @@ class Authenticate:
         bool
             Status of updating the user details.
         """
-        if not st.session_state['authentication_status']:
+        if not st.session_state.get('authentication_status'):
             raise UpdateError('User must be logged in to use the update user details widget')
         if fields is None:
             fields = {'Form name':'Update user details', 'Field':'Field', 'First name':'First name',

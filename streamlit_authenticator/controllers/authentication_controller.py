@@ -95,9 +95,8 @@ class AuthenticationController:
             st.session_state[f'2FA_content_{widget}'] = content if content else None
             del st.session_state[f'2FA_code_{widget}']
             return True
-        else:
-            st.session_state[f'2FA_check_{widget}'] = False
-            return False
+        st.session_state[f'2FA_check_{widget}'] = False
+        return False
     def forgot_password(self, username: str, callback: Optional[Callable]=None,
                         captcha: bool=False, entered_captcha: Optional[str]=None) -> tuple:
         """

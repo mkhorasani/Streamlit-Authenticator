@@ -54,17 +54,17 @@ if not _RELEASE:
         st.error(e)
 
     # Authenticating user
-    if st.session_state['authentication_status']:
+    if st.session_state.get('authentication_status'):
         authenticator.logout()
         st.write(f'Welcome *{st.session_state["name"]}*')
         st.title('Some content')
-    elif st.session_state['authentication_status'] is False:
+    elif st.session_state.get('authentication_status') is False:
         st.error('Username/password is incorrect')
-    elif st.session_state['authentication_status'] is None:
+    elif st.session_state.get('authentication_status') is None:
         st.warning('Please enter your username and password')
 
     # Creating a password reset widget
-    if st.session_state['authentication_status']:
+    if st.session_state.get('authentication_status'):
         try:
             if authenticator.reset_password(st.session_state['username']):
                 st.success('Password modified successfully')
@@ -97,7 +97,7 @@ if not _RELEASE:
     # Creating a forgot username widget
     try:
         (username_of_forgotten_username,
-         email_of_forgotten_username) = authenticator.forgot_username()
+         email_of_forgotten_username) = authenticator.forgot_username(two_factor_auth=True)
         if username_of_forgotten_username:
             st.success('Username sent securely')
             # Username to be transferred to the user securely
@@ -107,7 +107,7 @@ if not _RELEASE:
         st.error(e)
 
     # Creating an update user details widget
-    if st.session_state['authentication_status']:
+    if st.session_state.get('authentication_status'):
         try:
             if authenticator.update_user_details(st.session_state['username']):
                 st.success('Entry updated successfully')

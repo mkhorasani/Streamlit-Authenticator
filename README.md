@@ -241,18 +241,18 @@ except LoginError as e:
 
 ### 7. Authenticating users
 
-* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, **st.session_state['username']**, and **st.session_state['roles']** to allow a verified user to access restricted content.
+* You can then retrieve the name, authentication status, username, and roles from Streamlit's session state using the keys **'name'**, **'authentication_status'**, **'username'**, and **'roles'** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
 * The optional **key** parameter for the logout button should be used with multi-page applications to prevent Streamlit from throwing duplicate key errors.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state.get('authentication_status'):
     authenticator.logout()
-    st.write(f'Welcome *{st.session_state["name"]}*')
+    st.write(f'Welcome *{st.session_state.get("name")}*')
     st.title('Some content')
-elif st.session_state['authentication_status'] is False:
+elif st.session_state.get('authentication_status') is False:
     st.error('Username/password is incorrect')
-elif st.session_state['authentication_status'] is None:
+elif st.session_state.get('authentication_status') is None:
     st.warning('Please enter your username and password')
 ```
 
@@ -275,16 +275,16 @@ elif st.session_state['authentication_status'] is None:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.JPG)
 
-* You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state['failed_login_attempts']** which returns a dictionary with the username as key and the number of failed attempts as the value.
+* You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state.get('failed_login_attempts')** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
 ### 8. Creating a reset password widget
 
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state.get('authentication_status'):
     try:
-        if authenticator.reset_password(st.session_state['username']):
+        if authenticator.reset_password(st.session_state.get('username')):
             st.success('Password modified successfully')
     except Exception as e:
         st.error(e)
@@ -466,9 +466,9 @@ except Exception as e:
 * The widget will automatically save the updated details in both the credentials dictionary and re-authentication cookie.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state.get('authentication_status'):
     try:
-        if authenticator.update_user_details(st.session_state['username']):
+        if authenticator.update_user_details(st.session_state.get('username')):
             st.success('Entries updated successfully')
     except Exception as e:
         st.error(e)
