@@ -48,9 +48,9 @@ class AuthenticationController:
         SERVER_URL: str, optional
             Cloud server URL used for cloud related transactions.
         """
-        self.authentication_model = AuthenticationModel(credentials, auto_hash, path,
-                                                        API_KEY, SERVER_URL)
         self.validator = validator if validator is not None else Validator()
+        self.authentication_model = AuthenticationModel(credentials, auto_hash, path,
+                                                        API_KEY, SERVER_URL, self.validator)
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
         Checks the validity of the entered captcha.

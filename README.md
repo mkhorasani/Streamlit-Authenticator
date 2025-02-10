@@ -348,6 +348,8 @@ except Exception as e:
 >    - Merges username into email field, True: username will be the same as the email, False: username and email will be independent.
 >  - **password_hint:** _bool, default True_
 >    - Requirement for entering a password hint, True: password hint field added, False: password hint field removed.
+>  - **two_factor_auth:** _bool, default False_
+>    - Specifies whether to enable two factor authentication for the forgot password widget, True: two factor authentication enabled, False: two factor authentication disabled.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Register user'_

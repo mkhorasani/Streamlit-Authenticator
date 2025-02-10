@@ -78,7 +78,7 @@ if not _RELEASE:
          name_of_registered_user) = authenticator.register_user(pre_authorized=config['pre-authorized']['emails'])
         if email_of_registered_user:
             st.success('User registered successfully')
-    except RegisterError as e:
+    except (CloudError, RegisterError) as e:
         st.error(e)
 
     # Creating a forgot password widget

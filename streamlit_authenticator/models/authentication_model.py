@@ -17,12 +17,14 @@ from models.oauth2 import MicrosoftModel
 import params
 from utilities import (Hasher,
                          Helpers,
+                         CloudError,
                          CredentialsError,
                          ForgotError,
                          LoginError,
                          RegisterError,
                          ResetError,
-                         UpdateError)
+                         UpdateError,
+                         Validator)
 
 class AuthenticationModel:
     """
@@ -31,7 +33,7 @@ class AuthenticationModel:
     """
     def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
                  path: Optional[str]=None, API_KEY: Optional[str]=None,
-                 SERVER_URL: Optional[str]=None):
+                 SERVER_URL: Optional[str]=None, validator: Optional[Validator]=None):
         """
         Create a new instance of "AuthenticationModel".
 
@@ -50,7 +52,10 @@ class AuthenticationModel:
             factor authorization codes to the user by email.
         SERVER_URL: str, optional
             Cloud server URL used for cloud related transactions.
+        validator: Validator, optional
+            Validator object that checks the validity of the username, name, and email fields.
         """
+        self.validator = validator if validator is not None else Validator()
         self.path = path
         if self.path:
             self.config = Helpers.read_config_file(path)
@@ -632,6 +637,8 @@ class AuthenticationModel:
             None: no email sent,
             True: email sent successfully.
         """
+        if not self.validator.validate_email(recipient):
+            raise CloudError('Email not valid')
         return self.cloud_model.send_email(email_type, recipient, content)
     def send_password(self, result: Optional[dict]=None) -> bool:
         """

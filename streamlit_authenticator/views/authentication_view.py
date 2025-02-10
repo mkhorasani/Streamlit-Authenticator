@@ -222,12 +222,12 @@ class Authenticate:
         if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields
                                                    else fields['Submit']):
             result = self.authentication_controller.forgot_username(email, callback,
-                                                                  captcha, entered_captcha)
+                                                                    captcha, entered_captcha)
             if not two_factor_auth:
                 if send_email:
                     self.authentication_controller.send_username(result)
                 return result
-            self.__two_factor_auth(result[1], result, widget='forgot_username')
+            self.__two_factor_auth(email, result, widget='forgot_username')
         if two_factor_auth and st.session_state.get('2FA_check_forgot_username'):
             if send_email:
                 self.authentication_controller.send_username(st.session_state['2FA_content_forgot_username'])
@@ -413,9 +413,9 @@ class Authenticate:
     def register_user(self, location: str='main', pre_authorized: Optional[List[str]]=None,
                       domains: Optional[List[str]]=None, fields: Optional[Dict[str, str]]=None,
                       captcha: bool=True, roles: Optional[List[str]]=None,
-                      merge_username_email: bool=False, clear_on_submit: bool=False,
-                      password_hint: bool=True, key: str='Register user',
-                      callback: Optional[Callable]=None) -> tuple:
+                      merge_username_email: bool=False, password_hint: bool=True,
+                      two_factor_auth: bool=False, clear_on_submit: bool=False,
+                      key: str='Register user', callback: Optional[Callable]=None) -> tuple:
         """
         Renders a register new user widget.
 
@@ -445,6 +445,10 @@ class Authenticate:
             Requirement for entering a password hint,
             True: password hint field added,
             False: password hint field removed.
+        two_factor_auth: bool
+            Enable two factor authentication for the forgot username widget,
+            True: two factor authentication enabled,
+            False: two factor authentication disabled.
         clear_on_submit: bool
             Clear on submit setting,
             True: clears inputs on submit,
@@ -512,6 +516,18 @@ class Authenticate:
             register_user_form.image(Helpers.generate_captcha('register_user_captcha'))
         if register_user_form.form_submit_button('Register' if 'Register' not in fields
                                                  else fields['Register']):
+            if two_factor_auth:
+                self.__two_factor_auth(new_email, widget='register')
+            else:
+                return self.authentication_controller.register_user(new_first_name, new_last_name,
+                                                                    new_email, new_username,
+                                                                    new_password,
+                                                                    new_password_repeat,
+                                                                    password_hint, pre_authorized,
+                                                                    domains, roles, callback,
+                                                                    captcha, entered_captcha)
+        if two_factor_auth and st.session_state.get('2FA_check_register'):
+            del st.session_state['2FA_check_register']
             return self.authentication_controller.register_user(new_first_name, new_last_name,
                                                                 new_email, new_username,
                                                                 new_password, new_password_repeat,
