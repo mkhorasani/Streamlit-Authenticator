@@ -350,7 +350,7 @@ class Authenticate:
                             st.session_state['username'])
                 login_form.subheader('Login' if 'Form name' not in fields else fields['Form name'])
                 username = login_form.text_input('Username' if 'Username' not in fields
-                                                 else fields['Username'])
+                                                 else fields['Username'], autocomplete='off')
                 if 'password_hint' in st.session_state:
                     password = login_form.text_input('Password' if 'Password' not in fields
                                                      else fields['Password'], type='password',
