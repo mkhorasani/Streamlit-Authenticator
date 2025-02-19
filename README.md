@@ -20,12 +20,13 @@
 - [Creating a login widget](#5-creating-a-login-widget)
 - [Creating a guest login button](#6-creating-a-guest-login-button) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
-- [Creating a reset password widget](#8-creating-a-reset-password-widget)
-- [Creating a new user registration widget](#9-creating-a-new-user-registration-widget)
-- [Creating a forgot password widget](#10-creating-a-forgot-password-widget)
-- [Creating a forgot username widget](#11-creating-a-forgot-username-widget)
-- [Creating an update user details widget](#12-creating-an-update-user-details-widget)
-- [Updating the config file](#13-updating-the-config-file)
+- [Enabling two factor authentication](#8-enabling-two-factor-authentication) 🚀 **NEW**
+- [Creating a reset password widget](#9-creating-a-reset-password-widget)
+- [Creating a new user registration widget](#10-creating-a-new-user-registration-widget)
+- [Creating a forgot password widget](#11-creating-a-forgot-password-widget)
+- [Creating a forgot username widget](#12-creating-a-forgot-username-widget)
+- [Creating an update user details widget](#13-creating-an-update-user-details-widget)
+- [Updating the config file](#14-updating-the-config-file)
 - [License](#license)
 
 ### 1. Quickstart
@@ -97,6 +98,8 @@ oauth2: # Optional
 pre-authorized: # Optional
   emails:
   - melsby@gmail.com
+keys: # Optional
+    API_KEY: # Register to receive a free API key: https://streamlitauthenticator.com
 ```
 
 * _Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
@@ -277,7 +280,24 @@ elif st.session_state.get('authentication_status') is None:
 
 * You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state.get('failed_login_attempts')** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
-### 8. Creating a reset password widget
+### 8. Enabling two factor authentication
+
+* You may enable two factor authentication for the **register_user**, **forgot_password**, and **forgot_username** widgets for enhanced security.
+* First register to receive a free API key [here](https://streamlitauthenticator.com).
+* Add your API key to the the authenticator object as **API_KEY** or alternatively add it to the config file as shown in step 3.
+* Then set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication.JPG)
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email.JPG)
+
+* For the **forgot_password** and **forgot_username** widgets if you require the returned password and username to be sent to the user's email then you may set the **send_email** parameter to True.
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email_password.JPG)
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email_username.JPG)
+
+### 9. Creating a reset password widget
 
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
@@ -312,7 +332,7 @@ if st.session_state.get('authentication_status'):
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 9. Creating a new user registration widget
+### 10. Creating a new user registration widget
 
 * You may use the **register_user** widget to allow a user to sign up to your application as shown below.
 * If you require the user to be pre-authorized, define a **pre_authorized** list of emails that are allowed to register, and add it to the config file or provide it as a parameter to the **register_user** widget.
@@ -368,7 +388,7 @@ except Exception as e:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 10. Creating a forgot password widget
+### 11. Creating a forgot password widget
 
 * You may use the **forgot_password** widget to allow a user to generate a new random password.
 * The new password will be automatically hashed and saved in the credentials dictionary.
@@ -418,7 +438,7 @@ except Exception as e:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 11. Creating a forgot username widget
+### 12. Creating a forgot username widget
 
 * You may use the **forgot_username** widget to allow a user to retrieve their forgotten username.
 * The widget will return the username and email which the developer should then transfer to the user securely.
@@ -462,7 +482,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.JPG)
 
-### 12. Creating an update user details widget
+### 13. Creating an update user details widget
 
 * You may use the **update_user_details** widget to allow a logged in user to update their name and/or email.
 * The widget will automatically save the updated details in both the credentials dictionary and re-authentication cookie.
@@ -498,7 +518,7 @@ if st.session_state.get('authentication_status'):
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 13. Updating the config file
+### 14. Updating the config file
 
 * Please ensure that the config file is re-saved anytime the credentials are updated or whenever the **reset_password**, **register_user**, **forgot_password**, or **update_user_details** widgets are used.
 
