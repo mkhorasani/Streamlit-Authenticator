@@ -622,7 +622,8 @@ class Authenticate:
         def two_factor_auth_form():
             code = st.text_input('Code' if 'Code' not in fields else fields['Code'],
                                  help='Please enter the code sent to your email'
-                                 if 'Instructions' not in fields else fields['Instructions'])
+                                 if 'Instructions' not in fields else fields['Instructions'],
+                                 autocomplete='off')
             if st.button('Submit' if 'Submit' not in fields else fields['Submit']):
                 if self.authentication_controller.check_two_factor_auth_code(code, content, widget):
                     st.rerun()

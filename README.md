@@ -31,6 +31,7 @@
 
 ### 1. Quickstart
 
+* Subscribe to receive a free [API key](https://streamlitauthenticator.com)
 * Check out the [demo app](https://demo-app-v0-3-3.streamlit.app/).
 * Feel free to visit the [API reference](https://streamlit-authenticator.readthedocs.io/en/stable/).
 * And finally follow the tutorial below.
@@ -284,8 +285,8 @@ elif st.session_state.get('authentication_status') is None:
 
 * You may enable two factor authentication for the **register_user**, **forgot_password**, and **forgot_username** widgets for enhanced security.
 * First register to receive a free API key [here](https://streamlitauthenticator.com).
-* Add your API key to the the authenticator object as **API_KEY** or alternatively add it to the config file as shown in step 3.
-* Then set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
+* Then add your API key to the the authenticator object as **API_KEY** or alternatively add it to the config file as shown in step 3.
+* Finally set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication.JPG)
 
