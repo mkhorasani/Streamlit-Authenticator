@@ -140,10 +140,12 @@ class Authenticate:
         elif location == 'sidebar':
             forgot_password_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
         forgot_password_form.subheader(fields.get('Form name', 'Forget password'))
-        username = forgot_password_form.text_input(fields.get('Username', 'Username'))
+        username = forgot_password_form.text_input(fields.get('Username', 'Username'),
+                                                   autocomplete='off')
         entered_captcha = None
         if captcha:
-            entered_captcha = forgot_password_form.text_input(fields.get('Captcha', 'Captcha'))
+            entered_captcha = forgot_password_form.text_input(fields.get('Captcha', 'Captcha'),
+                                                              autocomplete='off')
             forgot_password_form.image(Helpers.generate_captcha('forgot_password_captcha'))
         result = (None, None, None)
         if forgot_password_form.form_submit_button(fields.get('Submit', 'Submit')):
@@ -213,11 +215,11 @@ class Authenticate:
         forgot_username_form.subheader('Forget username' if 'Form name' not in fields
                                        else fields['Form name'])
         email = forgot_username_form.text_input('Email' if 'Email' not in fields
-                                                else fields['Email'])
+                                                else fields['Email'], autocomplete='off')
         entered_captcha = None
         if captcha:
             entered_captcha = forgot_username_form.text_input('Captcha' if 'Captcha' not in fields
-                                                              else fields['Captcha'])
+                                                              else fields['Captcha'], autocomplete='off')
             forgot_username_form.image(Helpers.generate_captcha('forgot_username_captcha'))
         if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields
                                                    else fields['Submit']):
@@ -354,14 +356,17 @@ class Authenticate:
                 if 'password_hint' in st.session_state:
                     password = login_form.text_input('Password' if 'Password' not in fields
                                                      else fields['Password'], type='password',
-                                                     help=st.session_state['password_hint'])
+                                                     help=st.session_state['password_hint'],
+                                                     autocomplete='off')
                 else:
                     password = login_form.text_input('Password' if 'Password' not in fields
-                                                     else fields['Password'], type='password')
+                                                     else fields['Password'], type='password',
+                                                     autocomplete='off')
                 entered_captcha = None
                 if captcha:
                     entered_captcha = login_form.text_input('Captcha' if 'Captcha' not in fields
-                                                            else fields['Captcha'])
+                                                            else fields['Captcha'],
+                                                            autocomplete='off')
                     login_form.image(Helpers.generate_captcha('login_captcha'))
                 if login_form.form_submit_button('Login' if 'Login' not in fields
                                                  else fields['Login']):
@@ -486,33 +491,36 @@ class Authenticate:
                                      else fields['Form name'])
         col1_1, col2_1 = register_user_form.columns(2)
         new_first_name = col1_1.text_input('First name' if 'First name' not in fields
-                                         else fields['First name'])
+                                         else fields['First name'], autocomplete='off')
         new_last_name = col2_1.text_input('Last name' if 'Last name' not in fields
-                                        else fields['Last name'])
+                                        else fields['Last name'], autocomplete='off')
         if merge_username_email:
             new_email = register_user_form.text_input('Email' if 'Email' not in fields
-                                        else fields['Email'])
+                                        else fields['Email'], autocomplete='off')
             new_username = new_email
         else:
             new_email = col1_1.text_input('Email' if 'Email' not in fields
-                                        else fields['Email'])
+                                        else fields['Email'], autocomplete='off')
             new_username = col2_1.text_input('Username' if 'Username' not in fields
-                                        else fields['Username'])
+                                        else fields['Username'], autocomplete='off')
         col1_2, col2_2 = register_user_form.columns(2)
         password_instructions = params.PASSWORD_INSTRUCTIONS if 'password_instructions' \
             not in self.attrs else self.attrs['password_instructions']
         new_password = col1_2.text_input('Password' if 'Password' not in fields
                                        else fields['Password'], type='password',
-                                       help=password_instructions)
+                                       help=password_instructions, autocomplete='off')
         new_password_repeat = col2_2.text_input('Repeat password' if 'Repeat password' not in fields
-                                              else fields['Repeat password'], type='password')
+                                              else fields['Repeat password'], type='password',
+                                              autocomplete='off')
         if password_hint:
             password_hint = register_user_form.text_input('Password hint' if 'Password hint' not in
-                                                        fields else fields['Password hint'])
+                                                        fields else fields['Password hint'],
+                                                        autocomplete='off')
         entered_captcha = None
         if captcha:
             entered_captcha = register_user_form.text_input('Captcha' if 'Captcha' not in fields
-                                                            else fields['Captcha']).strip()
+                                                            else fields['Captcha'],
+                                                            autocomplete='off').strip()
             register_user_form.image(Helpers.generate_captcha('register_user_captcha'))
         if register_user_form.form_submit_button('Register' if 'Register' not in fields
                                                  else fields['Register']):
@@ -580,18 +588,20 @@ class Authenticate:
         password = reset_password_form.text_input('Current password'
                                                   if 'Current password' not in fields
                                                   else fields['Current password'],
-                                                  type='password').strip()
+                                                  type='password', autocomplete='off').strip()
         password_instructions = params.PASSWORD_INSTRUCTIONS if 'password_instructions' \
             not in self.attrs else self.attrs['password_instructions']
         new_password = reset_password_form.text_input('New password'
                                                       if 'New password' not in fields
                                                       else fields['New password'],
                                                       type='password',
-                                                      help=password_instructions).strip()
+                                                      help=password_instructions,
+                                                      autocomplete='off').strip()
         new_password_repeat = reset_password_form.text_input('Repeat password'
                                                              if 'Repeat password' not in fields
                                                              else fields['Repeat password'],
-                                                             type='password').strip()
+                                                             type='password',
+                                                             autocomplete='off').strip()
         if reset_password_form.form_submit_button('Reset' if 'Reset' not in fields
                                                   else fields['Reset']):
             if self.authentication_controller.reset_password(username, password, new_password,
@@ -682,7 +692,8 @@ class Authenticate:
                                                    else fields['Field'],
                                                    update_user_details_form_fields)
         new_value = update_user_details_form.text_input('New value' if 'New value' not in fields
-                                                        else fields['New value']).strip()
+                                                        else fields['New value'],
+                                                        autocomplete='off').strip()
         if update_user_details_form_fields.index(field) == 0:
             field = 'first_name'
         elif update_user_details_form_fields.index(field) == 1:
