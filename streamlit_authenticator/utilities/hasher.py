@@ -16,22 +16,22 @@ class Hasher:
     def __init__(self):
         pass
     @classmethod
-    def check_hash(cls, string: str, hashed_string: str) -> bool:
+    def check_pw(cls, password: str, hashed_password: str) -> bool:
         """
-        Checks the validity of the entered string.
+        Checks the validity of the entered password.
 
         Parameters
         ----------
-        string: str
-            The string.
+        password: str
+            The plain text password.
         hashed_password: str
-            The hashed string.
+            The hashed password.
         Returns
         -------
         bool
-            Validity of the entered string by comparing it to the hashed string.
+            Validity of the entered password by comparing it to the hashed password.
         """
-        return bcrypt.checkpw(string.encode(), hashed_string.encode())
+        return bcrypt.checkpw(password.encode(), hashed_password.encode())
     @classmethod
     def hash(cls, password: str) -> str:
         """

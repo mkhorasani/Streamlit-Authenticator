@@ -118,7 +118,7 @@ class AuthenticationModel:
         if username not in self.credentials['usernames']:
             return False
         try:
-            if Hasher.check_hash(password, self.credentials['usernames'][username]['password']):
+            if Hasher.check_pw(password, self.credentials['usernames'][username]['password']):
                 return True
             self._record_failed_login_attempts(username)
             return False
@@ -222,7 +222,7 @@ class AuthenticationModel:
         """
         two_factor_auth_code = Helpers.generate_random_string(length=4, letters=False,
                                                               punctuation=False)
-        st.session_state[f'2FA_code_{widget}'] = Hasher.hash(two_factor_auth_code)
+        st.session_state[f'2FA_code_{widget}'] = two_factor_auth_code
         self.send_email('2FA', email, two_factor_auth_code)
     def _get_username(self, key: str, value: str) -> str:
         """

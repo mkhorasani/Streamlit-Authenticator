@@ -626,7 +626,7 @@ class Authenticate:
         """
         if fields is None:
             fields = {'Form name':'Authentication code', 'Code':'Code', 'Submit':'Submit',
-                      'Error':'Code is incorrect'}
+                      'Success':'Code is correct', 'Error':'Code is incorrect'}
         self.authentication_controller.generate_two_factor_auth_code(email, widget)
         @st.dialog('Authentication code' if 'Form name' not in fields else fields['Form name'])
         def two_factor_auth_form():
