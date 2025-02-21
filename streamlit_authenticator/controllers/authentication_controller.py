@@ -12,6 +12,7 @@ import streamlit as st
 
 from models import AuthenticationModel
 from utilities import (ForgotError,
+                         Hasher,
                          Helpers,
                          LoginError,
                          RegisterError,
@@ -90,7 +91,7 @@ class AuthenticationController:
             True: two factor authentication code correct, 
             False: two factor authentication code incorrect.
         """
-        if code == st.session_state[f'2FA_code_{widget}']:
+        if Hasher.check_hash(code, st.session_state[f'2FA_code_{widget}']):
             st.session_state[f'2FA_check_{widget}'] = True
             st.session_state[f'2FA_content_{widget}'] = content if content else None
             del st.session_state[f'2FA_code_{widget}']
