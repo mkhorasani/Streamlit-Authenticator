@@ -73,7 +73,7 @@ class Helpers:
         if captcha_name not in st.session_state:
             st.session_state[captcha_name] = encryptor.encrypt(''.join(random.choices(string.digits,
                                                                                       k=4)))
-        return image.generate(st.session_state[captcha_name])
+        return image.generate(encryptor.decrypt(st.session_state[captcha_name]))
     @classmethod
     def generate_random_string(cls, length: int=16, letters: bool=True, digits: bool=True,
                                punctuation: bool=True) -> str:
