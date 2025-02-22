@@ -3,15 +3,18 @@ Script description: This module controls the requests for the login, logout, reg
 reset password, forgot password, forgot username, and modify user details widgets. 
 
 Libraries imported:
+- json: Module used to create JSON documents.
 - typing: Module implementing standard typing notations for Python functions.
 - streamlit: Framework used to build pure Python web applications.
 """
 
+import json
 from typing import Any, Callable, Dict, List, Optional
 import streamlit as st
 
 from models import AuthenticationModel
-from utilities import (ForgotError,
+from utilities import (Encryptor,
+                         ForgotError,
                          Helpers,
                          LoginError,
                          RegisterError,
@@ -52,8 +55,8 @@ class AuthenticationController:
         """
         self.secret_key = secret_key
         self.validator = validator if validator is not None else Validator()
-        self.authentication_model = AuthenticationModel(credentials, auto_hash, path,
-                                                        api_key, server_url, self.validator)
+        self.authentication_model = AuthenticationModel(credentials, auto_hash, path, api_key,
+                                                        self.secret_key, server_url, self.validator)
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
         Checks the validity of the entered captcha.
@@ -93,9 +96,11 @@ class AuthenticationController:
             True: two factor authentication code correct, 
             False: two factor authentication code incorrect.
         """
-        if code == st.session_state[f'2FA_code_{widget}']:
+        encryptor = Encryptor(self.secret_key)
+        if code == encryptor.decrypt(st.session_state[f'2FA_code_{widget}']):
             st.session_state[f'2FA_check_{widget}'] = True
-            st.session_state[f'2FA_content_{widget}'] = content if content else None
+            st.session_state[f'2FA_content_{widget}'] = \
+                encryptor.encrypt(json.dumps(content)) if content else None
             del st.session_state[f'2FA_code_{widget}']
             return True
         st.session_state[f'2FA_check_{widget}'] = False

@@ -3,10 +3,12 @@ Script description: This module executes the logic for the login, logout, regist
 reset password, forgot password, forgot username, and modify user details widgets.
 
 Libraries imported:
+- json: Module used to create JSON documents.
 - typing: Module implementing standard typing notations for Python functions.
 - streamlit: Framework used to build pure Python web applications.
 """
 
+import json
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import streamlit as st
@@ -15,7 +17,8 @@ from models.cloud import CloudModel
 from models.oauth2 import GoogleModel
 from models.oauth2 import MicrosoftModel
 import params
-from utilities import (Hasher,
+from utilities import (Encryptor,
+                         Hasher,
                          Helpers,
                          CloudError,
                          CredentialsError,
@@ -32,7 +35,7 @@ class AuthenticationModel:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
-                 path: Optional[str]=None, api_key: Optional[str]=None,
+                 path: Optional[str]=None, api_key: Optional[str]=None, secret_key: str='some_key',
                  server_url: Optional[str]=None, validator: Optional[Validator]=None):
         """
         Create a new instance of "AuthenticationModel".
@@ -50,11 +53,14 @@ class AuthenticationModel:
         api_key: str, optional
             API key used to connect to the cloud server to send reset passwords and two
             factor authorization codes to the user by email.
+        secret_key : str
+            A secret key used for encryption and decryption.
         server_url: str, optional
             Cloud server URL used for cloud related transactions.
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
         """
+        self.secret_key = secret_key
         self.validator = validator if validator is not None else Validator()
         self.path = path
         if self.path:
@@ -222,7 +228,8 @@ class AuthenticationModel:
         """
         two_factor_auth_code = Helpers.generate_random_string(length=4, letters=False,
                                                               punctuation=False)
-        st.session_state[f'2FA_code_{widget}'] = two_factor_auth_code
+        encryptor = Encryptor(self.secret_key)
+        st.session_state[f'2FA_code_{widget}'] = encryptor.encrypt(two_factor_auth_code)
         self.send_email('2FA', email, two_factor_auth_code)
     def _get_username(self, key: str, value: str) -> str:
         """
@@ -656,12 +663,12 @@ class AuthenticationModel:
             None: no password sent,
             True: password sent successfully.
         """
+        encryptor = Encryptor(self.secret_key)
         if not result and '2FA_content_forgot_password' in st.session_state:
-            email = st.session_state['2FA_content_forgot_password'][1]
-            password = st.session_state['2FA_content_forgot_password'][2]
+            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
+            _, email, password = json.loads(decrypted)
             return self.send_email('PWD', email, password)
-        else:
-            return self.send_email('PWD', result[1], result[2])
+        return self.send_email('PWD', result[1], result[2])
     def send_username(self, result: Optional[dict]=None) -> bool:
         """
         Implements the logic to send the username by email.
@@ -678,12 +685,12 @@ class AuthenticationModel:
             None: no username sent,
             True: username sent successfully.
         """
+        encryptor = Encryptor(self.secret_key)
         if not result and '2FA_content_forgot_username' in st.session_state:
-            username = st.session_state['2FA_content_forgot_username'][0]
-            email = st.session_state['2FA_content_forgot_username'][1]
+            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
+            username, email = json.loads(decrypted)
             return self.send_email('USERNAME', email, username)
-        else:
-            return self.send_email('USERNAME', result[1], result[0])
+        return self.send_email('USERNAME', result[1], result[0])
     def _set_random_password(self, username: str) -> str:
         """
         Updates the credentials dictionary with the user's hashed random password.

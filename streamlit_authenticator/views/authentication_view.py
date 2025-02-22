@@ -3,11 +3,13 @@ Script description: This module renders the login, logout, register user, reset 
 forgot password, forgot username, and modify user details widgets.
 
 Libraries imported:
+- json: Module used to create JSON documents.
 - time: Module implementing the sleep function.
 - typing: Module implementing standard typing notations for Python functions.
 - streamlit: Framework used to build pure Python web applications.
 """
 
+import json
 import time
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -17,6 +19,7 @@ from controllers import AuthenticationController, CookieController
 import params
 from utilities import (CloudError,
                        DeprecationError,
+                       Encryptor,
                        Helpers,
                        LogoutError,
                        ResetError,
@@ -160,10 +163,13 @@ class Authenticate:
                 return result
             self.__two_factor_auth(result[1], result, widget='forgot_password')
         if two_factor_auth and st.session_state.get('2FA_check_forgot_password'):
+            encryptor = Encryptor(self.secret_key)
+            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
+            result = json.loads(decrypted)
             if send_email:
-                self.authentication_controller.send_password(st.session_state['2FA_content_forgot_password'])
+                self.authentication_controller.send_password(result)
             del st.session_state['2FA_check_forgot_password']
-            return st.session_state['2FA_content_forgot_password']
+            return result
         return None, None, None
     def forgot_username(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, send_email: bool=False, two_factor_auth: bool=False,
@@ -235,10 +241,13 @@ class Authenticate:
                 return result
             self.__two_factor_auth(email, result, widget='forgot_username')
         if two_factor_auth and st.session_state.get('2FA_check_forgot_username'):
+            encryptor = Encryptor(self.secret_key)
+            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
+            result = json.loads(decrypted)
             if send_email:
-                self.authentication_controller.send_username(st.session_state['2FA_content_forgot_username'])
+                self.authentication_controller.send_username(result)
             del st.session_state['2FA_check_forgot_username']
-            return st.session_state['2FA_content_forgot_username']
+            return result
         return None, email
     def experimental_guest_login(self, button_name: str='Guest login', location: str='main',
                                  provider: str='google', oauth2: Optional[dict]=None,
