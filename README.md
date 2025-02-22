@@ -100,7 +100,7 @@ pre-authorized: # Optional
   emails:
   - melsby@gmail.com
 keys: # Optional
-    API_KEY: # Register to receive a free API key: https://streamlitauthenticator.com
+    api_key: # Register to receive a free API key: https://streamlitauthenticator.com
 ```
 
 * _Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
@@ -152,7 +152,7 @@ authenticator = stauth.Authenticate(
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
->  - **API_KEY:** _str, optional, default None_
+>  - **api_key:** _str, optional, default None_
 >    - API key used to connect to the cloud server to send reset passwords and two factor authorization codes to the user by email.
 >  - ****kwargs:** _dict, optional_
 >    - Arguments to pass to the Authenticate class.
@@ -285,7 +285,7 @@ elif st.session_state.get('authentication_status') is None:
 
 * You may enable two factor authentication for the **register_user**, **forgot_password**, and **forgot_username** widgets for enhanced security.
 * First register to receive a free API key [here](https://streamlitauthenticator.com).
-* Then add your API key to the the authenticator object as **API_KEY** or alternatively add it to the config file as shown in step 3.
+* Then add your API key to the the authenticator object as **api_key** or alternatively add it to the config file as shown in step 3.
 * Finally set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication.JPG)
