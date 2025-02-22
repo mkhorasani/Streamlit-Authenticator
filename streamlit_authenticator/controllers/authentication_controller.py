@@ -25,8 +25,8 @@ class AuthenticationController:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, validator: Optional[Validator]=None,
-                 auto_hash: bool=True, path: Optional[str]=None, API_KEY: Optional[str]=None,
-                 SERVER_URL: Optional[str]=None):
+                 auto_hash: bool=True, path: Optional[str]=None, api_key: Optional[str]=None,
+                 secret_key: str='some_key', server_url: Optional[str]=None):
         """
         Create a new instance of "AuthenticationController".
 
@@ -42,15 +42,18 @@ class AuthenticationController:
             False: plain text passwords will not be automatically hashed.
         path: str
             File path of the config file.
-        API_KEY: str, optional
+        api_key: str, optional
             API key used to connect to the cloud server to send reset passwords and two
             factor authorization codes to the user by email.
-        SERVER_URL: str, optional
+        secret_key : str
+            A secret key used for encryption and decryption.
+        server_url: str, optional
             Cloud server URL used for cloud related transactions.
         """
+        self.secret_key = secret_key
         self.validator = validator if validator is not None else Validator()
         self.authentication_model = AuthenticationModel(credentials, auto_hash, path,
-                                                        API_KEY, SERVER_URL, self.validator)
+                                                        api_key, server_url, self.validator)
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
         Checks the validity of the entered captcha.
@@ -64,7 +67,7 @@ class AuthenticationController:
         entered_captcha: str, optional
             User entered captcha to validate against the generated captcha.
         """
-        if Helpers.check_captcha(captcha_name, entered_captcha):
+        if Helpers.check_captcha(captcha_name, entered_captcha, self.secret_key):
             del st.session_state[captcha_name]
         else:
             raise exception('Captcha entered incorrectly')

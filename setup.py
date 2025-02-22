@@ -24,6 +24,7 @@ setuptools.setup(
     install_requires=[
         "bcrypt >= 3.1.7",
         "captcha >= 0.5.0",
+        "cryptography >= 42.0.5",
         "extra-streamlit-components >= 0.1.70",
         "PyJWT >=2.3.0",
         "PyYAML >= 5.3.1",

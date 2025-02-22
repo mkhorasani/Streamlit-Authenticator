@@ -32,8 +32,8 @@ class AuthenticationModel:
     forgot password, forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
-                 path: Optional[str]=None, API_KEY: Optional[str]=None,
-                 SERVER_URL: Optional[str]=None, validator: Optional[Validator]=None):
+                 path: Optional[str]=None, api_key: Optional[str]=None,
+                 server_url: Optional[str]=None, validator: Optional[Validator]=None):
         """
         Create a new instance of "AuthenticationModel".
 
@@ -47,10 +47,10 @@ class AuthenticationModel:
             False: plain text passwords will not be automatically hashed.
         path: str
             File path of the config file.
-        API_KEY: str, optional
+        api_key: str, optional
             API key used to connect to the cloud server to send reset passwords and two
             factor authorization codes to the user by email.
-        SERVER_URL: str, optional
+        server_url: str, optional
             Cloud server URL used for cloud related transactions.
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
@@ -93,9 +93,9 @@ class AuthenticationModel:
             st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
-        self.API_KEY = API_KEY
-        if self.API_KEY:
-          self.cloud_model = CloudModel(API_KEY, SERVER_URL)
+        self.api_key = api_key
+        if self.api_key:
+          self.cloud_model = CloudModel(api_key, server_url)
     def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks the validity of the entered credentials.

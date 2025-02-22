@@ -31,7 +31,7 @@ class Authenticate:
     def __init__(self, credentials: Union[dict, str], cookie_name: str='some_cookie_name',
                  cookie_key: str='some_key', cookie_expiry_days: float=30.0,
                  validator: Optional[Validator]=None, auto_hash: bool=True,
-                 API_KEY: Optional[str]=None, **kwargs: Optional[Dict[str, Any]]):
+                 api_key: Optional[str]=None, **kwargs: Optional[Dict[str, Any]]):
         """
         Create a new instance of "Authenticate".
 
@@ -44,7 +44,7 @@ class Authenticate:
             Name of the re-authentication cookie stored on the client's browser for password-less
             re-authentication.
         cookie_key: str
-            Key to be used to hash the signature of the re-authentication cookie.
+            Key used to hash the signature of the re-authentication cookie and as a secret key.
         cookie_expiry_days: float
             Number of days before the re-authentication cookie automatically expires on the client's
             browser.
@@ -54,14 +54,15 @@ class Authenticate:
             Automatic hashing requirement for passwords,
             True: plain text passwords will be automatically hashed,
             False: plain text passwords will not be automatically hashed.
-        API_KEY: str, optional
+        api_key: str, optional
             API key used to connect to the cloud server to send reset passwords and two
             factor authorization codes to the user by email.
         **kwargs : dict, optional
             Arguments to pass to the Authenticate class.
         """
-        self.API_KEY = API_KEY
+        self.api_key = api_key
         self.attrs = kwargs
+        self.secret_key = cookie_key
         if isinstance(validator, dict):
             raise DeprecationError(f"""Please note that the 'pre_authorized' parameter has been
                                    removed from the Authenticate class and added directly to the
@@ -76,9 +77,10 @@ class Authenticate:
                                                                      validator,
                                                                      auto_hash,
                                                                      self.path,
-                                                                     self.API_KEY,
-                                                                     self.attrs['SERVER_URL'] \
-                                                                        if 'SERVER_URL' \
+                                                                     self.api_key,
+                                                                     self.secret_key,
+                                                                     self.attrs['server_url'] \
+                                                                        if 'server_url' \
                                                                             in self.attrs else None)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, send_email: bool=False, two_factor_auth: bool=False,
@@ -128,10 +130,10 @@ class Authenticate:
                       'Submit':'Submit'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if send_email and not self.API_KEY:
+        if send_email and not self.api_key:
             raise CloudError(f"""Please provide an API key to use the send email feature. For
                              further information please refer to {params.SEND_EMAIL_LINK}.""")
-        if two_factor_auth and not self.API_KEY:
+        if two_factor_auth and not self.api_key:
             raise CloudError(f"""Please provide an API key to use the two factor authentication
                              feature. For further information please refer to
                              {params.TWO_FACTOR_AUTH_LINK}.""")
@@ -146,7 +148,8 @@ class Authenticate:
         if captcha:
             entered_captcha = forgot_password_form.text_input(fields.get('Captcha', 'Captcha'),
                                                               autocomplete='off')
-            forgot_password_form.image(Helpers.generate_captcha('forgot_password_captcha'))
+            forgot_password_form.image(Helpers.generate_captcha('forgot_password_captcha',
+                                                                self.secret_key))
         result = (None, None, None)
         if forgot_password_form.form_submit_button(fields.get('Submit', 'Submit')):
             result = self.authentication_controller.forgot_password(username, callback, captcha,
@@ -220,7 +223,8 @@ class Authenticate:
         if captcha:
             entered_captcha = forgot_username_form.text_input('Captcha' if 'Captcha' not in fields
                                                               else fields['Captcha'], autocomplete='off')
-            forgot_username_form.image(Helpers.generate_captcha('forgot_username_captcha'))
+            forgot_username_form.image(Helpers.generate_captcha('forgot_username_captcha',
+                                                                self.secret_key))
         if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields
                                                    else fields['Submit']):
             result = self.authentication_controller.forgot_username(email, callback,
@@ -367,7 +371,7 @@ class Authenticate:
                     entered_captcha = login_form.text_input('Captcha' if 'Captcha' not in fields
                                                             else fields['Captcha'],
                                                             autocomplete='off')
-                    login_form.image(Helpers.generate_captcha('login_captcha'))
+                    login_form.image(Helpers.generate_captcha('login_captcha', self.secret_key))
                 if login_form.form_submit_button('Login' if 'Login' not in fields
                                                  else fields['Login']):
                     if self.authentication_controller.login(username, password,
@@ -391,7 +395,7 @@ class Authenticate:
         location: str
             Location of the logout button i.e. main, sidebar or unrendered.
         key: str
-            Unique key to be used in multi-page applications.
+            Unique key used in multi-page applications.
         use_container_width: bool
             Button width setting,
             True: width will match container,
@@ -521,7 +525,8 @@ class Authenticate:
             entered_captcha = register_user_form.text_input('Captcha' if 'Captcha' not in fields
                                                             else fields['Captcha'],
                                                             autocomplete='off').strip()
-            register_user_form.image(Helpers.generate_captcha('register_user_captcha'))
+            register_user_form.image(Helpers.generate_captcha('register_user_captcha',
+                                                              self.secret_key))
         if register_user_form.form_submit_button('Register' if 'Register' not in fields
                                                  else fields['Register']):
             if two_factor_auth:

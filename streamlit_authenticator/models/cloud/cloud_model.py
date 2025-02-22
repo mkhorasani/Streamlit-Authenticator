@@ -27,13 +27,13 @@ class CloudModel:
 
         Parameters
         ----------
-        API_KEY: str
+        api_key: str
             API key used to connect to the cloud server.
-        SERVER_URL: str, optional
+        server_url: str, optional
             Cloud server URL used for cloud related transactions.
         """
-        _self.API_KEY = api_key
-        _self.SERVER_URL = server_url if server_url else \
+        _self.api_key = api_key
+        _self.server_url = server_url if server_url else \
             _self.get_remote_variable(params.REMOTE_VARIABLES_LINK,
                                       'TWO_FACTOR_AUTH_SERVER_ADDRESS')
     @st.cache_data(show_spinner=False)
@@ -61,7 +61,7 @@ class CloudModel:
                     return variables[variable_name]
         except Exception as e:
             print(f"""Cannot find server URL, please enter it manually into the 'Authenticate' class
-                  as SERVER_URL='{params.SERVER_URL}'""")
+                  as server_url='{params.SERVER_URL}'""")
             raise CloudError(str(e)) from e
     def send_email(_self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str='',
                    content: str='') -> bool:
@@ -93,8 +93,8 @@ class CloudModel:
                 "recipient": recipient,
                 "email_type": email_type
             }
-            url = _self.SERVER_URL + params.SEND_EMAIL
-            headers = {'Authorization': f'Bearer {_self.API_KEY}'}
+            url = _self.server_url + params.SEND_EMAIL
+            headers = {'Authorization': f'Bearer {_self.api_key}'}
             response = requests.post(url, headers=headers, json=email_data, timeout=params.TIMEOUT)
         except Exception as e:
             raise CloudError(str(e)) from e

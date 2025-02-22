@@ -17,6 +17,8 @@ import random
 import streamlit as st
 from captcha.image import ImageCaptcha
 
+from utilities import Encryptor
+
 class Helpers:
     """
     This class executes the logic for miscellaneous functions.
@@ -24,7 +26,7 @@ class Helpers:
     def __init__(self):
         pass
     @classmethod
-    def check_captcha(cls, captcha_name: str, entered_captcha: str):
+    def check_captcha(cls, captcha_name: str, entered_captcha: str, secret_key: str):
         """
         Checks the validity of the entered captcha.
 
@@ -34,6 +36,8 @@ class Helpers:
             Name of the generated captcha stored in the session state.
         entered_captcha: str, optional
             User entered captcha to validate against the generated captcha.
+        secret_key : str
+            A secret key used for encryption and decryption.
 
         Returns
         -------
@@ -42,11 +46,12 @@ class Helpers:
             True: captcha is valid,
             False: captcha is invalid.
         """
-        if entered_captcha == st.session_state[captcha_name]:
+        encryptor = Encryptor(secret_key)
+        if entered_captcha == encryptor.decrypt(st.session_state[captcha_name]):
             return True
         return False
     @classmethod
-    def generate_captcha(cls, captcha_name: str) -> ImageCaptcha:
+    def generate_captcha(cls, captcha_name: str, secret_key: str) -> ImageCaptcha:
         """
         Generates a captcha image and stores the associated captcha string in the
         session state.
@@ -55,15 +60,19 @@ class Helpers:
         ----------
         captcha_name: str
             Name of the generated captcha stored in the session state.
+        secret_key : str
+            A secret key used for encryption and decryption.
 
         Returns
         -------
         ImageCaptcha
             Randomly generated captcha image.
         """
+        encryptor = Encryptor(secret_key)
         image = ImageCaptcha(width=120, height=75)
         if captcha_name not in st.session_state:
-            st.session_state[captcha_name] = ''.join(random.choices(string.digits, k=4))
+            st.session_state[captcha_name] = encryptor.encrypt(''.join(random.choices(string.digits,
+                                                                                      k=4)))
         return image.generate(st.session_state[captcha_name])
     @classmethod
     def generate_random_string(cls, length: int=16, letters: bool=True, digits: bool=True,

@@ -25,7 +25,7 @@ class CookieController:
         cookie_name: str
             Name of the cookie stored on the client's browser for password-less re-authentication.
         cookie_key: str
-            Key to be used to hash the signature of the re-authentication cookie.
+            Key used to hash the signature of the re-authentication cookie.
         cookie_expiry_days: float
             Number of days before the re-authentication cookie automatically expires on the client's 
             browser.

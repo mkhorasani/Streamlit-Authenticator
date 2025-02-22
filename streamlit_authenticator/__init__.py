@@ -31,7 +31,7 @@ if not _RELEASE:
         config['cookie']['name'],
         config['cookie']['key'],
         config['cookie']['expiry_days'],
-        API_KEY='ajdmgj2v4hx57py9fdmzikjpm6cj0hhs'
+        api_key='ajdmgj2v4hx57py9fdmzikjpm6cj0hhs'
     )
 
     # authenticator = Authenticate(
@@ -80,12 +80,12 @@ if not _RELEASE:
             st.success('User registered successfully')
     except (CloudError, RegisterError) as e:
         st.error(e)
-
+    
     # Creating a forgot password widget
     try:
         (username_of_forgotten_password,
          email_of_forgotten_password,
-         new_random_password) = authenticator.forgot_password(two_factor_auth=True)
+         new_random_password) = authenticator.forgot_password(two_factor_auth=True, send_email=True)
         if username_of_forgotten_password:
             st.success('New password sent securely')
             # Random password to be transferred to the user securely
@@ -97,7 +97,7 @@ if not _RELEASE:
     # Creating a forgot username widget
     try:
         (username_of_forgotten_username,
-         email_of_forgotten_username) = authenticator.forgot_username(two_factor_auth=True)
+         email_of_forgotten_username) = authenticator.forgot_username(two_factor_auth=True, send_email=True)
         if username_of_forgotten_username:
             st.success('Username sent securely')
             # Username to be transferred to the user securely

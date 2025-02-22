@@ -8,6 +8,7 @@ from .exceptions import (AuthenticateError,
                          RegisterError,
                          ResetError,
                          UpdateError)
+from .encryptor import Encryptor
 from .hasher import Hasher
 from .helpers import Helpers
 from .validator import Validator
