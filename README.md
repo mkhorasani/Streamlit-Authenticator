@@ -62,8 +62,8 @@ import streamlit_authenticator as stauth
 ```python
 cookie:
   expiry_days: 30
-  key: some_signature_key # Must be a string
-  name: some_cookie_name
+  key: # To be filled with any string
+  name: # To be filled with any string
 credentials:
   usernames:
     jsmith:
@@ -99,8 +99,7 @@ oauth2: # Optional
 pre-authorized: # Optional
   emails:
   - melsby@gmail.com
-keys: # Optional
-    api_key: # Register to receive a free API key: https://streamlitauthenticator.com
+api_key: # Optional - register to receive a free API key: https://streamlitauthenticator.com
 ```
 
 * _Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._

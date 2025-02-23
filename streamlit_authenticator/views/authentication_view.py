@@ -17,8 +17,7 @@ import streamlit as st
 
 from controllers import AuthenticationController, CookieController
 import params
-from utilities import (CloudError,
-                       DeprecationError,
+from utilities import (DeprecationError,
                        Encryptor,
                        Helpers,
                        LogoutError,
@@ -132,13 +131,6 @@ class Authenticate:
                       'Error':'Code is incorrect'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if send_email and not self.api_key:
-            raise CloudError(f"""Please provide an API key to use the send email feature. For
-                             further information please refer to {params.SEND_EMAIL_LINK}.""")
-        if two_factor_auth and not self.api_key:
-            raise CloudError(f"""Please provide an API key to use the two factor authentication
-                             feature. For further information please refer to
-                             {params.TWO_FACTOR_AUTH_LINK}.""")
         if location == 'main':
             forgot_password_form = st.form(key=key, clear_on_submit=clear_on_submit)
         elif location == 'sidebar':

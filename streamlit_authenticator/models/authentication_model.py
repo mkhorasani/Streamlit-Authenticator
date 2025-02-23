@@ -60,14 +60,18 @@ class AuthenticationModel:
         validator: Validator, optional
             Validator object that checks the validity of the username, name, and email fields.
         """
-        self.secret_key = secret_key
-        self.validator = validator if validator is not None else Validator()
+        self.api_key = api_key
+        self.config = self.credentials = None
         self.path = path
         if self.path:
             self.config = Helpers.read_config_file(path)
-            self.credentials = self.config['credentials']
+            self.credentials = self.config.get('credentials')
+            self.api_key = self.api_key or self.config.get('api_key')
         else:
             self.credentials = credentials
+        self.cloud_model = CloudModel(self.api_key, server_url) if self.api_key else None
+        self.secret_key = secret_key
+        self.validator = validator if validator is not None else Validator()
         if self.credentials['usernames']:
             self.credentials['usernames'] = {
                 key.lower(): value
@@ -99,9 +103,6 @@ class AuthenticationModel:
             st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
-        self.api_key = api_key
-        if self.api_key:
-          self.cloud_model = CloudModel(api_key, server_url)
     def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks the validity of the entered credentials.
@@ -644,6 +645,10 @@ class AuthenticationModel:
             None: no email sent,
             True: email sent successfully.
         """
+        if not self.api_key:
+            raise CloudError(f"""Please provide an API key to use the two factor authentication
+                             feature. For further information please refer to
+                             {params.TWO_FACTOR_AUTH_LINK}.""")
         if not self.validator.validate_email(recipient):
             raise CloudError('Email not valid')
         return self.cloud_model.send_email(email_type, recipient, content)

@@ -91,7 +91,7 @@ if not _RELEASE:
             # Random password to be transferred to the user securely
         elif not username_of_forgotten_password:
             st.error('Username not found')
-    except ForgotError as e:
+    except (CloudError, ForgotError) as e:
         st.error(e)
 
     # Creating a forgot username widget
@@ -103,7 +103,7 @@ if not _RELEASE:
             # Username to be transferred to the user securely
         elif not username_of_forgotten_username:
             st.error('Email not found')
-    except ForgotError as e:
+    except (CloudError, ForgotError) as e:
         st.error(e)
 
     # Creating an update user details widget
