@@ -639,10 +639,10 @@ class Authenticate:
             Rendered names of the fields/buttons.
         """
         if fields is None:
-            fields = {'Form name':'Authentication code', 'Code':'Code', 'Submit':'Submit',
+            fields = {'Form name':'Verification code', 'Code':'Code', 'Submit':'Submit',
                       'Success':'Code is correct', 'Error':'Code is incorrect'}
         self.authentication_controller.generate_two_factor_auth_code(email, widget)
-        @st.dialog('Authentication code' if 'Form name' not in fields else fields['Form name'])
+        @st.dialog('Verification code' if 'Form name' not in fields else fields['Form name'])
         def two_factor_auth_form():
             code = st.text_input('Code' if 'Code' not in fields else fields['Code'],
                                  help='Please enter the code sent to your email'
