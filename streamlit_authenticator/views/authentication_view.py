@@ -82,9 +82,7 @@ class Authenticate:
                                                                      self.path,
                                                                      self.api_key,
                                                                      self.secret_key,
-                                                                     self.attrs['server_url'] \
-                                                                        if 'server_url' \
-                                                                            in self.attrs else None)
+                                                                     self.attrs.get('server_url'))
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, send_email: bool=False, two_factor_auth: bool=False,
                         clear_on_submit: bool=False, key: str='Forgot password',
@@ -130,7 +128,8 @@ class Authenticate:
         """
         if fields is None:
             fields = {'Form name':'Forgot password', 'Username':'Username', 'Captcha':'Captcha',
-                      'Submit':'Submit'}
+                      'Submit':'Submit', 'Dialog name':'Verification code', 'Code':'Code',
+                      'Error':'Code is incorrect'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if send_email and not self.api_key:
@@ -161,7 +160,7 @@ class Authenticate:
                 if send_email:
                     self.authentication_controller.send_password(result)
                 return result
-            self.__two_factor_auth(result[1], result, widget='forgot_password')
+            self.__two_factor_auth(result[1], result, widget='forgot_password', fields=fields)
         if two_factor_auth and st.session_state.get('2FA_check_forgot_password'):
             encryptor = Encryptor(self.secret_key)
             decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
@@ -214,7 +213,8 @@ class Authenticate:
         """
         if fields is None:
             fields = {'Form name':'Forgot username', 'Email':'Email', 'Captcha':'Captcha',
-                      'Submit':'Submit'}
+                      'Submit':'Submit', 'Dialog name':'Verification code', 'Code':'Code',
+                      'Error':'Code is incorrect'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -239,7 +239,7 @@ class Authenticate:
                 if send_email:
                     self.authentication_controller.send_username(result)
                 return result
-            self.__two_factor_auth(email, result, widget='forgot_username')
+            self.__two_factor_auth(email, result, widget='forgot_username', fields=fields)
         if two_factor_auth and st.session_state.get('2FA_check_forgot_username'):
             encryptor = Encryptor(self.secret_key)
             decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
@@ -291,8 +291,7 @@ class Authenticate:
             token = self.cookie_controller.get_cookie()
             if token:
                 self.authentication_controller.login(token=token)
-            time.sleep(params.PRE_LOGIN_SLEEP_TIME if 'login_sleep_time' not in self.attrs \
-                       else self.attrs['login_sleep_time'])
+            time.sleep(self.attrs.get('login_sleep_time', params.PRE_LOGIN_SLEEP_TIME))
             if not st.session_state.get('authentication_status'):
                 auth_endpoint = \
                     self.authentication_controller.guest_login(cookie_controller=\
@@ -353,8 +352,7 @@ class Authenticate:
             token = self.cookie_controller.get_cookie()
             if token:
                 self.authentication_controller.login(token=token)
-            time.sleep(params.PRE_LOGIN_SLEEP_TIME if 'login_sleep_time' not in self.attrs \
-                       else self.attrs['login_sleep_time'])
+            time.sleep(self.attrs.get('login_sleep_time', params.PRE_LOGIN_SLEEP_TIME))
             if not st.session_state.get('authentication_status'):
                 if location == 'main':
                     login_form = st.form(key=key, clear_on_submit=clear_on_submit)
@@ -493,7 +491,9 @@ class Authenticate:
             fields = {'Form name':'Register user', 'First name':'First name',
                       'Last name':'Last name', 'Email':'Email', 'Username':'Username',
                       'Password':'Password', 'Repeat password':'Repeat password',
-                      'Password hint':'Password hint', 'Captcha':'Captcha', 'Register':'Register'}
+                      'Password hint':'Password hint', 'Captcha':'Captcha', 'Register':'Register',
+                      'Dialog name':'Verification code', 'Code':'Code', 'Submit':'Submit',
+                      'Error':'Code is incorrect'}
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -517,8 +517,8 @@ class Authenticate:
             new_username = col2_1.text_input('Username' if 'Username' not in fields
                                         else fields['Username'], autocomplete='off')
         col1_2, col2_2 = register_user_form.columns(2)
-        password_instructions = params.PASSWORD_INSTRUCTIONS if 'password_instructions' \
-            not in self.attrs else self.attrs['password_instructions']
+        password_instructions = self.attrs.get('password_instructions',
+                                               params.PASSWORD_INSTRUCTIONS)
         new_password = col1_2.text_input('Password' if 'Password' not in fields
                                        else fields['Password'], type='password',
                                        help=password_instructions, autocomplete='off')
@@ -539,7 +539,7 @@ class Authenticate:
         if register_user_form.form_submit_button('Register' if 'Register' not in fields
                                                  else fields['Register']):
             if two_factor_auth:
-                self.__two_factor_auth(new_email, widget='register')
+                self.__two_factor_auth(new_email, widget='register', fields=fields)
             else:
                 return self.authentication_controller.register_user(new_first_name, new_last_name,
                                                                     new_email, new_username,
@@ -603,8 +603,8 @@ class Authenticate:
                                                   if 'Current password' not in fields
                                                   else fields['Current password'],
                                                   type='password', autocomplete='off').strip()
-        password_instructions = params.PASSWORD_INSTRUCTIONS if 'password_instructions' \
-            not in self.attrs else self.attrs['password_instructions']
+        password_instructions = self.attrs.get('password_instructions',
+                                               params.PASSWORD_INSTRUCTIONS)
         new_password = reset_password_form.text_input('New password'
                                                       if 'New password' not in fields
                                                       else fields['New password'],
@@ -638,11 +638,8 @@ class Authenticate:
         fields: dict, optional
             Rendered names of the fields/buttons.
         """
-        if fields is None:
-            fields = {'Form name':'Verification code', 'Code':'Code', 'Submit':'Submit',
-                      'Success':'Code is correct', 'Error':'Code is incorrect'}
         self.authentication_controller.generate_two_factor_auth_code(email, widget)
-        @st.dialog('Verification code' if 'Form name' not in fields else fields['Form name'])
+        @st.dialog('Verification code' if 'Dialog name' not in fields else fields['Dialog name'])
         def two_factor_auth_form():
             code = st.text_input('Code' if 'Code' not in fields else fields['Code'],
                                  help='Please enter the code sent to your email'
