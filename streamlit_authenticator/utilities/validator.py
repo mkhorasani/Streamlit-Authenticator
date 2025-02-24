@@ -92,7 +92,7 @@ class Validator:
         bool
             Validity of entered name.
         """
-        pattern = r"^[A-Za-z. ]{2,100}$"
+        pattern = r"^[\p{L}\p{M}. ]{2,100}$"
         return bool(re.match(pattern, name))
     def validate_password(self, password: str) -> bool:
         """
