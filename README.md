@@ -18,7 +18,7 @@
 - [Creating a config file](#3-creating-a-config-file)
 - [Setup](#4-setup)
 - [Creating a login widget](#5-creating-a-login-widget)
-- [Creating a guest login button](#6-creating-a-guest-login-button) 🚀 **NEW**
+- [Enabling guest login](#6-enabling-guest-login) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
 - [Enabling two factor authentication](#8-enabling-two-factor-authentication) 🚀 **NEW**
 - [Creating a reset password widget](#9-creating-a-reset-password-widget)
@@ -194,7 +194,7 @@ except LoginError as e:
 
 * **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 
-### 6. Creating a guest login button
+### 6. Enabling guest login
 
 * You may use the **experimental_guest_login** button to log in non-registered users with their Google or Microsoft accounts using OAuth2.
 * To create the client ID and client secret parameters for Google OAuth2 please refer to [Google's documentation](https://developers.google.com/identity/protocols/oauth2).
