@@ -187,10 +187,12 @@ class AuthenticationModel:
         if self._is_guest_user(username):
             raise ForgotError('Guest user cannot use forgot password widget')
         if username in self.credentials['usernames']:
-            email = self.credentials['usernames'][username]['email']
+            user = self.credentials['usernames'][username]
+            email = user.get('email')
             random_password = self._set_random_password(username)
             if callback:
                 callback({'widget': 'Forgot password', 'username': username, 'email': email,
+                          'name': self._get_user_name(username), 'roles': user.get('roles'),
                           'random_password': random_password})
             return (username, email, random_password)
         return False, None, None
@@ -213,8 +215,10 @@ class AuthenticationModel:
             Email of the user.
         """
         username = self._get_username('email', email), email
+        user = self.credentials['usernames'][username]
         if callback:
-            callback({'widget': 'Forgot username', 'username': username, 'email': email})
+            callback({'widget': 'Forgot username', 'username': username, 'email': email,
+                      'name': self._get_user_name(username), 'roles': user.get('roles')})
         return username
     def generate_two_factor_auth_code(self, email: str, widget: Optional[str]=None) -> str:
         """
@@ -252,9 +256,9 @@ class AuthenticationModel:
             if values[key] == value:
                 return username
         return False
-    def _get_user_variables(self, username: str) -> tuple:
+    def _get_user_name(self, username: str) -> tuple:
         """
-        Gets the user's email, name, and roles based on a provided username.
+        Gets the user's name.
 
         Parameters
         ----------
@@ -264,24 +268,12 @@ class AuthenticationModel:
         Returns
         -------
         str
-            Email associated with the given username.
-        str
             Name associated with the given username.
-        str
-            Roles associated with the given username.
         """
-        if 'first_name' in self.credentials['usernames'][username] and \
-            'last_name' in self.credentials['usernames'][username]:
-            first_name = self.credentials['usernames'][username]['first_name']
-            last_name = self.credentials['usernames'][username]['last_name']
-            name = f'{first_name} {last_name}'
-        else:
-            name = self.credentials['usernames'][username]['name']
-        if 'roles' in self.credentials['usernames'][username]:
-            roles = self.credentials['usernames'][username]['roles']
-        else:
-            roles = None
-        return self.credentials['usernames'][username]['email'], name, roles
+        user = self.credentials['usernames'][username]
+        name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() \
+            or user.get('name')
+        return name
     def guest_login(self, cookie_controller: Any, provider: str='google',
                     oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
                     single_session: bool=False, roles: Optional[List[str]]=None,
@@ -416,10 +408,12 @@ class AuthenticationModel:
                 if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
                     max_concurrent_users - 1:
                     raise LoginError('Maximum number of concurrent users exceeded')
-                if single_session and self.credentials['usernames'][username]['logged_in']:
+                user = self.credentials['usernames'][username]
+                if single_session and user.get('logged_in'):
                     raise LoginError('Cannot log in multiple sessions')
-                st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
-                    self._get_user_variables(username)
+                st.session_state['email'] = user.get('email')
+                st.session_state['name'] = self._get_user_name(username)
+                st.session_state['roles'] = user.get('roles')
                 st.session_state['authentication_status'] = True
                 st.session_state['username'] = username
                 self._record_failed_login_attempts(username, reset=True)
@@ -429,19 +423,20 @@ class AuthenticationModel:
                 if self.path:
                     Helpers.update_config_file(self.path, 'credentials', self.credentials)
                 if callback:
-                    callback({'widget': 'Login', 'username': username})
+                    callback({'widget': 'Login', 'username': username, 'email': user.get('email'),
+                              'name': self._get_user_name(username), 'roles': user.get('roles')})
                 return True
             st.session_state['authentication_status'] = False
-            if username in self.credentials['usernames'] and \
-                'password_hint' in self.credentials['usernames'][username]:
-                st.session_state['password_hint'] = \
-                    self.credentials['usernames'][username]['password_hint']
+            if username in self.credentials['usernames'] and 'password_hint' in user:
+                st.session_state['password_hint'] = user.get('password_hint')
             return False
         if token:
             if not token['username'] in self.credentials['usernames']:
                 raise LoginError('User not authorized')
-            st.session_state['email'], st.session_state['name'], st.session_state['roles'] = \
-                self._get_user_variables(token['username'])
+            user = self.credentials['usernames'][token['username']]
+            st.session_state['email'] = user.get('email')
+            st.session_state['name'] = self._get_user_name(token['username'])
+            st.session_state['roles'] = user.get('roles')    
             st.session_state['authentication_status'] = True
             st.session_state['username'] = token['username']
             self.credentials['usernames'][token['username']]['logged_in'] = True
@@ -458,6 +453,10 @@ class AuthenticationModel:
             Callback function that will be invoked on button press.
         """
         self.credentials['usernames'][st.session_state['username']]['logged_in'] = False
+        if callback:
+            callback({'widget': 'Logout', 'username': st.session_state.get('username'),
+                      'email': st.session_state.get('email'), 'name': st.session_state.get('name'),
+                      'roles': st.session_state.get('roles')})
         st.session_state['logout'] = True
         st.session_state['name'] = None
         st.session_state['username'] = None
@@ -466,8 +465,6 @@ class AuthenticationModel:
         st.session_state['roles'] = None
         if self.path:
             Helpers.update_config_file(self.path, 'credentials', self.credentials)
-        if callback:
-            callback({'widget': 'Logout'})
     def _record_failed_login_attempts(self, username: str, reset: bool=False):
         """
         Records the number of failed login attempts for a given username.
@@ -618,8 +615,10 @@ class AuthenticationModel:
             raise CredentialsError('password')
         self._update_password(username, new_password)
         self._record_failed_login_attempts(username, reset=True)
+        user = self.credentials['usernames'][username]
         if callback:
-            callback({'widget': 'Reset password', 'username': username})
+            callback({'widget': 'Reset password', 'username': username, 'email': user.get('email'),
+                      'name': self._get_user_name(username), 'roles': user.get('roles')})
         return True
     def send_email(self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str,
                    content: str) -> bool:
@@ -768,20 +767,22 @@ class AuthenticationModel:
             State of updating the user's detail,
             True: details updated successfully.
         """
+        user = self.credentials['usernames'][username]
         if field == 'email':
             if self._credentials_contains_value(new_value):
                 raise UpdateError('Email already taken')
-        if 'first_name' not in self.credentials['usernames'][username]:
+        if 'first_name' not in user:
             self.credentials['usernames'][username]['first_name'] = None
             self.credentials['usernames'][username]['last_name'] = None
         if new_value != self.credentials['usernames'][username][field]:
             self._update_entry(username, field, new_value)
             if field in {'first_name', 'last_name'}:
-                _, st.session_state['name'], _ = self._get_user_variables(username)
-                if 'name' in self.credentials['usernames'][username]:
+                st.session_state['name'] = self._get_user_name(username)
+                if 'name' in user:
                     del self.credentials['usernames'][username]['name']
             if callback:
                 callback({'widget': 'Update user details', 'username': username,
-                          'field': field, 'new_value': new_value})
+                          'field': field, 'new_value': new_value, 'email': user.get('email'),
+                          'name': self._get_user_name(username), 'roles': user.get('roles')})
             return True
         raise UpdateError('New and current values are the same')
