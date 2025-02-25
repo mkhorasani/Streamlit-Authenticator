@@ -10,7 +10,7 @@ PASSWORD_INSTRUCTIONS:      str     =   """
                                         - Contain at least one lowercase letter.
                                         - Contain at least one uppercase letter.
                                         - Contain at least one digit.
-                                        - Contain at least one special character from [@$!%*?&].
+                                        - Contain at least one special character from !@#$%^&*()_+-=[]{};:'\"\\|,.<>/?`~.
                                         """
 PRE_GUEST_LOGIN_SLEEP_TIME: float   =   0.7
 PRE_LOGIN_SLEEP_TIME:       float   =   0.7
