@@ -75,7 +75,7 @@ if not _RELEASE:
     try:
         (email_of_registered_user,
          username_of_registered_user,
-         name_of_registered_user) = authenticator.register_user(pre_authorized=config['pre-authorized']['emails'])
+         name_of_registered_user) = authenticator.register_user()
         if email_of_registered_user:
             st.success('User registered successfully')
     except (CloudError, RegisterError) as e:
@@ -116,4 +116,4 @@ if not _RELEASE:
 
     # Saving config file
     with open('../config.yaml', 'w', encoding='utf-8') as file:
-        yaml.dump(config, file, default_flow_style=False)
+        yaml.dump(config, file, default_flow_style=False, allow_unicode=True)

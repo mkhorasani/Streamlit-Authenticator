@@ -524,7 +524,7 @@ if st.session_state.get('authentication_status'):
 
 ```python
 with open('../config.yaml', 'w') as file:
-    yaml.dump(config, file, default_flow_style=False)
+    yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
 ```
 
 ## License

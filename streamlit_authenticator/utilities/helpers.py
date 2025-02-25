@@ -125,7 +125,7 @@ class Helpers:
             Config file dict.
         """
         with open(path, 'w', encoding='utf-8') as file:
-            yaml.dump(config, file, default_flow_style=False)
+            yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
     @classmethod
     def update_config_file(cls, path: str, key: str, items: dict) -> tuple:
         """
@@ -144,4 +144,4 @@ class Helpers:
             config = yaml.load(file, Loader=SafeLoader)
         config[key] = items
         with open(path, 'w', encoding='utf-8') as file:
-            yaml.dump(config, file, default_flow_style=False)
+            yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
