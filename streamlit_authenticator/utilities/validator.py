@@ -32,16 +32,16 @@ class Validator:
         max_length = 20
         errors = []
         if not min_length <= len(password) <= max_length:
-            errors.append(f'Password must be between {min_length} and {max_length} characters long')
+            errors.append(f'Between {min_length} and {max_length} characters long \n\n')
         if not re.search(r'[a-z]', password):
-            errors.append('Password must contain at least one lowercase letter')
+            errors.append('Contain at least one lowercase letter \n\n')
         if not re.search(r'[A-Z]', password):
-            errors.append('Password must contain at least one uppercase letter')
+            errors.append('Contain at least one uppercase letter \n\n')
         if not re.search(r'\d', password):
-            errors.append('Password must contain at least one digit')
-        if not re.search(r'[@$!%*?&]', password):
-            errors.append('Password must contain at least one special character (@$!%*?&)')
-        return 'Password is not valid: ' + '; '.join(errors)
+            errors.append('Contain at least one digit \n\n')
+        if not re.search(r'[!@#$%^&*()_+\-=\[\]{};:\'\"\\|,.<>\/?`~]', password):
+            errors.append('Contain at least one special character (@$!%*?&) \n\n')
+        return '**Password must:** \n\n' + ''.join(errors)
     def validate_email(self, email: str) -> bool:
         """
         Checks the validity of the entered email.
@@ -108,7 +108,7 @@ class Validator:
         bool
             Validity of entered password.
         """
-        pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$"
+        pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?`~])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?`~]{8,20}$"
         return bool(re.match(pattern, password))
     def validate_username(self, username: str) -> bool:
         """
