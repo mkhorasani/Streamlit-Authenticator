@@ -214,12 +214,13 @@ class AuthenticationModel:
         str
             Email of the user.
         """
-        username = self._get_username('email', email), email
-        user = self.credentials['usernames'][username]
-        if callback:
-            callback({'widget': 'Forgot username', 'username': username, 'email': email,
-                      'name': self._get_user_name(username), 'roles': user.get('roles')})
-        return username
+        username = self._get_username('email', email)
+        if username:
+            user = self.credentials['usernames'][username]
+            if callback:
+                callback({'widget': 'Forgot username', 'username': username, 'email': email,
+                        'name': self._get_user_name(username), 'roles': user.get('roles')})
+        return username, email
     def generate_two_factor_auth_code(self, email: str, widget: Optional[str]=None) -> str:
         """
         Generates and sends a two factor authentication code.

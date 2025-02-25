@@ -220,7 +220,8 @@ class Authenticate:
         entered_captcha = None
         if captcha:
             entered_captcha = forgot_username_form.text_input('Captcha' if 'Captcha' not in fields
-                                                              else fields['Captcha'], autocomplete='off')
+                                                              else fields['Captcha'],
+                                                              autocomplete='off')
             forgot_username_form.image(Helpers.generate_captcha('forgot_username_captcha',
                                                                 self.secret_key))
         if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields
