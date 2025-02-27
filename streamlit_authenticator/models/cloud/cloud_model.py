@@ -21,7 +21,7 @@ class CloudModel:
     """
     This class executes the logic for cloud related transactions.
     """
-    def __init__(_self, api_key: str=None, server_url: Optional[str]=None):
+    def __init__(_self, api_key: str, server_url: Optional[str]=None):
         """
         Create a new instance of "CloudModel".
 
@@ -37,7 +37,7 @@ class CloudModel:
             _self.get_remote_variable(params.REMOTE_VARIABLES_LINK,
                                       'TWO_FACTOR_AUTH_SERVER_ADDRESS')
     @st.cache_data(show_spinner=False)
-    def get_remote_variable(_self, url: str=None, variable_name: str=None) -> str:
+    def get_remote_variable(_self, url: str, variable_name: str) -> str:
         """
         Gets a remote variable.
 
@@ -63,8 +63,8 @@ class CloudModel:
             print(f"""Cannot find server URL, please enter it manually into the 'Authenticate' class
                   as server_url='{params.SERVER_URL}'""")
             raise CloudError(str(e)) from e
-    def send_email(_self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str='',
-                   content: str='') -> bool:
+    def send_email(_self, email_type: Literal['2FA', 'PWD', 'USERNAME'], recipient: str,
+                   content: str) -> bool:
         """
         Sends an email to a specified recipient.
 
