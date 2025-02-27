@@ -103,6 +103,7 @@ class AuthenticationModel:
             st.session_state['roles'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
+        self.encryptor = Encryptor(self.secret_key)
     def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks the validity of the entered credentials.
@@ -234,8 +235,7 @@ class AuthenticationModel:
         """
         two_factor_auth_code = Helpers.generate_random_string(length=4, letters=False,
                                                               punctuation=False)
-        encryptor = Encryptor(self.secret_key)
-        st.session_state[f'2FA_code_{widget}'] = encryptor.encrypt(two_factor_auth_code)
+        st.session_state[f'2FA_code_{widget}'] = self.encryptor.encrypt(two_factor_auth_code)
         self.send_email('2FA', email, two_factor_auth_code)
     def _get_username(self, key: str, value: str) -> str:
         """
@@ -668,9 +668,8 @@ class AuthenticationModel:
             None: no password sent,
             True: password sent successfully.
         """
-        encryptor = Encryptor(self.secret_key)
         if not result and '2FA_content_forgot_password' in st.session_state:
-            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
+            decrypted = self.encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
             _, email, password = json.loads(decrypted)
             return self.send_email('PWD', email, password)
         return self.send_email('PWD', result[1], result[2])
@@ -690,9 +689,8 @@ class AuthenticationModel:
             None: no username sent,
             True: username sent successfully.
         """
-        encryptor = Encryptor(self.secret_key)
         if not result and '2FA_content_forgot_username' in st.session_state:
-            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
+            decrypted = self.encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
             username, email = json.loads(decrypted)
             return self.send_email('USERNAME', email, username)
         return self.send_email('USERNAME', result[1], result[0])

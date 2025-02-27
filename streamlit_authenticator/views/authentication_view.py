@@ -59,8 +59,8 @@ class Authenticate:
         api_key: str, optional
             API key used to connect to the cloud server to send reset passwords and two
             factor authorization codes to the user by email.
-        **kwargs : dict, optional
-            Arguments to pass to the Authenticate class.
+        **kwargs: dict, optional
+            Key word arguments to pass to the Authenticate class.
         """
         self.api_key = api_key
         self.attrs = kwargs
@@ -82,6 +82,7 @@ class Authenticate:
                                                                      self.api_key,
                                                                      self.secret_key,
                                                                      self.attrs.get('server_url'))
+        self.encryptor = Encryptor(self.secret_key)
     def forgot_password(self, location: str='main', fields: Optional[Dict[str, str]]=None,
                         captcha: bool=False, send_email: bool=False, two_factor_auth: bool=False,
                         clear_on_submit: bool=False, key: str='Forgot password',
@@ -135,7 +136,7 @@ class Authenticate:
             forgot_password_form = st.form(key=key, clear_on_submit=clear_on_submit)
         elif location == 'sidebar':
             forgot_password_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
-        forgot_password_form.subheader(fields.get('Form name', 'Forget password'))
+        forgot_password_form.subheader(fields.get('Form name', 'Forgot password'))
         username = forgot_password_form.text_input(fields.get('Username', 'Username'),
                                                    autocomplete='off')
         entered_captcha = None
@@ -154,8 +155,7 @@ class Authenticate:
                 return result
             self.__two_factor_auth(result[1], result, widget='forgot_password', fields=fields)
         if two_factor_auth and st.session_state.get('2FA_check_forgot_password'):
-            encryptor = Encryptor(self.secret_key)
-            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
+            decrypted = self.encryptor.decrypt(st.session_state['2FA_content_forgot_password'])
             result = json.loads(decrypted)
             if send_email:
                 self.authentication_controller.send_password(result)
@@ -213,7 +213,7 @@ class Authenticate:
             forgot_username_form = st.form(key=key, clear_on_submit=clear_on_submit)
         elif location == 'sidebar':
             forgot_username_form = st.sidebar.form(key=key, clear_on_submit=clear_on_submit)
-        forgot_username_form.subheader('Forget username' if 'Form name' not in fields
+        forgot_username_form.subheader('Forgot username' if 'Form name' not in fields
                                        else fields['Form name'])
         email = forgot_username_form.text_input('Email' if 'Email' not in fields
                                                 else fields['Email'], autocomplete='off')
@@ -234,8 +234,7 @@ class Authenticate:
                 return result
             self.__two_factor_auth(email, result, widget='forgot_username', fields=fields)
         if two_factor_auth and st.session_state.get('2FA_check_forgot_username'):
-            encryptor = Encryptor(self.secret_key)
-            decrypted = encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
+            decrypted = self.encryptor.decrypt(st.session_state['2FA_content_forgot_username'])
             result = json.loads(decrypted)
             if send_email:
                 self.authentication_controller.send_username(result)

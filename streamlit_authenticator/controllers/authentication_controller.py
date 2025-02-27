@@ -57,6 +57,7 @@ class AuthenticationController:
         self.validator = validator if validator is not None else Validator()
         self.authentication_model = AuthenticationModel(credentials, auto_hash, path, api_key,
                                                         self.secret_key, server_url, self.validator)
+        self.encryptor = Encryptor(self.secret_key)
     def _check_captcha(self, captcha_name: str, exception: Exception, entered_captcha: str):
         """
         Checks the validity of the entered captcha.
@@ -96,11 +97,10 @@ class AuthenticationController:
             True: two factor authentication code correct, 
             False: two factor authentication code incorrect.
         """
-        encryptor = Encryptor(self.secret_key)
-        if code == encryptor.decrypt(st.session_state[f'2FA_code_{widget}']):
+        if code == self.encryptor.decrypt(st.session_state[f'2FA_code_{widget}']):
             st.session_state[f'2FA_check_{widget}'] = True
             st.session_state[f'2FA_content_{widget}'] = \
-                encryptor.encrypt(json.dumps(content)) if content else None
+                self.encryptor.encrypt(json.dumps(content)) if content else None
             del st.session_state[f'2FA_code_{widget}']
             return True
         st.session_state[f'2FA_check_{widget}'] = False
