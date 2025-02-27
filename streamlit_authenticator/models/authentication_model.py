@@ -34,7 +34,7 @@ class AuthenticationModel:
     This class executes the logic for the login, logout, register user, reset password,
     forgot password, forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: Optional[dict]=None, auto_hash: bool=True,
+    def __init__(self, credentials: Optional[Dict]=None, auto_hash: bool=True,
                  path: Optional[str]=None, api_key: Optional[str]=None, secret_key: str='some_key',
                  server_url: Optional[str]=None, validator: Optional[Validator]=None):
         """
@@ -276,7 +276,7 @@ class AuthenticationModel:
             or user.get('name')
         return name
     def guest_login(self, cookie_controller: Any, provider: str='google',
-                    oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
+                    oauth2: Optional[Dict]=None, max_concurrent_users: Optional[int]=None,
                     single_session: bool=False, roles: Optional[List[str]]=None,
                     callback: Optional[Callable]=None) -> Optional[str]:
         """
@@ -653,7 +653,7 @@ class AuthenticationModel:
         if not self.validator.validate_email(recipient):
             raise CloudError('Email not valid')
         return self.cloud_model.send_email(email_type, recipient, content)
-    def send_password(self, result: Optional[dict]=None) -> bool:
+    def send_password(self, result: Optional[Dict]=None) -> bool:
         """
         Implements the logic to send the password by email.
 
@@ -674,7 +674,7 @@ class AuthenticationModel:
             _, email, password = json.loads(decrypted)
             return self.send_email('PWD', email, password)
         return self.send_email('PWD', result[1], result[2])
-    def send_username(self, result: Optional[dict]=None) -> bool:
+    def send_username(self, result: Optional[Dict]=None) -> bool:
         """
         Implements the logic to send the username by email.
 

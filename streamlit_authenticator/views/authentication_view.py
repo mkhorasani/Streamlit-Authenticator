@@ -11,7 +11,7 @@ Libraries imported:
 
 import json
 import time
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 import streamlit as st
 
@@ -242,7 +242,8 @@ class Authenticate:
             return result
         return None, email
     def experimental_guest_login(self, button_name: str='Guest login', location: str='main',
-                                 provider: str='google', oauth2: Optional[dict]=None,
+                                 provider: Literal['google', 'microsoft']='google',
+                                 oauth2: Optional[Dict]=None,
                                  max_concurrent_users: Optional[int]=None,
                                  single_session: bool=False, roles: Optional[List[str]]=None,
                                  use_container_width: bool=False,
@@ -614,8 +615,8 @@ class Authenticate:
                                                           new_password_repeat, callback):
                 return True
         return None
-    def __two_factor_auth(self, email: str, content: Optional[dict]=None,
-                          fields: Optional[dict[str, str]]=None, widget: Optional[str]=None):
+    def __two_factor_auth(self, email: str, content: Optional[Dict]=None,
+                          fields: Optional[Dict[str, str]]=None, widget: Optional[str]=None):
         """
         Renders a two factor authentication widget.
 

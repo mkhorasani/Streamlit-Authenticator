@@ -27,7 +27,7 @@ class AuthenticationController:
     This class controls the requests for the login, logout, register user, reset password, 
     forgot password, forgot username, and modify user details widgets.
     """
-    def __init__(self, credentials: Optional[dict]=None, validator: Optional[Validator]=None,
+    def __init__(self, credentials: Optional[Dict]=None, validator: Optional[Validator]=None,
                  auto_hash: bool=True, path: Optional[str]=None, api_key: Optional[str]=None,
                  secret_key: str='some_key', server_url: Optional[str]=None):
         """
@@ -75,7 +75,7 @@ class AuthenticationController:
             del st.session_state[captcha_name]
         else:
             raise exception('Captcha entered incorrectly')
-    def check_two_factor_auth_code(self, code: str, content: Optional[dict]=None,
+    def check_two_factor_auth_code(self, code: str, content: Optional[Dict]=None,
                                    widget: Optional[str]=None) -> bool:
         """
         Controls the request to check the two factor authentication code.
@@ -188,7 +188,7 @@ class AuthenticationController:
         """
         self.authentication_model.generate_two_factor_auth_code(email, widget)
     def guest_login(self, cookie_controller: Any, provider: str='google',
-                    oauth2: Optional[dict]=None, max_concurrent_users: Optional[int]=None,
+                    oauth2: Optional[Dict]=None, max_concurrent_users: Optional[int]=None,
                     single_session: bool=False, roles: Optional[List[str]]=None,
                     callback: Optional[Callable]=None) -> str:
         """
@@ -431,7 +431,7 @@ class AuthenticationController:
             True: email sent successfully.
         """
         return self.authentication_model.send_email(email, subject, body)
-    def send_password(self, result: Optional[dict]=None) -> bool:
+    def send_password(self, result: Optional[Dict]=None) -> bool:
         """
         Controls the request to send the password by email.
 
@@ -448,7 +448,7 @@ class AuthenticationController:
             True: password sent successfully.
         """
         return self.authentication_model.send_email('PWD', result[1], result[2])
-    def send_username(self, result: Optional[dict]=None) -> bool:
+    def send_username(self, result: Optional[Dict]=None) -> bool:
         """
         Controls the request to send the username by email.
 
