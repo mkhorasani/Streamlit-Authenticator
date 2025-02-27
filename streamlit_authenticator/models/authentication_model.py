@@ -428,7 +428,8 @@ class AuthenticationModel:
                               'name': self._get_user_name(username), 'roles': user.get('roles')})
                 return True
             st.session_state['authentication_status'] = False
-            if username in self.credentials['usernames'] and 'password_hint' in user:
+            if username in self.credentials['usernames'] and 'password_hint' in \
+                self.credentials['usernames'][username]:
                 st.session_state['password_hint'] = user.get('password_hint')
             return False
         if token:
