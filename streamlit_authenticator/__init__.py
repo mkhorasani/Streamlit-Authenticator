@@ -3,6 +3,7 @@ Script description: This script imports the main module of this library
 and also provides unit testing commands for development. 
 
 Libraries imported:
+-------------------
 - yaml: Module implementing the data serialization used for human readable documents.
 - streamlit: Framework used to build pure Python web applications.
 """
@@ -13,13 +14,7 @@ import streamlit.components.v1 as components
 from yaml.loader import SafeLoader
 
 from .views import Authenticate
-from .utilities import (CredentialsError,
-                        ForgotError,
-                        Hasher,
-                        LoginError,
-                        RegisterError,
-                        ResetError,
-                        UpdateError)
+from .utilities import *
 
 _RELEASE = True
 
@@ -36,7 +31,8 @@ if not _RELEASE:
         config['credentials'],
         config['cookie']['name'],
         config['cookie']['key'],
-        config['cookie']['expiry_days']
+        config['cookie']['expiry_days'],
+        api_key='ajdmgj2v4hx57py9fdmzikjpm6cj0hhs'
     )
 
     # authenticator = Authenticate(
@@ -59,17 +55,17 @@ if not _RELEASE:
         st.error(e)
 
     # Authenticating user
-    if st.session_state['authentication_status']:
+    if st.session_state.get('authentication_status'):
         authenticator.logout()
         st.write(f'Welcome *{st.session_state["name"]}*')
         st.title('Some content')
-    elif st.session_state['authentication_status'] is False:
+    elif st.session_state.get('authentication_status') is False:
         st.error('Username/password is incorrect')
-    elif st.session_state['authentication_status'] is None:
+    elif st.session_state.get('authentication_status') is None:
         st.warning('Please enter your username and password')
 
     # Creating a password reset widget
-    if st.session_state['authentication_status']:
+    if st.session_state.get('authentication_status'):
         try:
             if authenticator.reset_password(st.session_state['username']):
                 st.success('Password modified successfully')
@@ -83,36 +79,36 @@ if not _RELEASE:
          name_of_registered_user) = authenticator.register_user()
         if email_of_registered_user:
             st.success('User registered successfully')
-    except RegisterError as e:
+    except (CloudError, RegisterError) as e:
         st.error(e)
-
+    
     # Creating a forgot password widget
     try:
         (username_of_forgotten_password,
          email_of_forgotten_password,
-         new_random_password) = authenticator.forgot_password()
+         new_random_password) = authenticator.forgot_password(two_factor_auth=True, send_email=True)
         if username_of_forgotten_password:
             st.success('New password sent securely')
             # Random password to be transferred to the user securely
         elif not username_of_forgotten_password:
             st.error('Username not found')
-    except ForgotError as e:
+    except (CloudError, ForgotError) as e:
         st.error(e)
 
     # Creating a forgot username widget
     try:
         (username_of_forgotten_username,
-         email_of_forgotten_username) = authenticator.forgot_username()
+         email_of_forgotten_username) = authenticator.forgot_username(two_factor_auth=True, send_email=True)
         if username_of_forgotten_username:
             st.success('Username sent securely')
             # Username to be transferred to the user securely
         elif not username_of_forgotten_username:
             st.error('Email not found')
-    except ForgotError as e:
+    except (CloudError, ForgotError) as e:
         st.error(e)
 
     # Creating an update user details widget
-    if st.session_state['authentication_status']:
+    if st.session_state.get('authentication_status'):
         try:
             if authenticator.update_user_details(st.session_state['username']):
                 st.success('Entry updated successfully')
@@ -121,4 +117,4 @@ if not _RELEASE:
 
     # Saving config file
     with open('../config.yaml', 'w', encoding='utf-8') as file:
-        yaml.dump(config, file, default_flow_style=False)
+        yaml.dump(config, file, default_flow_style=False, allow_unicode=True)

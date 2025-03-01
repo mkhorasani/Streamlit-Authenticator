@@ -1,16 +1,16 @@
 """
-Script description: This module executes the logic for the cookies for password-less
-re-authentication. 
+Script description: This module handles cookie-based password-less re-authentication.
 
 Libraries imported:
-- typing: Module implementing standard typing notations for Python functions.
-- datetime: Module implementing DateTime data types.
-- jwt: Module implementing JSON Web Tokens for Python.
-- streamlit: Framework used to build pure Python web applications.
-- extra_streamlit_components: Module implementing cookies for Streamlit.
+-------------------
+- typing: Provides standard type hints for Python functions.
+- datetime: Handles date and time operations.
+- jwt: Implements JSON Web Tokens for authentication.
+- streamlit: Framework for building web applications.
+- extra_streamlit_components: Provides cookie management for Streamlit.
 """
 
-from typing import Optional
+from typing import Any, Dict, Optional
 from datetime import datetime, timedelta
 import jwt
 from jwt import DecodeError, InvalidSignatureError
@@ -19,27 +19,32 @@ import extra_streamlit_components as stx
 
 from ..utilities import Helpers
 
+
 class CookieModel:
     """
-    This class executes the logic for the cookies for password-less re-authentication, 
-    including deleting, getting, and setting the cookie.
+    Manages cookie-based password-less re-authentication, including setting, retrieving,
+    and deleting authentication cookies.
     """
-    def __init__(self, cookie_name: Optional[str]=None, cookie_key: Optional[str]=None,
-                 cookie_expiry_days: Optional[float]=None, path: Optional[str]=None):
+    def __init__(
+            self,
+            cookie_name: Optional[str] = None,
+            cookie_key: Optional[str] = None,
+            cookie_expiry_days: Optional[float] = None,
+            path: Optional[str] = None
+            ) -> None:
         """
-        Create a new instance of "CookieModel".
+        Initializes the CookieModel instance.
 
         Parameters
         ----------
-        cookie_name: str
-            Name of the cookie stored on the client's browser for password-less re-authentication.
-        cookie_key: str
-            Key to be used to hash the signature of the re-authentication cookie.
-        cookie_expiry_days: float
-            Number of days before the re-authentication cookie automatically expires on the client's 
-            browser.
-        path: str
-            File path of the config file.
+        cookie_name : str, optional
+            Name of the cookie stored in the client's browser for password-less re-authentication.
+        cookie_key : str, optional
+            Secret key used for signing and verifying the authentication cookie.
+        cookie_expiry_days : float, optional
+            Number of days before the re-authentication cookie expires.
+        path : str, optional
+            Path to the configuration file.
         """
         if path:
             config = Helpers.read_config_file(path)
@@ -53,22 +58,23 @@ class CookieModel:
         self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
-    def delete_cookie(self):
+    def delete_cookie(self) -> None:
         """
-        Deletes the re-authentication cookie.
+        Deletes the re-authentication cookie from the user's browser.
         """
         try:
             self.cookie_manager.delete(self.cookie_name)
         except KeyError as e:
             print(e)
-    def get_cookie(self) -> str:
+    def get_cookie(self) -> Optional[Dict[str, Any]]:
         """
-        Gets, checks, and then returns the re-authentication cookie.
+        Retrieves, validates, and returns the authentication cookie.
 
         Returns
         -------
-        str
-            Re-authentication cookie.
+        dict or None
+            If valid, returns a dictionary containing the cookie's data.
+            Returns None if the cookie is expired or invalid.
         """
         if st.session_state['logout']:
             return False
@@ -81,9 +87,9 @@ class CookieModel:
                 self.token['exp_date'] > datetime.now().timestamp()):
                 return self.token
         return None
-    def set_cookie(self):
+    def set_cookie(self) -> None:
         """
-        Sets the re-authentication cookie.
+        Creates and stores the authentication cookie in the user's browser.
         """
         if self.cookie_expiry_days != 0:
             self.exp_date = self._set_exp_date()
@@ -91,24 +97,25 @@ class CookieModel:
             self.cookie_manager.set(self.cookie_name, token,
                                     expires_at=datetime.now() + \
                                     timedelta(days=self.cookie_expiry_days))
-    def _set_exp_date(self) -> str:
+    def _set_exp_date(self) -> float:
         """
-        Sets the re-authentication cookie's expiry date.
+        Computes the expiration timestamp for the authentication cookie.
 
         Returns
         -------
-        str
-            re-authentication cookie's expiry timestamp in Unix Epoch.
+        float
+            Unix timestamp representing the expiration date of the cookie.
         """
         return (datetime.now() + timedelta(days=self.cookie_expiry_days)).timestamp()
-    def _token_decode(self) -> str:
+    def _token_decode(self) -> Optional[Dict[str, Any]]:
         """
-        Decodes the contents of the re-authentication cookie.
+        Decodes and verifies the JWT authentication token.
 
         Returns
         -------
-        str
-            Decoded cookie used for password-less re-authentication.
+        dict or None
+            Decoded token contents if verification is successful.
+            Returns None if decoding fails due to an invalid signature or token error.
         """
         try:
             return jwt.decode(self.token, self.cookie_key, algorithms=['HS256'])
@@ -117,12 +124,12 @@ class CookieModel:
             return False
     def _token_encode(self) -> str:
         """
-        Encodes the contents of the re-authentication cookie.
+        Encodes the authentication data into a JWT token.
 
         Returns
         -------
         str
-            Cookie used for password-less re-authentication.
+            The signed JWT token containing authentication details.
         """
         return jwt.encode({'username': st.session_state['username'],
             'exp_date': self.exp_date}, self.cookie_key, algorithm='HS256')

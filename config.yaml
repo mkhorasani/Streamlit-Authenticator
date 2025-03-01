@@ -1,33 +1,30 @@
+api_key: null
 cookie:
   expiry_days: 30
   key: some_key
   name: some_cookie_name
 credentials:
   usernames:
-    dbaldwin:
-      email: dbaldwin@gmail.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: David Baldwin
-      password: $2b$12$E9/bCaN/r8sN/FV2l8NpgOgspUBAp7UAVU6BgsXJzp/pW8gQWCprC
     jsmith:
       email: jsmith@gmail.com
       failed_login_attempts: 0
+      first_name: John
+      last_name: Smith
       logged_in: false
-      name: John Smith
-      password: $2b$12$iWlVOac3uujRvTrXDi6wructXftKmo/GyQd6SMu5FmyX306kH.yFO
+      password: $2b$12$lhOfbg3eMo9/TIcgFOvlbuYTGJQBdTLU/ek3SiDOooJNrIktqfKr6
+      roles:
+      - admin
+      - editor
+      - viewer
     rbriggs:
       email: rbriggs@gmail.com
       failed_login_attempts: 0
+      first_name: Rebecca
+      last_name: Briggs
       logged_in: false
-      name: Rebecca Briggs
-      password: $2b$12$uNaTgvGPG9rMbzOJHYaPQePw0DUfp1qHBrSq6l4O304qani6pKFpm
-    rcouper:
-      email: rcouper@gmail.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: Ross Couper
-      password: $2b$12$Tir/PbHVmmnt5kgNxgOwMuxNIb2fv2pJ.q71TW8ekvbugCqkye4yu
+      password: $2b$12$SxD/z1xJN6C7G7ygeiCuDOR88ZFAMoky9nCm9JgACEuJiVbVV6/4a
+      roles:
+      - viewer
 oauth2:
   google:
     client_id: null

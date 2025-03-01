@@ -22,18 +22,20 @@
 - [Creating a config file](#3-creating-a-config-file)
 - [Setup](#4-setup)
 - [Creating a login widget](#5-creating-a-login-widget)
-- [Creating a guest login button](#6-creating-a-guest-login-button) 🚀 **NEW**
+- [Creating a guest login widget](#6-creating-a-guest-login-widget) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
-- [Creating a reset password widget](#8-creating-a-reset-password-widget)
-- [Creating a new user registration widget](#9-creating-a-new-user-registration-widget)
-- [Creating a forgot password widget](#10-creating-a-forgot-password-widget)
-- [Creating a forgot username widget](#11-creating-a-forgot-username-widget)
-- [Creating an update user details widget](#12-creating-an-update-user-details-widget)
-- [Updating the config file](#13-updating-the-config-file)
+- [Enabling two factor authentication](#8-enabling-two-factor-authentication) 🚀 **NEW**
+- [Creating a reset password widget](#9-creating-a-reset-password-widget)
+- [Creating a new user registration widget](#10-creating-a-new-user-registration-widget)
+- [Creating a forgot password widget](#11-creating-a-forgot-password-widget)
+- [Creating a forgot username widget](#12-creating-a-forgot-username-widget)
+- [Creating an update user details widget](#13-creating-an-update-user-details-widget)
+- [Updating the config file](#14-updating-the-config-file)
 - [License](#license)
 
 ### 1. Quickstart
 
+* Subscribe to receive a free [API key](https://streamlitauthenticator.com)
 * Check out the [demo app](https://demo-app-v0-3-3.streamlit.app/).
 * Feel free to visit the [API reference](https://streamlit-authenticator.readthedocs.io/en/stable/).
 * And finally follow the tutorial below.
@@ -64,8 +66,8 @@ import streamlit_authenticator as stauth
 ```python
 cookie:
   expiry_days: 30
-  key: some_signature_key # Must be a string
-  name: some_cookie_name
+  key: # To be filled with any string
+  name: # To be filled with any string
 credentials:
   usernames:
     jsmith:
@@ -101,6 +103,7 @@ oauth2: # Optional
 pre-authorized: # Optional
   emails:
   - melsby@gmail.com
+api_key: # Optional - register to receive a free API key: https://streamlitauthenticator.com
 ```
 
 * _Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
@@ -152,6 +155,8 @@ authenticator = stauth.Authenticate(
 >    - Provides a validator object that will check the validity of the username, name, and email fields.
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
+>  - **api_key:** _str, optional, default None_
+>    - API key used to connect to the cloud server to send reset passwords and two factor authorization codes to the user by email.
 >  - ****kwargs:** _dict, optional_
 >    - Arguments to pass to the Authenticate class.
 
@@ -194,7 +199,7 @@ except Exception as e:
 * **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 6. Creating a guest login button
+### 6. Creating a guest login widget
 
 * You may use the **experimental_guest_login** button to log in non-registered users with their Google or Microsoft accounts using OAuth2.
 * To create the client ID and client secret parameters for Google OAuth2 please refer to [Google's documentation](https://developers.google.com/identity/protocols/oauth2).
@@ -229,6 +234,8 @@ except Exception as e:
 >    - Disables the ability for the same user to log in multiple sessions, True: single session allowed, False: multiple sessions allowed.
 >  - **roles:** _list, optional, default None_
 >    - User roles for guest users.
+>  - **use_container_width:** _bool, default False_
+>    - Button width setting, True: width will match container, False: width will fit to button contents.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on button press with a dict as a parameter.
 
@@ -239,22 +246,21 @@ except Exception as e:
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_microsoft.JPG)
 
 * Please note that upon successful login, the guest user's name, email, and other information will be registered in the credentials dictionary and their re-authentication cookie will be saved automatically.
-* **_Please remember to update the config file (as shown in step 13) after you use this button._**
 
 ### 7. Authenticating users
 
-* You can then retrieve the name, authentication status, and username from Streamlit's session state using **st.session_state['name']**, **st.session_state['authentication_status']**, **st.session_state['username']**, and **st.session_state['roles']** to allow a verified user to access restricted content.
+* You can then retrieve the name, authentication status, username, and roles from Streamlit's session state using the keys **'name'**, **'authentication_status'**, **'username'**, and **'roles'** to allow a verified user to access restricted content.
 * You may also render a logout button, or may choose not to render the button if you only need to implement the logout logic programmatically.
 * The optional **key** parameter for the logout button should be used with multi-page applications to prevent Streamlit from throwing duplicate key errors.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state.get('authentication_status'):
     authenticator.logout()
-    st.write(f'Welcome *{st.session_state["name"]}*')
+    st.write(f'Welcome *{st.session_state.get("name")}*')
     st.title('Some content')
-elif st.session_state['authentication_status'] is False:
+elif st.session_state.get('authentication_status') is False:
     st.error('Username/password is incorrect')
-elif st.session_state['authentication_status'] is None:
+elif st.session_state.get('authentication_status') is None:
     st.warning('Please enter your username and password')
 ```
 
@@ -266,6 +272,8 @@ elif st.session_state['authentication_status'] is None:
 >    - Specifies the location of the logout button. If 'unrendered' is passed, the logout logic will be executed without rendering the button.
 >  - **key:** _str, default None_
 >    - Unique key that should be used in multi-page applications.
+>  - **use_container_width:** _bool, default False_
+>    - Button width setting, True: width will match container, False: width will fit to button contents.
 >  - **callback:** _callable, optional, default None_
 >    - Callback function that will be invoked on form submission with a dict as a parameter.
 
@@ -275,16 +283,33 @@ elif st.session_state['authentication_status'] is None:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/incorrect_login.JPG)
 
-* You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state['failed_login_attempts']** which returns a dictionary with the username as key and the number of failed attempts as the value.
+* You may also retrieve the number of failed login attempts a user has made by accessing **st.session_state.get('failed_login_attempts')** which returns a dictionary with the username as key and the number of failed attempts as the value.
 
-### 8. Creating a reset password widget
+### 8. Enabling two factor authentication
+
+* You may enable two factor authentication for the **register_user**, **forgot_password**, and **forgot_username** widgets for enhanced security.
+* First register to receive a free API key [here](https://streamlitauthenticator.com).
+* Then add your API key to the the authenticator object as **api_key** or alternatively add it to the config file as shown in step 3.
+* Finally set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication.JPG)
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email.JPG)
+
+* For the **forgot_password** and **forgot_username** widgets if you require the returned password and username to be sent to the user's email then you may set the **send_email** parameter to True.
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email_password.JPG)
+
+![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email_username.JPG)
+
+### 9. Creating a reset password widget
 
 * You may use the **reset_password** widget to allow a logged in user to modify their password as shown below.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state.get('authentication_status'):
     try:
-        if authenticator.reset_password(st.session_state['username']):
+        if authenticator.reset_password(st.session_state.get('username')):
             st.success('Password modified successfully')
     except Exception as e:
         st.error(e)
@@ -312,7 +337,7 @@ if st.session_state['authentication_status']:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 9. Creating a new user registration widget
+### 10. Creating a new user registration widget
 
 * You may use the **register_user** widget to allow a user to sign up to your application as shown below.
 * If you require the user to be pre-authorized, define a **pre_authorized** list of emails that are allowed to register, and add it to the config file or provide it as a parameter to the **register_user** widget.
@@ -346,6 +371,10 @@ except Exception as e:
 >    - User roles for registered users.
 >  - **merge_username_email:** _bool, default False_
 >    - Merges username into email field, True: username will be the same as the email, False: username and email will be independent.
+>  - **password_hint:** _bool, default True_
+>    - Requirement for entering a password hint, True: password hint field added, False: password hint field removed.
+>  - **two_factor_auth:** _bool, default False_
+>    - Specifies whether to enable two factor authentication for the forgot password widget, True: two factor authentication enabled, False: two factor authentication disabled.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Register user'_
@@ -364,7 +393,7 @@ except Exception as e:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 10. Creating a forgot password widget
+### 11. Creating a forgot password widget
 
 * You may use the **forgot_password** widget to allow a user to generate a new random password.
 * The new password will be automatically hashed and saved in the credentials dictionary.
@@ -392,6 +421,10 @@ except Exception as e:
 >    - Customizes the text of headers, buttons and other fields.
 >  - **captcha:** _bool, default False_
 >    - Specifies the captcha requirement for the forgot password widget, True: captcha required, False: captcha removed.
+>  - **send_email:** _bool, default False_
+>    - Specifies whether to send the generated password to the user's email, True: password will be sent to user's email, False: password will not be sent to user's email.
+>  - **two_factor_auth:** _bool, default False_
+>    - Specifies whether to enable two factor authentication for the forgot password widget, True: two factor authentication enabled, False: two factor authentication disabled.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Forgot password'_
@@ -410,7 +443,7 @@ except Exception as e:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 11. Creating a forgot username widget
+### 12. Creating a forgot username widget
 
 * You may use the **forgot_username** widget to allow a user to retrieve their forgotten username.
 * The widget will return the username and email which the developer should then transfer to the user securely.
@@ -436,6 +469,10 @@ except Exception as e:
 >    - Customizes the text of headers, buttons and other fields.
 >  - **captcha:** _bool, default False_
 >    - Specifies the captcha requirement for the forgot username widget, True: captcha required, False: captcha removed.
+>  - **send_email:** _bool, default False_
+>    - Specifies whether to send the retrieved username to the user's email, True: username will be sent to user's email, False: username will not be sent to user's email.
+>  - **two_factor_auth:** _bool, default False_
+>    - Specifies whether to enable two factor authentication for the forgot username widget, True: two factor authentication enabled, False: two factor authentication disabled.
 >  - **clear_on_submit:** _bool, default False_
 >    - Specifies the clear on submit setting, True: clears inputs on submit, False: keeps inputs on submit.
 >  - **key:** _str, default 'Forgot username'_
@@ -450,15 +487,15 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_username.JPG)
 
-### 12. Creating an update user details widget
+### 13. Creating an update user details widget
 
 * You may use the **update_user_details** widget to allow a logged in user to update their name and/or email.
 * The widget will automatically save the updated details in both the credentials dictionary and re-authentication cookie.
 
 ```python
-if st.session_state['authentication_status']:
+if st.session_state.get('authentication_status'):
     try:
-        if authenticator.update_user_details(st.session_state['username']):
+        if authenticator.update_user_details(st.session_state.get('username')):
             st.success('Entries updated successfully')
     except Exception as e:
         st.error(e)
@@ -486,13 +523,13 @@ if st.session_state['authentication_status']:
 
 * **_Please remember to update the config file (as shown in step 13) after you use this widget._**
 
-### 13. Updating the config file
+### 14. Updating the config file
 
 * Please ensure that the config file is re-saved whenever the contents are modified or after using any of the widgets or buttons.
 
 ```python
 with open('../config.yaml', 'w') as file:
-    yaml.dump(config, file, default_flow_style=False)
+    yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
 ```
 * Please note that this step is not required if you are providing the config file as a path to the **Authenticate** class.
   

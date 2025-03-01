@@ -2,6 +2,7 @@
 Script description: This script imports tests the Streamlit-Authenticator package. 
 
 Libraries imported:
+-------------------
 - yaml: Module implementing the data serialization used for human readable documents.
 - streamlit: Framework used to build pure Python web applications.
 """
@@ -10,13 +11,7 @@ import yaml
 import streamlit as st
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
-from streamlit_authenticator.utilities import (CredentialsError,
-                                               ForgotError,
-                                               Hasher,
-                                               LoginError,
-                                               RegisterError,
-                                               ResetError,
-                                               UpdateError)
+from streamlit_authenticator.utilities import *
 
 # Loading config file
 with open('../config.yaml', 'r', encoding='utf-8') as file:
@@ -115,4 +110,4 @@ if st.session_state['authentication_status']:
 
 # Saving config file
 with open('../config.yaml', 'w', encoding='utf-8') as file:
-    yaml.dump(config, file, default_flow_style=False)
+    yaml.dump(config, file, default_flow_style=False, allow_unicode=True)

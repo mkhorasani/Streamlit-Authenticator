@@ -1,69 +1,88 @@
 """
-Script description: This module executes the logic for the hashing of plain text passwords. 
+Script description: Handles secure hashing and validation of plain text passwords using bcrypt.
 
-Libraries imported:
-- re: Module implementing regular expressions.
-- bcrypt: Module implementing secure hashing for plain text.
+Libraries Imported:
+-------------------
+- re: Implements regular expressions for pattern matching.
+- bcrypt: Provides secure password hashing.
+- typing: Provides standard type hints for Python functions.
 """
 
 import re
 import bcrypt
+from typing import Dict, List
+
 
 class Hasher:
     """
-    This class will hash plain text passwords.
+    This class provides methods for hashing and verifying passwords.
     """
-    def __init__(self, passwords: list):
-        """
-        Create a new instance of "Hasher".
-
-        Parameters
-        ----------
-        passwords: list
-            The list of plain text passwords to be hashed.
-        """
-        self.passwords = passwords
+    def __init__(self) -> None:
+        pass
     @classmethod
     def check_pw(cls, password: str, hashed_password: str) -> bool:
         """
-        Checks the validity of the entered password.
+        Verifies if a plain text password matches a hashed password.
 
         Parameters
         ----------
-        password: str
+        password : str
             The plain text password.
-        hashed_password: str
-            The hashed password.
+        hashed_password : str
+            The hashed password to compare against.
+
         Returns
         -------
         bool
-            Validity of the entered password by comparing it to the hashed password.
+            True if the password matches the hash, False otherwise.
         """
         return bcrypt.checkpw(password.encode(), hashed_password.encode())
     @classmethod
-    def hash_list(self) -> list:
+    def hash(cls, password: str) -> str:
         """
-        Hashes the list of plain text passwords.
-
-        Returns
-        -------
-        list
-            The list of hashed passwords.
-        """
-        return [self.hash(password) for password in self.passwords]
-    @classmethod
-    def hash_passwords(cls, credentials: dict) -> dict:
-        """
-        Hashes all plain text passwords in the credentials dict.
+        Hashes a plain text password using bcrypt.
 
         Parameters
         ----------
-        credentials: dict
-            The credentials dict with plain text passwords.
+        password : str
+            The plain text password.
+
+        Returns
+        -------
+        str
+            The securely hashed password.
+        """
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    @classmethod
+    def hash_list(cls, passwords: List[str]) -> List[str]:
+        """
+        Hashes a list of plain text passwords.
+
+        Parameters
+        ----------
+        passwords : list of str
+            The list of plain text passwords to be hashed.
+
+        Returns
+        -------
+        list of str
+            The list of securely hashed passwords.
+        """
+        return [cls.hash(password) for password in passwords]
+    @classmethod
+    def hash_passwords(cls, credentials: Dict[str, Dict[str, str]]) -> Dict[str, Dict[str, str]]:
+        """
+        Hashes all plain text passwords in a credentials dictionary.
+
+        Parameters
+        ----------
+        credentials : dict
+            Dictionary containing usernames as keys and user details as values.
+
         Returns
         -------
         dict
-            The credentials dict with hashed passwords.
+            The credentials dictionary with all passwords securely hashed.
         """
         usernames = credentials['usernames']
 
@@ -74,32 +93,19 @@ class Hasher:
                 user['password'] = hashed_password
         return credentials
     @classmethod
-    def hash(cls, password: str) -> str:
+    def is_hash(cls, hash_string: str) -> bool:
         """
-        Hashes the plain text password.
+        Determines if a given string is a bcrypt hash.
 
         Parameters
         ----------
-        password: str
-            The plain text password.
-        Returns
-        -------
-        str
-            The hashed password.
-        """
-        return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-    @classmethod
-    def is_hash(cls, hash_string: str) -> bool:
-        """
-        Determines if a string is a hash.
+        hash_string : str
+            The string to check.
 
         Returns
         -------
         bool
-            The state of whether the string is a hash,
-            True: the string is a hash,
-            False: the string is not a hash.
+            True if the string is a valid bcrypt hash, False otherwise.
         """
         bcrypt_regex = re.compile(r'^\$2[aby]\$\d+\$.{53}$')
         return bool(bcrypt_regex.match(hash_string))
-    
