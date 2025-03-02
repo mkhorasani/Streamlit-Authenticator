@@ -36,7 +36,7 @@
 ### 1. Quickstart
 
 * Subscribe to receive a free [API key](https://streamlitauthenticator.com)
-* Check out the [demo app](https://demo-app-v0-3-3.streamlit.app/).
+* Check out the [demo app](https://st-demo-application.streamlit.app/).
 * Feel free to visit the [API reference](https://streamlit-authenticator.readthedocs.io/en/stable/).
 * And finally follow the tutorial below.
 
