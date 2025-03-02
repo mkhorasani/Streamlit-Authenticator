@@ -246,6 +246,7 @@ except Exception as e:
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/guest_login_microsoft.JPG)
 
 * Please note that upon successful login, the guest user's name, email, and other information will be registered in the credentials dictionary and their re-authentication cookie will be saved automatically.
+* **_Please remember to update the config file (as shown in step 14) after you use this widget._**
 
 ### 7. Authenticating users
 
