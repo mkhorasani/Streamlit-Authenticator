@@ -61,7 +61,7 @@ import streamlit_authenticator as stauth
 * Enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Define an optional list of pre-authorized emails of users who are allowed to register and add their credentials to the config file using the **register_user** widget.
 * Add the optional configuration parameters for OAuth2 if you wish to use the **experimental_guest_login** button.
-* **_Please remember to update the config file (as shown in step 13) whenever the contents are modified or after using any of the widgets or buttons._**
+* **_Please remember to update the config file (as shown in step 14) whenever the contents are modified or after using any of the widgets or buttons._**
 
 ```python
 cookie:
@@ -197,7 +197,7 @@ except Exception as e:
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/login_form.JPG)
 
 * **_Please remember to re-invoke an 'unrendered' login widget on each and every page in a multi-page application._**
-* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 14) after you use this widget._**
 
 ### 6. Creating a guest login widget
 
@@ -335,7 +335,7 @@ if st.session_state.get('authentication_status'):
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/reset_password.JPG)
 
-* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 14) after you use this widget._**
 
 ### 10. Creating a new user registration widget
 
@@ -391,7 +391,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/register_user.JPG)
 
-* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 14) after you use this widget._**
 
 ### 11. Creating a forgot password widget
 
@@ -441,7 +441,7 @@ except Exception as e:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/forgot_password.JPG)
 
-* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 14) after you use this widget._**
 
 ### 12. Creating a forgot username widget
 
