@@ -8,7 +8,7 @@ Libraries imported:
 
 from typing import Any, Dict, Optional
 
-from ..models import CookieModel
+from models import CookieModel
 
 
 class CookieController:

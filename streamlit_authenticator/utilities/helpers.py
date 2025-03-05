@@ -17,7 +17,7 @@ import random
 import streamlit as st
 from captcha.image import ImageCaptcha
 
-from ..utilities import Encryptor
+from utilities import Encryptor
 
 
 class Helpers:
