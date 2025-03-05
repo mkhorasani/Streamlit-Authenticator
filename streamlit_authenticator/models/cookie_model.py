@@ -55,7 +55,6 @@ class CookieModel:
             self.cookie_name            =   cookie_name
             self.cookie_key             =   cookie_key
             self.cookie_expiry_days     =   cookie_expiry_days
-        # self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
     def delete_cookie(self) -> None:
