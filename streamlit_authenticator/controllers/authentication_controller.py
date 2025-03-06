@@ -13,8 +13,8 @@ import json
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type
 import streamlit as st
 
-from models import AuthenticationModel
-from utilities import (Encryptor,
+from ..models import AuthenticationModel
+from ..utilities import (Encryptor,
                          ForgotError,
                          Helpers,
                          LoginError,

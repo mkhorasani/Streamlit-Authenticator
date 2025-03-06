@@ -23,8 +23,8 @@ from typing import Dict, Union
 import requests
 import streamlit as st
 
-import params
-from utilities import LoginError
+from ... import params
+from ...utilities import LoginError
 
 
 class MicrosoftModel:

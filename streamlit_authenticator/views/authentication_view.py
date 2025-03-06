@@ -16,9 +16,9 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 
 import streamlit as st
 
-from controllers import AuthenticationController, CookieController
-import params
-from utilities import (DeprecationError,
+from ..controllers import AuthenticationController, CookieController
+from .. import params
+from ..utilities import (DeprecationError,
                          Encryptor,
                          Helpers,
                          LogoutError,
