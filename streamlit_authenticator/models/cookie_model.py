@@ -61,7 +61,8 @@ class CookieModel:
         """
         Deletes the authentication cookie from the user's browser using JavaScript.
         """
-        js_code = f'document.cookie = "{self.cookie_name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";'
+        js_code = f'document.cookie = "{self.cookie_name}=; ' \
+            f'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";'
         st_javascript(js_code)
     def get_cookie(self) -> Optional[Dict[str, Any]]:
         """
@@ -75,7 +76,6 @@ class CookieModel:
         """
         if st.session_state['logout']:
             return False
-        # self.token = self.cookie_manager.get(self.cookie_name)
         self.token = st.context.cookies[self.cookie_name] if self.cookie_name in \
             st.context.cookies else None
         if self.token is not None:
@@ -91,7 +91,8 @@ class CookieModel:
         if self.cookie_expiry_days != 0:
             self.exp_date = self._set_exp_date()
             token = self._token_encode()
-            js_code = f'document.cookie = "{self.cookie_name}={token}; expires={self.exp_date}; path=/;";'
+            js_code = f'document.cookie = "{self.cookie_name}={token}; ' \
+                f'expires={self.exp_date}; path=/;";'
             st_javascript(js_code)
     def _set_exp_date(self) -> float:
         """
