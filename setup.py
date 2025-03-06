@@ -27,7 +27,7 @@ setuptools.setup(
         "cryptography >= 42.0.5",
         "PyJWT >= 2.3.0",
         "PyYAML >= 5.3.1",
-        "streamlit >= 1.37.0"
+        "streamlit >= 1.37.0",
         "streamlit-javascript >= 0.1.5"
     ],
 )
