@@ -48,13 +48,13 @@ class CookieModel:
         """
         if path:
             config = Helpers.read_config_file(path)
-            self.cookie_name        = config['cookie']['name']
-            self.cookie_key         = config['cookie']['key']
-            self.cookie_expiry_days = config['cookie']['expiry_days']
+            self.cookie_name        =   config['cookie']['name']
+            self.cookie_key         =   config['cookie']['key']
+            self.cookie_expiry_days =   config['cookie']['expiry_days']
         else:
-            self.cookie_name            =   cookie_name
-            self.cookie_key             =   cookie_key
-            self.cookie_expiry_days     =   cookie_expiry_days
+            self.cookie_name        =   cookie_name
+            self.cookie_key         =   cookie_key
+            self.cookie_expiry_days =   cookie_expiry_days
         self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
