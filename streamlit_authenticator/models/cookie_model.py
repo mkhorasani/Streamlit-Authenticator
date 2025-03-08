@@ -7,7 +7,7 @@ Libraries imported:
 - datetime: Handles date and time operations.
 - jwt: Implements JSON Web Tokens for authentication.
 - streamlit: Framework for building web applications.
-- streamlit_javascript: Provides cookie management for Streamlit.
+- extra_streamlit_components: Provides cookie management for Streamlit.
 """
 
 from typing import Any, Dict, Optional
@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 import jwt
 from jwt import DecodeError, InvalidSignatureError
 import streamlit as st
-from streamlit_javascript import st_javascript
+import extra_streamlit_components as stx
 
 from ..utilities import Helpers
 
@@ -55,15 +55,17 @@ class CookieModel:
             self.cookie_name            =   cookie_name
             self.cookie_key             =   cookie_key
             self.cookie_expiry_days     =   cookie_expiry_days
+        self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
     def delete_cookie(self) -> None:
         """
-        Deletes the authentication cookie from the user's browser using JavaScript.
+        Deletes the re-authentication cookie from the user's browser.
         """
-        js_code = f'document.cookie = "{self.cookie_name}=; ' \
-            f'expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";'
-        st_javascript(js_code)
+        try:
+            self.cookie_manager.delete(self.cookie_name)
+        except KeyError as e:
+            print(e)
     def get_cookie(self) -> Optional[Dict[str, Any]]:
         """
         Retrieves, validates, and returns the authentication cookie.
@@ -76,6 +78,7 @@ class CookieModel:
         """
         if st.session_state['logout']:
             return False
+        # self.token = self.cookie_manager.get(self.cookie_name)
         self.token = st.context.cookies[self.cookie_name] if self.cookie_name in \
             st.context.cookies else None
         if self.token is not None:
@@ -86,14 +89,14 @@ class CookieModel:
         return None
     def set_cookie(self) -> None:
         """
-        Creates and stores the authentication cookie using JavaScript.
+        Creates and stores the authentication cookie in the user's browser.
         """
         if self.cookie_expiry_days != 0:
             self.exp_date = self._set_exp_date()
             token = self._token_encode()
-            js_code = f'document.cookie = "{self.cookie_name}={token}; ' \
-                f'expires={self.exp_date}; path=/;";'
-            st_javascript(js_code)
+            self.cookie_manager.set(self.cookie_name, token,
+                                    expires_at=datetime.now() + \
+                                    timedelta(days=self.cookie_expiry_days))
     def _set_exp_date(self) -> float:
         """
         Computes the expiration timestamp for the authentication cookie.
