@@ -17,6 +17,7 @@ import streamlit as st
 from ..models.cloud import CloudModel
 from ..models.oauth2 import GoogleModel
 from ..models.oauth2 import MicrosoftModel
+from ..models.oauth2 import Auth0Model
 from .. import params
 from ..utilities import (Encryptor,
                          Hasher,
@@ -312,12 +313,16 @@ class AuthenticationModel:
         elif provider.lower() == 'microsoft':
             microsoft_model = MicrosoftModel(oauth2[provider])
             result = microsoft_model.guest_login()
+        elif provider.lower() == 'auth0':  
+            auth0_model = Auth0Model(oauth2[provider])  
+            result = auth0_model.guest_login()  
         if isinstance(result, dict):
             if isinstance(max_concurrent_users, int) and self._count_concurrent_users() > \
                 max_concurrent_users - 1:
                 st.query_params.clear()
                 raise LoginError('Maximum number of concurrent users exceeded')
-            result['email'] = result.get('email', result.get('upn')).lower()
+            if 'email' not in result:
+                raise LoginError('Email not found in authentication result')
             if result['email'] not in self.credentials['usernames']:
                 self.credentials['usernames'][result['email']] = {}
             if not self._is_guest_user(result['email']):
@@ -334,8 +339,26 @@ class AuthenticationModel:
             st.session_state['authentication_status'] = True
             st.session_state['name'] = f'{result.get("given_name", "")} ' \
                 f'{result.get("family_name", "")}'
-            st.session_state['email'] = result['email']
-            st.session_state['username'] = result['email']
+          
+            if provider.lower() == 'microsoft':
+                if 'aadobjectid' in result:
+                    st.session_state['aadobjectid'] = result.get('aadobjectid')
+                    self.credentials['usernames'][result['email']]['aadobjectid'] = result.get('aadobjectid')
+                if 'groups' in result:
+                    groups = result.get('groups')
+                    st.session_state['groups'] = groups
+                    self.credentials['usernames'][result['email']]['groups'] = groups
+                if 'applications' in result:
+                    applications = result.get('applications')
+                    st.session_state['applications'] = applications
+                    self.credentials['usernames'][result['email']]['applications'] = applications
+            if provider.lower() == 'auth0':
+                if 'sub' in result:
+                    st.session_state['sub'] = result.get('sub')
+                    self.credentials['usernames'][result['email']]['sub'] = result.get('sub')
+                  
+            st.session_state['email'] = result.get('email')
+            st.session_state['username'] = result.get('email')
             st.session_state['roles'] = roles
             st.query_params.clear()
             cookie_controller.set_cookie()
