@@ -230,7 +230,7 @@ class Authenticate:
         return None, email
     def experimental_guest_login(self, button_name: str='Guest login',
                                  location: Literal['main', 'sidebar'] = 'main',
-                                 provider: Literal['google', 'microsoft'] = 'google',
+                                 provider: Literal['google', 'microsoft', 'auth0'] = 'google',
                                  oauth2: Optional[Dict[str, Any]] = None,
                                  max_concurrent_users: Optional[int]=None,
                                  single_session: bool=False, roles: Optional[List[str]]=None,
@@ -245,7 +245,7 @@ class Authenticate:
             Display name for the guest login button.
         location : {'main', 'sidebar'}, default='main'
             Location where the guest login button is rendered.
-        provider : {'google', 'microsoft'}, default='google'
+        provider : {'google', 'microsoft', 'auth0'}, default='google'
             OAuth2 provider used for authentication.
         oauth2 : dict, optional
             Configuration parameters for OAuth2 authentication.
@@ -262,8 +262,8 @@ class Authenticate:
         """
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if provider not in ['google', 'microsoft']:
-            raise ValueError("Provider must be one of 'google' or 'microsoft'")
+        if provider not in ['google', 'microsoft', 'auth0']:
+            raise ValueError("Provider must be one of 'google' or 'microsoft' or 'auth0'")
         if not st.session_state.get('authentication_status'):
             token = self.cookie_controller.get_cookie()
             if token:
