@@ -407,7 +407,7 @@ try:
     new_random_password = authenticator.forgot_password()
     if username_of_forgotten_password:
         st.success('New password to be sent securely')
-        # The developer should securely transfer the new password to the user.
+        # To securely transfer the new password to the user please see step 8.
     elif username_of_forgotten_password == False:
         st.error('Username not found')
 except Exception as e:
@@ -455,7 +455,7 @@ try:
     email_of_forgotten_username = authenticator.forgot_username()
     if username_of_forgotten_username:
         st.success('Username to be sent securely')
-        # The developer should securely transfer the username to the user.
+        # To securely transfer the username to the user please see step 8.
     elif username_of_forgotten_username == False:
         st.error('Email not found')
 except Exception as e:
