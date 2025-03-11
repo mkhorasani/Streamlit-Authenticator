@@ -398,7 +398,7 @@ except Exception as e:
 
 * You may use the **forgot_password** widget to allow a user to generate a new random password.
 * The new password will be automatically hashed and saved in the credentials dictionary.
-* The widget will return the username, email, and new random password which the developer should then transfer to the user securely.
+* The widget will return the username, email, and new random password which the developer can then transfer to the user securely using the send email feature shown in step 8.
 
 ```python
 try:
@@ -447,7 +447,7 @@ except Exception as e:
 ### 12. Creating a forgot username widget
 
 * You may use the **forgot_username** widget to allow a user to retrieve their forgotten username.
-* The widget will return the username and email which the developer should then transfer to the user securely.
+* The widget will return the username and email which the developer can then transfer to the user securely using the send email feature shown in step 8.
 
 ```python
 try:
