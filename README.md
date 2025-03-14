@@ -303,7 +303,7 @@ elif st.session_state.get('authentication_status') is None:
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/two_factor_authentication_email_username.JPG)
 
-* **_Please check your spam folder to ensure our emails aren’t being filtered._**
+* **_Please check your spam folder to ensure emails are not being filtered._**
 
 ### 9. Creating a reset password widget
 
