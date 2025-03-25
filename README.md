@@ -524,7 +524,7 @@ if st.session_state.get('authentication_status'):
 
 ![](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/graphics/update_user_details.JPG)
 
-* **_Please remember to update the config file (as shown in step 13) after you use this widget._**
+* **_Please remember to update the config file (as shown in step 14) after you use this widget._**
 
 ### 14. Updating the config file
 
