@@ -3,10 +3,10 @@ name: Streamlit Authenticator Testing
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull request to the main branch
+      - main
 
 jobs:
   test:
@@ -19,24 +19,15 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'  # Specify the Python version
+        python-version: '3.9'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Install your dependencies
-        pip install pytest  # Install pytest if not in requirements
+        pip install -r requirements.txt
+        pip install pytest
 
     - name: Run Streamlit app and tests
       run: |
-        # Run Streamlit app in the background (it will be used by your tests)
-        nohup streamlit run tests/streamlit_authenticator_test.py &  # Path to your app
-        # Run pytest to execute the tests
+        nohup streamlit run tests/streamlit_authenticator_test.py &
         pytest tests/pytest.py --maxfail=1 --disable-warnings -q
-
-    - name: Upload Test Results (optional)
-      if: failure()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-results
-        path: tests/pytest.py  # Upload your test file if tests fail
