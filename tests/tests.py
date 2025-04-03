@@ -9,7 +9,7 @@ Libraries imported:
 from streamlit.testing.v1 import AppTest
 
 def test_login():
-    at = AppTest.from_file('tests/streamlit_authenticator_test.py').run()
+    at = AppTest.from_file('tests/app.py').run()
     at.text_input[0].input('jsmith').run()
     at.text_input[1].input('abc').run()
     at.button[0].click().run()
