@@ -1,0 +1,9 @@
+bcrypt==3.1.7
+captcha==0.5.0
+cryptography==42.0.5
+extra-streamlit-components==0.1.70
+PyJWT==2.3.0
+pytest==7.0.0
+PyYAML==5.3.1
+streamlit==1.37.0
+streamlit-authenticator==0.4.2
