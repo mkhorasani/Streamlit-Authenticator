@@ -29,5 +29,5 @@ jobs:
 
     - name: Run Streamlit app and tests
       run: |
-        nohup streamlit run tests/streamlit_authenticator_test.py &
+        nohup streamlit run tests/app.py &
         pytest tests/tests.py --maxfail=1 --disable-warnings -q
