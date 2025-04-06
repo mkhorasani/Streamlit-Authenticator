@@ -156,7 +156,7 @@ authenticator = stauth.Authenticate(
 >  - **auto_hash:** _bool, default True_
 >    - Automatic hashing requirement for passwords, True: plain text passwords will be hashed automatically, False: plain text passwords will not be hashed automatically.
 >  - **api_key:** _str, optional, default None_
->    - API key used to connect to the cloud server to send reset passwords and two factor authorization codes to the user by email.
+>    - API key used to connect to the cloud server to send two factor authorization codes, reset passwords, and forgotten usernames to the user by email.
 >  - ****kwargs:** _dict, optional_
 >    - Arguments to pass to the Authenticate class.
 
