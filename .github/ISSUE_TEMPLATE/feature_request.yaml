@@ -1,0 +1,43 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please provide a clear and concise description.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the feature
+      description: What should the feature do?
+      placeholder: Describe your idea here...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: Why is this feature needed? How would it help?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Have you considered any alternatives?
+    validations:
+      required: false
+
+  - type: input
+    id: related
+    attributes:
+      label: Related Issues
+      description: Link any related issues or PRs.
+      placeholder: "#123"
+    validations:
+      required: false
