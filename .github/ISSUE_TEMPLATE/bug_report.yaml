@@ -9,7 +9,7 @@ body:
         Thanks for taking the time to report a bug! Please fill in the details below.
 
   - type: input
-    id: version
+    id: streamlit_version
     attributes:
       label: Streamlit Version
       placeholder: "e.g. v1.2.3"
@@ -17,7 +17,7 @@ body:
       required: true
 
   - type: input
-    id: version
+    id: streamlit_authenticator_version
     attributes:
       label: Streamlit Authenticator Version
       placeholder: "e.g. v1.2.3"
