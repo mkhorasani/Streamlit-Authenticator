@@ -9,6 +9,22 @@ body:
         Thanks for taking the time to report a bug! Please fill in the details below.
 
   - type: input
+    id: version
+    attributes:
+      label: Streamlit Version
+      placeholder: "e.g. v1.2.3"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Streamlit Authenticator Version
+      placeholder: "e.g. v1.2.3"
+    validations:
+      required: true
+
+  - type: input
     id: environment
     attributes:
       label: Environment
@@ -45,11 +61,3 @@ body:
         4. See error
     validations:
       required: true
-
-  - type: input
-    id: version
-    attributes:
-      label: App Version
-      placeholder: "e.g. v1.2.3"
-    validations:
-      required: false
