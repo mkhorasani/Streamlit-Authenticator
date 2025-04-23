@@ -35,7 +35,7 @@
 
 ### 1. Quickstart
 
-* Subscribe to receive a free [API key](https://streamlitauthenticator.com)
+* Subscribe to receive a free [API key](https://stauthenticator.com/)
 * Check out the [demo app](https://st-demo-application.streamlit.app/).
 * Feel free to visit the [API reference](https://streamlit-authenticator.readthedocs.io/en/stable/).
 * And finally follow the tutorial below.
@@ -103,7 +103,7 @@ oauth2: # Optional
 pre-authorized: # Optional
   emails:
   - melsby@gmail.com
-api_key: # Optional - register to receive a free API key: https://streamlitauthenticator.com
+api_key: # Optional - register to receive a free API key: https://stauthenticator.com
 ```
 
 * _Please note that the 'failed_login_attempts' and 'logged_in' fields corresponding to each user's number of failed login attempts and log-in status in the credentials will be added and managed automatically._
@@ -289,7 +289,7 @@ elif st.session_state.get('authentication_status') is None:
 ### 8. Enabling two factor authentication
 
 * You may enable two factor authentication for the **register_user**, **forgot_password**, and **forgot_username** widgets for enhanced security.
-* First register to receive a free API key [here](https://streamlitauthenticator.com).
+* First register to receive a free API key [here](https://stauthenticator.com/).
 * Then add your API key to the the authenticator object as **api_key** or alternatively add it to the config file as shown in step 3.
 * Finally set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
 
