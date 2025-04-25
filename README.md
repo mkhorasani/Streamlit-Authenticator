@@ -15,6 +15,7 @@
 > [!TIP]
 > Looking for enterprise support for your Streamlit apps? Check out the [Ploomber platform](https://ploomber.io/streamlit-enterprise?utm_source=st-authenticator)!
 
+> 📚 Questions? [Ask DeepWiki](https://deepwiki.com/mkhorasani/Streamlit-Authenticator)
 
 ## Table of Contents
 - [Quickstart](#1-quickstart)
