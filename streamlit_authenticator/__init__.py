@@ -1,6 +1,6 @@
 """
 Script description: This script imports the main module of this library
-and also provides unit testing commands for development. 
+and also provides unit testing commands for development.
 
 Libraries imported:
 -------------------
@@ -31,7 +31,8 @@ if not _RELEASE:
         config['credentials'],
         config['cookie']['name'],
         config['cookie']['key'],
-        config['cookie']['expiry_days']
+        config['cookie']['expiry_days'],
+        config['cookie']['path']
     )
 
     # authenticator = Authenticate(
@@ -80,7 +81,7 @@ if not _RELEASE:
             st.success('User registered successfully')
     except (CloudError, RegisterError) as e:
         st.error(e)
-    
+
     # Creating a forgot password widget
     try:
         (username_of_forgotten_password,

@@ -30,6 +30,7 @@ class CookieModel:
             cookie_name: Optional[str] = None,
             cookie_key: Optional[str] = None,
             cookie_expiry_days: Optional[float] = None,
+            cookie_path: Optional[str] = "/",
             path: Optional[str] = None
             ) -> None:
         """
@@ -43,6 +44,8 @@ class CookieModel:
             Secret key used for signing and verifying the authentication cookie.
         cookie_expiry_days : float, optional
             Number of days before the re-authentication cookie expires.
+        cookie_path : str, optional
+            path scope for cookie.
         path : str, optional
             Path to the configuration file.
         """
@@ -51,10 +54,12 @@ class CookieModel:
             self.cookie_name        = config['cookie']['name']
             self.cookie_key         = config['cookie']['key']
             self.cookie_expiry_days = config['cookie']['expiry_days']
+            self.cookie_path        = config['cookie'].get('path', '/')
         else:
             self.cookie_name            =   cookie_name
             self.cookie_key             =   cookie_key
             self.cookie_expiry_days     =   cookie_expiry_days
+            self.cookie_path            =   cookie_path
         self.cookie_manager         =   stx.CookieManager()
         self.token                  =   None
         self.exp_date               =   None
@@ -95,6 +100,7 @@ class CookieModel:
             self.exp_date = self._set_exp_date()
             token = self._token_encode()
             self.cookie_manager.set(self.cookie_name, token,
+                                    path=self.cookie_path,
                                     expires_at=datetime.now() + \
                                     timedelta(days=self.cookie_expiry_days))
     def _set_exp_date(self) -> float:

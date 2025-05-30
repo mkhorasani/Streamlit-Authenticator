@@ -54,7 +54,7 @@ import streamlit_authenticator as stauth
 ### 3. Creating a config file
 
 * Create a YAML config file and add to it your user's credentials: including username, email, first name, last name, and password (plain text passwords will be hashed automatically).
-* Enter a name, random key, and number of days to expiry, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
+* Enter a name, random key, number of days to expiry and optional path scope, for a re-authentication cookie that will be stored on the client's browser to enable password-less re-authentication. If you do not require re-authentication, you may set the number of days to expiry to 0.
 * Define an optional list of pre-authorized emails of users who are allowed to register and add their credentials to the config file using the **register_user** widget.
 * Add the optional configuration parameters for OAuth2 if you wish to use the **experimental_guest_login** button.
 * **_Please remember to update the config file (as shown in step 14) whenever the contents are modified or after using any of the widgets or buttons._**
@@ -64,6 +64,7 @@ cookie:
   expiry_days: 30
   key: # To be filled with any string
   name: # To be filled with any string
+  path: # To be filled with any string, optional. Default '/'
 credentials:
   usernames:
     jsmith:
@@ -122,7 +123,8 @@ authenticator = stauth.Authenticate(
     config['credentials'],
     config['cookie']['name'],
     config['cookie']['key'],
-    config['cookie']['expiry_days']
+    config['cookie']['expiry_days'],
+    config['cookie']['path']
 )
 ```
 

@@ -20,6 +20,7 @@ class CookieController:
             self,
             cookie_name: Optional[str] = None,
             cookie_key: Optional[str] = None,
+            cookie_path: Optional[str] = "/",
             cookie_expiry_days: Optional[float] = None,
             path: Optional[str] = None
             ) -> None:
@@ -34,12 +35,15 @@ class CookieController:
             Secret key used for signing and verifying the authentication cookie.
         cookie_expiry_days : float, optional
             Number of days before the re-authentication cookie automatically expires.
+        cookie_path : str, optional
+            path scope for cookie.
         path : str, optional
             Path to the configuration file.
         """
         self.cookie_model = CookieModel(cookie_name,
                                         cookie_key,
                                         cookie_expiry_days,
+                                        cookie_path,
                                         path)
     def delete_cookie(self) -> None:
         """

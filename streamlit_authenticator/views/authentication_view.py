@@ -38,6 +38,7 @@ class Authenticate:
             cookie_name: str = 'some_cookie_name',
             cookie_key: str = 'some_key',
             cookie_expiry_days: float = 30.0,
+            cookie_path: str = '/',
             validator: Optional[Validator] = None,
             auto_hash: bool = True,
             api_key: Optional[str] = None,
@@ -56,6 +57,8 @@ class Authenticate:
             Secret key used for encrypting the re-authentication cookie.
         cookie_expiry_days : float, default=30.0
             Expiry time for the re-authentication cookie in days.
+        cookie_path : str, optional
+            path scope for cookie.
         validator : Validator, optional
             Validator object for checking username, name, and email validity.
         auto_hash : bool, default=True
@@ -77,6 +80,7 @@ class Authenticate:
         self.cookie_controller          =   CookieController(cookie_name,
                                                              cookie_key,
                                                              cookie_expiry_days,
+                                                             cookie_path,
                                                              self.path)
         self.authentication_controller  =   AuthenticationController(credentials,
                                                                      validator,
