@@ -238,14 +238,15 @@ class Authenticate:
             del st.session_state['2FA_check_forgot_username']
             return result
         return None, email
-    def experimental_guest_login(self, button_name: str='Guest login',
+    def experimental_guest_login(self, button_name: str = 'Guest login',
                                  location: Literal['main', 'sidebar'] = 'main',
                                  provider: Literal['google', 'microsoft'] = 'google',
                                  oauth2: Optional[Dict[str, Any]] = None,
-                                 max_concurrent_users: Optional[int]=None,
-                                 single_session: bool=False, roles: Optional[List[str]]=None,
-                                 use_container_width: bool=False,
-                                 callback: Optional[Callable]=None) -> None:
+                                 max_concurrent_users: Optional[int] = None,
+                                 single_session: bool = False, roles: Optional[List[str]] = None,
+                                 use_container_width: bool = False,
+                                 callback: Optional[Callable] = None
+                                 ) -> None:
         """
         Renders a guest login button.
 
@@ -282,14 +283,14 @@ class Authenticate:
             if not st.session_state.get('authentication_status'):
                 auth_endpoint = \
                     self.authentication_controller.guest_login(cookie_controller=\
-                                                                self.cookie_controller,
-                                                                provider=provider,
-                                                                oauth2=oauth2,
-                                                                max_concurrent_users=\
-                                                                max_concurrent_users,
-                                                                single_session=single_session,
-                                                                roles=roles,
-                                                                callback=callback)
+                                                               self.cookie_controller,
+                                                               provider=provider,
+                                                               oauth2=oauth2,
+                                                               max_concurrent_users=\
+                                                               max_concurrent_users,
+                                                               single_session=single_session,
+                                                               roles=roles,
+                                                               callback=callback)
                 if location == 'main' and auth_endpoint:
                     st.link_button(button_name, url=auth_endpoint,
                                    use_container_width=use_container_width)
@@ -299,7 +300,7 @@ class Authenticate:
     def login(self, location: Literal['main', 'sidebar', 'unrendered'] = 'main',
               max_concurrent_users: Optional[int] = None, max_login_attempts: Optional[int] = None,
               fields: Optional[Dict[str, str]] = None, captcha: bool = False,
-              single_session: bool=False, clear_on_submit: bool = False, key: str = 'Login',
+              single_session: bool = False, clear_on_submit: bool = False, key: str = 'Login',
               type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
               icon: Optional[str] = None, use_container_width: bool = False,
               callback: Optional[Callable] = None
@@ -633,7 +634,7 @@ class Authenticate:
                                                   else fields['Reset'], icon=icon, type=type,
                                                   use_container_width=use_container_width):
             if self.authentication_controller.reset_password(username, password, new_password,
-                                                          new_password_repeat, callback):
+                                                             new_password_repeat, callback):
                 return True
         return None
     def __two_factor_auth(self, email: str, content: Optional[Dict[str, Any]] = None,
@@ -720,7 +721,7 @@ class Authenticate:
         update_user_details_form_fields = ['First name' if 'First name' not in fields else \
                                            fields['First name'],
                                            'Last name' if 'Last name' not in fields else \
-                                            fields['Last name'],
+                                           fields['Last name'],
                                            'Email' if 'Email' not in fields else fields['Email']]
         field = update_user_details_form.selectbox('Field' if 'Field' not in fields
                                                    else fields['Field'],
