@@ -161,7 +161,10 @@ class Authenticate:
                         fields: Optional[Dict[str, str]] = None, captcha: bool = False,
                         send_email: bool = False, two_factor_auth: bool = False,
                         clear_on_submit: bool = False, key: str = 'Forgot username',
-                        callback: Optional[Callable]=None) -> Tuple[Optional[str], Optional[str]]:
+                        type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
+                        icon: Optional[str] = None, use_container_width: bool = False,
+                        callback: Optional[Callable] = None
+                        ) -> Tuple[Optional[str], Optional[str]]:
         """
         Renders a forgot username widget.
 
@@ -181,6 +184,12 @@ class Authenticate:
             If True, clears input fields after form submission.
         key : str, default='Forgot username'
             Unique key for the widget to prevent duplicate WidgetID errors.
+        type : {'primary', 'secondary', 'terciary'}, default='secondary'
+            Specifies the button type.
+        icon : str, optional
+            Optional emoji or icon to display next to the button label.
+        use_container_width : bool, default=False
+            Whether to expand the button's width to fill its parent container.
         callback : Callable, optional
             Function to be executed after form submission.
 
@@ -212,7 +221,8 @@ class Authenticate:
             forgot_username_form.image(Helpers.generate_captcha('forgot_username_captcha',
                                                                 self.secret_key))
         if forgot_username_form.form_submit_button('Submit' if 'Submit' not in fields
-                                                   else fields['Submit']):
+                                                   else fields['Submit'], type=type, icon=icon,
+                                                   use_container_width=use_container_width):
             result = self.authentication_controller.forgot_username(email, callback,
                                                                     captcha, entered_captcha)
             if not two_factor_auth:
@@ -290,6 +300,8 @@ class Authenticate:
               max_concurrent_users: Optional[int] = None, max_login_attempts: Optional[int] = None,
               fields: Optional[Dict[str, str]] = None, captcha: bool = False,
               single_session: bool=False, clear_on_submit: bool = False, key: str = 'Login',
+              type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
+              icon: Optional[str] = None, use_container_width: bool = False,
               callback: Optional[Callable] = None
               ) -> Optional[Tuple[Optional[str], Optional[bool], Optional[str]]]:
         """
@@ -313,6 +325,12 @@ class Authenticate:
             If True, clears input fields after form submission.
         key : str, default='Login'
             Unique key for the widget to prevent duplicate WidgetID errors.
+        type : {'primary', 'secondary', 'terciary'}, default='secondary'
+            Specifies the button type.
+        icon : str, optional
+            Optional emoji or icon to display next to the button label.
+        use_container_width : bool, default=False
+            Whether to expand the button's width to fill its parent container.
         callback : Callable, optional
             Function to execute when the form is submitted.
 
@@ -359,7 +377,8 @@ class Authenticate:
                                                             autocomplete='off')
                     login_form.image(Helpers.generate_captcha('login_captcha', self.secret_key))
                 if login_form.form_submit_button('Login' if 'Login' not in fields
-                                                 else fields['Login']):
+                                                 else fields['Login'], type=type, icon=icon, 
+                                                 use_container_width=use_container_width):
                     if self.authentication_controller.login(username, password,
                                                             max_concurrent_users,
                                                             max_login_attempts,
@@ -371,8 +390,10 @@ class Authenticate:
                             st.rerun()
     def logout(self, button_name: str = 'Logout',
                location: Literal['main', 'sidebar', 'unrendered'] = 'main',
-               key: str = 'Logout', use_container_width: bool = False,
-               callback: Optional[Callable] = None) -> None:
+               key: str = 'Logout', type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
+               icon: Optional[str] = None, use_container_width: bool = False,
+               callback: Optional[Callable] = None
+               ) -> None:
         """
         Renders a logout button.
 
@@ -384,6 +405,10 @@ class Authenticate:
             Location where the logout button is rendered.
         key : str, default='Logout'
             Unique key for the widget, useful in multi-page applications.
+        type : {'primary', 'secondary', 'terciary'}, default='secondary'
+            Specifies the button type.
+        icon : str, optional
+            Optional emoji or icon to display next to the button label.
         use_container_width : bool, default=False
             If True, the button width matches the container.
         callback : Callable, optional
@@ -394,11 +419,13 @@ class Authenticate:
         if location not in ['main', 'sidebar', 'unrendered']:
             raise ValueError("Location must be one of 'main' or 'sidebar' or 'unrendered'")
         if location == 'main':
-            if st.button(button_name, key=key, use_container_width=use_container_width):
+            if st.button(button_name, key=key, type=type, icon=icon,
+                         use_container_width=use_container_width):
                 self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
         elif location == 'sidebar':
-            if st.sidebar.button(button_name, key=key, use_container_width=use_container_width):
+            if st.sidebar.button(button_name, key=key, type=type, icon=icon,
+                                 use_container_width=use_container_width):
                 self.authentication_controller.logout(callback)
                 self.cookie_controller.delete_cookie()
         elif location == 'unrendered':
@@ -411,7 +438,10 @@ class Authenticate:
                       captcha: bool = True, roles: Optional[List[str]] = None,
                       merge_username_email: bool = False, password_hint: bool = True,
                       two_factor_auth: bool = False, clear_on_submit: bool = False,
-                      key: str = 'Register user', callback: Optional[Callable] = None
+                      key: str = 'Register user',
+                      type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
+                      icon: Optional[str] = None, use_container_width: bool = False,
+                      callback: Optional[Callable] = None
                       ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         """
         Renders a register new user widget.
@@ -440,6 +470,12 @@ class Authenticate:
             If True, clears input fields after form submission.
         key : str, default='Register user'
             Unique key for the widget to prevent duplicate WidgetID errors.
+        type : {'primary', 'secondary', 'terciary'}, default='secondary'
+            Specifies the button type.
+        icon : str, optional
+            Optional emoji or icon to display next to the button label.
+        use_container_width : bool, default=False
+            Whether to expand the button's width to fill its parent container.
         callback : Callable, optional
             Function to execute when the form is submitted.
 
@@ -504,7 +540,8 @@ class Authenticate:
             register_user_form.image(Helpers.generate_captcha('register_user_captcha',
                                                               self.secret_key))
         if register_user_form.form_submit_button('Register' if 'Register' not in fields
-                                                 else fields['Register']):
+                                                 else fields['Register'], type=type, icon=icon,
+                                                 use_container_width=use_container_width):
             if two_factor_auth:
                 self.__two_factor_auth(new_email, widget='register', fields=fields)
             else:
@@ -526,7 +563,10 @@ class Authenticate:
         return None, None, None
     def reset_password(self, username: str, location: Literal['main', 'sidebar'] = 'main',
                        fields: Optional[Dict[str, str]] = None, clear_on_submit: bool = False,
-                       key: str = 'Reset password', callback: Optional[Callable] = None
+                       key: str = 'Reset password',
+                       type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
+                       icon: Optional[str] = None, use_container_width: bool = False,
+                       callback: Optional[Callable] = None
                        ) -> Optional[bool]:
         """
         Renders a password reset widget.
@@ -543,6 +583,12 @@ class Authenticate:
             If True, clears input fields after form submission.
         key : str, default='Reset password'
             Unique key for the widget to prevent duplicate WidgetID errors.
+        type : {'primary', 'secondary', 'terciary'}, default='secondary'
+            Specifies the button type.
+        icon : str, optional
+            Optional emoji or icon to display next to the button label.
+        use_container_width : bool, default=False
+            Whether to expand the button's width to fill its parent container.
         callback : Callable, optional
             Function to execute when the form is submitted.
 
@@ -584,7 +630,8 @@ class Authenticate:
                                                              type='password',
                                                              autocomplete='off').strip()
         if reset_password_form.form_submit_button('Reset' if 'Reset' not in fields
-                                                  else fields['Reset']):
+                                                  else fields['Reset'], icon=icon, type=type,
+                                                  use_container_width=use_container_width):
             if self.authentication_controller.reset_password(username, password, new_password,
                                                           new_password_repeat, callback):
                 return True
@@ -622,7 +669,10 @@ class Authenticate:
     def update_user_details(self, username: str, location: Literal['main', 'sidebar'] = 'main',
                             fields: Optional[Dict[str, str]] = None,
                             clear_on_submit: bool = False, key: str = 'Update user details',
-                            callback: Optional[Callable] = None) -> bool:
+                            type: Literal['primary', 'secondary', 'tertiary'] = 'secondary',
+                            icon: Optional[str] = None, use_container_width: bool = False,
+                            callback: Optional[Callable] = None
+                            ) -> bool:
         """
         Renders an update user details widget.
 
@@ -638,6 +688,12 @@ class Authenticate:
             If True, clears input fields after form submission.
         key : str, default='Update user details'
             Unique key for the widget to prevent duplicate WidgetID errors.
+        type : {'primary', 'secondary', 'terciary'}, default='secondary'
+            Specifies the button type.
+        icon : str, optional
+            Optional emoji or icon to display next to the button label.
+        use_container_width : bool, default=False
+            Whether to expand the button's width to fill its parent container.
         callback : Callable, optional
             Function to execute when the form is submitted.
 
@@ -679,7 +735,8 @@ class Authenticate:
         elif update_user_details_form_fields.index(field) == 2:
             field = 'email'
         if update_user_details_form.form_submit_button('Update' if 'Update' not in fields
-                                                       else fields['Update']):
+                                                       else fields['Update'], icon=icon, type=type,
+                                                       use_container_width=use_container_width):
             if self.authentication_controller.update_user_details(username, field, new_value,
                                                                   callback):
                 # self.cookie_controller.set_cookie()
