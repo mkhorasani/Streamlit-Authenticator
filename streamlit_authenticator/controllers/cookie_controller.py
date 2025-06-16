@@ -20,8 +20,8 @@ class CookieController:
             self,
             cookie_name: Optional[str] = None,
             cookie_key: Optional[str] = None,
-            cookie_path: Optional[str] = "/",
             cookie_expiry_days: Optional[float] = None,
+            cookie_path: Optional[str] = "/",
             path: Optional[str] = None
             ) -> None:
         """
