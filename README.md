@@ -534,4 +534,5 @@ with open('../config.yaml', 'w') as file:
   
 ## License
 
-This project is proprietary software. The use of this software is governed by the terms specified in the [LICENSE](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/LICENSE) file. Unauthorized copying, modification, or distribution of this software is prohibited.
+This project is open source software licensed under the MIT License. The use of this software is governed by the terms specified in the [LICENSE](https://github.com/mkhorasani/Streamlit-Authenticator/blob/main/LICENSE) file.
+You are free to copy, modify, and distribute this software in accordance with the license terms.
