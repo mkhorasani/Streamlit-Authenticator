@@ -367,6 +367,7 @@ class Authenticate:
                                                             callback=callback, captcha=captcha,
                                                             entered_captcha=entered_captcha):
                         self.cookie_controller.set_cookie()
+                        time.sleep(self.attrs.get('login_sleep_time', params.PRE_LOGIN_SLEEP_TIME))
                         if self.path and self.cookie_controller.get_cookie():
                             st.rerun()
     def logout(self, button_name: str = 'Logout',
