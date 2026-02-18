@@ -20,7 +20,7 @@
 - [Creating a login widget](#5-creating-a-login-widget)
 - [Creating a guest login widget](#6-creating-a-guest-login-widget) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
-- [Enabling two factor authentication](#8-enabling-two-factor-authentication-(phased-out)) (phased out)
+- [Enabling two factor authentication](#8-enabling-two-factor-authentication-phased-out) (phased out)
 - [Creating a reset password widget](#9-creating-a-reset-password-widget)
 - [Creating a new user registration widget](#10-creating-a-new-user-registration-widget)
 - [Creating a forgot password widget](#11-creating-a-forgot-password-widget)
