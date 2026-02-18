@@ -20,7 +20,7 @@
 - [Creating a login widget](#5-creating-a-login-widget)
 - [Creating a guest login widget](#6-creating-a-guest-login-widget) 🚀 **NEW**
 - [Authenticating users](#7-authenticating-users)
-- [Enabling two factor authentication](#8-enabling-two-factor-authentication) 🚀 **NEW**
+- [Enabling two factor authentication](#8-enabling-two-factor-authentication-(phased-out)) (phased out)
 - [Creating a reset password widget](#9-creating-a-reset-password-widget)
 - [Creating a new user registration widget](#10-creating-a-new-user-registration-widget)
 - [Creating a forgot password widget](#11-creating-a-forgot-password-widget)
@@ -285,7 +285,7 @@ elif st.session_state.get('authentication_status') is None:
 ### 8. Enabling two factor authentication (phased out)
 
 * You may enable two factor authentication for the **register_user**, **forgot_password**, and **forgot_username** widgets for enhanced security.
-```* First register to receive a free API key [here](https://subscribe.streamlit.app/).```
+* First register to receive a free API key
 * Then add your API key to the the authenticator object as **api_key** or alternatively add it to the config file as shown in step 3.
 * Finally set the **two_factor_auth** parameter for the widget to True, this will prompt the user to enter a four digit code sent to their email.
 
