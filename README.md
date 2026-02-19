@@ -33,6 +33,7 @@
 
 * Subscribe to receive a free API key (phased out).
 * Check out the [demo app](https://st-demo-application.streamlit.app/).
+* Ask questions to [Streamlit-Authenticator's DeepWiki](https://deepwiki.com/mkhorasani/Streamlit-Authenticator)
 * Feel free to visit the [API reference](https://streamlit-authenticator.readthedocs.io/en/stable/).
 * And finally follow the tutorial below.
 
