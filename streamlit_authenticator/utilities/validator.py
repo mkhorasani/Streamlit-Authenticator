@@ -93,7 +93,7 @@ class Validator:
         bool
             True if the name is valid, False otherwise.
         """
-        pattern = r"^[A-Za-z\u00C0-\u024F\u0370-\u1FFF\u2C00-\uD7FF\u4E00-\u9FFF' .-]{2,100}$"
+        pattern = r"^[A-Za-z\u00C0-\u024F\u0370-\u1FFF\u2C00-\uD7FF\u4E00-\u9FFF' .-]{1,100}$"
         return bool(re.match(pattern, name, re.UNICODE))
     def validate_password(self, password: str) -> bool:
         """
