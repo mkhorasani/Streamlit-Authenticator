@@ -12,6 +12,13 @@
 
 <!--- ###### _To learn more please refer to my book [Web Application Development with Streamlit](http://tinyurl.com/2p8mw32d)._ --->
 
+
+---
+
+> <a href="https://apiguard.co"><img src="https://apiguard.co/favicon.svg" height="18" align="center" /></a> &nbsp; **[APIGuard](https://apiguard.co)** — Automatically test your API against its OpenAPI spec on every deploy. Catch breaking changes, schema drift, and contract violations before they reach production. **[Try it free →](https://apiguard.co/register)**
+
+---
+
 ## Table of Contents
 - [Quickstart](#1-quickstart)
 - [Installation](#2-installation)
