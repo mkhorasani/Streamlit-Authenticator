@@ -76,12 +76,12 @@ class CookieModel:
             If valid, returns a dictionary containing the cookie's data.
             Returns None if the cookie is expired or invalid.
         """
-        if st.session_state['logout']:
-            return False
-        # self.token = self.cookie_manager.get(self.cookie_name)
+        if st.session_state.get('logout'):
+            return None        
         self.token = st.context.cookies[self.cookie_name] if self.cookie_name in \
             st.context.cookies else None
         if self.token is not None:
+            self.cookie_manager.set(self.cookie_name, self.token)
             self.token = self._token_decode()
             if (self.token is not False and 'username' in self.token and
                 self.token['exp_date'] > datetime.now().timestamp()):
