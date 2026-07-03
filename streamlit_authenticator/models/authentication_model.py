@@ -14,21 +14,22 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
 import streamlit as st
 
-from ..models.cloud import CloudModel
-from ..models.oauth2 import GoogleModel
-from ..models.oauth2 import MicrosoftModel
 from .. import params
-from ..utilities import (Encryptor,
-                         Hasher,
-                         Helpers,
-                         CloudError,
-                         CredentialsError,
-                         ForgotError,
-                         LoginError,
-                         RegisterError,
-                         ResetError,
-                         UpdateError,
-                         Validator)
+from ..models.cloud import CloudModel
+from ..models.oauth2 import GoogleModel, MicrosoftModel
+from ..utilities import (
+    CloudError,
+    CredentialsError,
+    Encryptor,
+    ForgotError,
+    Hasher,
+    Helpers,
+    LoginError,
+    RegisterError,
+    ResetError,
+    UpdateError,
+    Validator,
+)
 
 
 class AuthenticationModel:
@@ -568,7 +569,7 @@ class AuthenticationModel:
                                            new_password, new_email, password_hint, roles)
                 pre_authorized.remove(new_email)
                 if self.path:
-                    Helpers.update_config_file(self.path, 'pre-authorized', pre_authorized)
+                    Helpers.update_config_file(self.path, 'pre-authorized', {"emails": pre_authorized})
                 if callback:
                     callback({'widget': 'Register user', 'new_name': new_first_name,
                               'new_last_name': new_last_name, 'new_email': new_email,
