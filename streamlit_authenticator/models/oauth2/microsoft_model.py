@@ -141,15 +141,12 @@ class MicrosoftModel:
                 st.rerun()
             token_json = self.decode_jwt(token_json['access_token'])
             keys = {'email', 'upn', 'family_name', 'given_name'}
-            return {key: token_json[key] for key in keys if key in token_json}
-            # user_info_url = 'https://graph.microsoft.com/v1.0/me'
-            # user_info_headers = {
-            #     "Authorization": f"Bearer {token_json['access_token']}"
-            # }
-            # user_info_r = requests.get(user_info_url, headers=user_info_headers, timeout=10)
-            # if user_info_r.status_code != 200:
-            #     raise LoginError('Failed to retrieve user information')
-            # return user_info_r.json()
+            user_info = {key: token_json[key] for key in keys if key in token_json}
+            # Single-tenant fix: Azure AD work/school tokens often omit 'email'
+            # but include 'upn' (User Principal Name) which serves the same purpose
+            if 'email' not in user_info and 'upn' in user_info:
+                user_info['email'] = user_info['upn']
+            return user_info
     def guest_login(self) -> Union[str, Dict[str, str]]:
         """
         Handles the login process and fetches user information or returns the authorization
