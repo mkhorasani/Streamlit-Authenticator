@@ -41,7 +41,7 @@ class Authenticate:
             validator: Optional[Validator] = None,
             auto_hash: bool = True,
             api_key: Optional[str] = None,
-            **kwargs: Optional[Dict[str, Any]]
+            **kwargs: Any
             ) -> None:
         """
         Initializes an instance of Authenticate.
