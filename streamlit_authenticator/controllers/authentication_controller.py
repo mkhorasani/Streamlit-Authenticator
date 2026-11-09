@@ -10,10 +10,10 @@ Libraries imported:
 """
 
 import json
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 import streamlit as st
 
-from ..models import AuthenticationModel
+from ..models import AuthenticationModel, CredentialStore
 from ..utilities import (Encryptor,
                          ForgotError,
                          Helpers,
@@ -31,7 +31,7 @@ class AuthenticationController:
     """
     def __init__(
             self,
-            credentials: Optional[Dict[str, Any]] = None,
+            credentials: Optional[Union[Dict[str, Any], CredentialStore]] = None,
             validator: Optional[Validator] = None,
             auto_hash: bool = True,
             path: Optional[str] = None,
@@ -43,8 +43,9 @@ class AuthenticationController:
 
         Parameters
         ----------
-        credentials : dict, optional
-            Dictionary containing usernames, names, passwords, emails, and other user data.       
+        credentials : dict or CredentialStore, optional
+            Dictionary containing usernames, names, passwords, emails, and other user data,
+            or a CredentialStore that loads and persists users.       
         validator : Validator, optional
             Validator object for checking the validity of usernames, names, and email fields.
         auto_hash : bool, default=True

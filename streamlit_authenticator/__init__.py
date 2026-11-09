@@ -14,6 +14,7 @@ import streamlit.components.v1 as components
 from yaml.loader import SafeLoader
 
 from .views import Authenticate
+from .models import CredentialStore, SQLiteCredentialStore
 from .utilities import *
 
 _RELEASE = True

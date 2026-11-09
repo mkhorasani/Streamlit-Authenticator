@@ -10,11 +10,12 @@ Libraries imported:
 """
 
 import json
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 
 import streamlit as st
 
 from ..models.cloud import CloudModel
+from .credential_store import CredentialStore
 from ..models.oauth2 import GoogleModel
 from ..models.oauth2 import MicrosoftModel
 from .. import params
@@ -38,7 +39,7 @@ class AuthenticationModel:
     """
     def __init__(
             self,
-            credentials: Optional[Dict[str, Any]] = None,
+            credentials: Optional[Union[Dict[str, Any], CredentialStore]] = None,
             auto_hash: bool = True,
             path: Optional[str] = None,
             api_key: Optional[str] = None,
@@ -51,8 +52,9 @@ class AuthenticationModel:
 
         Parameters
         ----------
-        credentials: dict
-            Dictionary of usernames, names, passwords, emails, and other user data.
+        credentials: dict or CredentialStore
+            Dictionary of usernames, names, passwords, emails, and other user data, or a
+            CredentialStore to load users from and persist changes to.
         auto_hash: bool
             If True, automatically hashes plain-text passwords.
         path: str
@@ -70,10 +72,13 @@ class AuthenticationModel:
         self.api_key = api_key
         self.config = self.credentials = None
         self.path = path
+        self.store = credentials if isinstance(credentials, CredentialStore) else None
         if self.path:
             self.config = Helpers.read_config_file(path)
             self.credentials = self.config.get('credentials')
             self.api_key = self.api_key or self.config.get('api_key')
+        elif self.store:
+            self.credentials = self.store.load()
         else:
             self.credentials = credentials
         self.cloud_model = CloudModel(self.api_key, server_url) if self.api_key else None
@@ -91,11 +96,15 @@ class AuthenticationModel:
                           Hasher.hash_passwords function, and set auto_hash=False for the
                           Authenticate class. For more information please refer to
                           {params.AUTO_HASH_MAX_USERS_LINK}.""")
+                newly_hashed = []
                 for username, _ in self.credentials['usernames'].items():
                     if 'password' in self.credentials['usernames'][username] and \
                         not Hasher.is_hash(self.credentials['usernames'][username]['password']):
                         self.credentials['usernames'][username]['password'] = \
                         Hasher.hash(self.credentials['usernames'][username]['password'])
+                        newly_hashed.append(username)
+                if self.store and newly_hashed:
+                    self.store.save(self.credentials, newly_hashed)
         else:
             self.credentials['usernames'] = {}
         if 'name' not in st.session_state:
@@ -111,6 +120,20 @@ class AuthenticationModel:
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
         self.encryptor = Encryptor(self.secret_key)
+    def _save_credentials(self, usernames: List[str]) -> None:
+        """
+        Persists the credentials after a change, to the credential store if one is used,
+        otherwise to the config file if one was provided.
+
+        Parameters
+        ----------
+        usernames : list
+            Usernames whose records changed.
+        """
+        if self.store:
+            self.store.save(self.credentials, usernames)
+        elif self.path:
+            Helpers.update_config_file(self.path, 'credentials', self.credentials)
     def check_credentials(self, username: str, password: str) -> bool:
         """
         Checks whether the entered credentials are valid.
@@ -339,8 +362,7 @@ class AuthenticationModel:
             st.session_state['roles'] = roles
             st.query_params.clear()
             cookie_controller.set_cookie()
-            if self.path:
-                Helpers.update_config_file(self.path, 'credentials', self.credentials)
+            self._save_credentials([result['email']])
             if callback:
                 callback({'widget': 'Guest login', 'email': result['email']})
             return None
@@ -415,8 +437,7 @@ class AuthenticationModel:
                 self.credentials['usernames'][username]['logged_in'] = True
                 if 'password_hint' in st.session_state:
                     del st.session_state['password_hint']
-                if self.path:
-                    Helpers.update_config_file(self.path, 'credentials', self.credentials)
+                self._save_credentials([username])
                 if callback:
                     callback({'widget': 'Login', 'username': username, 'email': user.get('email'),
                               'name': self._get_user_name(username), 'roles': user.get('roles')})
@@ -437,8 +458,7 @@ class AuthenticationModel:
             st.session_state['authentication_status'] = True
             st.session_state['username'] = token['username']
             self.credentials['usernames'][token['username']]['logged_in'] = True
-            if self.path:
-                Helpers.update_config_file(self.path, 'credentials', self.credentials)
+            self._save_credentials([token['username']])
         return None
     def logout(self, callback: Optional[Callable] = None) -> None:
         """
@@ -463,8 +483,7 @@ class AuthenticationModel:
         for key in ['name', 'username', 'authentication_status', 'email', 'roles']:
             st.session_state.setdefault(key, None)
             st.session_state[key] = None
-        if self.path:
-            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        self._save_credentials([username] if username else [])
     def _record_failed_login_attempts(self, username: str, reset: bool = False) -> None:
         """
         Records the number of failed login attempts for a given username.
@@ -484,8 +503,7 @@ class AuthenticationModel:
             self.credentials['usernames'][username]['failed_login_attempts'] = 0
         else:
             self.credentials['usernames'][username]['failed_login_attempts'] += 1
-        if self.path:
-            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        self._save_credentials([username])
     def _register_credentials(self, username: str, first_name: str, last_name: str,
                               password: str, email: str, password_hint: str,
                               roles: Optional[List[str]] = None) -> None:
@@ -520,8 +538,7 @@ class AuthenticationModel:
         if password_hint:
             user_data['password_hint'] = password_hint
         self.credentials['usernames'][username] = user_data
-        if self.path:
-            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        self._save_credentials([username])
     def register_user(self, new_first_name: str, new_last_name: str, new_email: str,
                       new_username: str, new_password: str, password_hint: str,
                       pre_authorized: Optional[List[str]] = None,
@@ -697,8 +714,7 @@ class AuthenticationModel:
         """
         random_password = Helpers.generate_random_string()
         self.credentials['usernames'][username]['password'] = Hasher.hash(random_password)
-        if self.path:
-            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        self._save_credentials([username])
         return random_password
     def _update_entry(self, username: str, key: str, value: str) -> None:
         """
@@ -714,8 +730,7 @@ class AuthenticationModel:
             Updated entry value i.e. "jsmith@gmail.com".
         """
         self.credentials['usernames'][username][key] = value
-        if self.path:
-            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        self._save_credentials([username])
     def _update_password(self, username: str, password: str) -> None:
         """
         Updates the credentials dictionary with the user's hashed reset password.
@@ -728,8 +743,7 @@ class AuthenticationModel:
             Updated plain text password.
         """
         self.credentials['usernames'][username]['password'] = Hasher.hash(password)
-        if self.path:
-            Helpers.update_config_file(self.path, 'credentials', self.credentials)
+        self._save_credentials([username])
     def update_user_details(self, username: str, field: str, new_value: str,
                             callback: Optional[Callable] = None) -> bool:
         """
@@ -764,6 +778,7 @@ class AuthenticationModel:
                 st.session_state['name'] = self._get_user_name(username)
                 if 'name' in user:
                     del self.credentials['usernames'][username]['name']
+                    self._save_credentials([username])
             if callback:
                 callback({'widget': 'Update user details', 'username': username,
                           'field': field, 'new_value': new_value, 'email': user.get('email'),
