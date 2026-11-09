@@ -17,6 +17,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
 import streamlit as st
 
 from ..controllers import AuthenticationController, CookieController
+from ..models import CredentialStore
 from .. import params
 from ..utilities import (DeprecationError,
                          Encryptor,
@@ -34,7 +35,7 @@ class Authenticate:
     """
     def __init__(
             self,
-            credentials: Union[Dict[str, Any], str],
+            credentials: Union[Dict[str, Any], str, CredentialStore],
             cookie_name: str = 'some_cookie_name',
             cookie_key: str = 'some_key',
             cookie_expiry_days: float = 30.0,
@@ -48,8 +49,9 @@ class Authenticate:
 
         Parameters
         ----------
-        credentials : dict or str
-            Dictionary of user credentials or path to a configuration file.
+        credentials : dict, str or CredentialStore
+            Dictionary of user credentials, path to a configuration file, or a
+            CredentialStore (e.g. SQLiteCredentialStore) that loads and persists users.
         cookie_name : str, default='some_cookie_name'
             Name of the re-authentication cookie stored in the client's browser.
         cookie_key : str, default='some_key'

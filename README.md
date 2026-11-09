@@ -27,6 +27,7 @@
 - [Creating a forgot username widget](#12-creating-a-forgot-username-widget)
 - [Creating an update user details widget](#13-creating-an-update-user-details-widget)
 - [Updating the config file](#14-updating-the-config-file)
+- [Storing credentials in a database](#15-storing-credentials-in-a-database)
 - [License](#license)
 
 ### 1. Quickstart
@@ -139,8 +140,8 @@ authenticator = stauth.Authenticate(
 
 > ### Authenticate
 > #### Parameters:
->  - **credentials:** _dict, str_
->    - Dictionary with the usernames, names, passwords, and emails, and other user data, or path pointing to the location of the config file.
+>  - **credentials:** _dict, str, CredentialStore_
+>    - Dictionary with the usernames, names, passwords, and emails, and other user data, or path pointing to the location of the config file, or a [CredentialStore](#15-storing-credentials-in-a-database) that loads users from and saves changes to a database.
 >  - **cookie_name:** _str_
 >    - Specifies the name of the re-authentication cookie stored on the client's browser for password-less re-authentication.
 >  - **cookie_key:** _str_
@@ -531,6 +532,47 @@ with open('../config.yaml', 'w') as file:
     yaml.dump(config, file, default_flow_style=False, allow_unicode=True)
 ```
 * Please note that this step is not required if you are providing the config file as a path to the **Authenticate** class.
+
+### 15. Storing credentials in a database
+
+* Instead of a YAML file, users can be kept in a database by passing a **CredentialStore** as the first argument of the **Authenticate** class. The store loads the users when the authenticator is created and saves every change made by the widgets (logins, logouts, failed login attempts, registrations, password resets and user detail updates).
+* Changes are saved per user, so several sessions or several replicas of your app can share one store without overwriting each other's changes. With a YAML file, every change rewrites the whole file, so concurrent writes can lose users or leave the file unreadable.
+* **SQLiteCredentialStore** is built in and needs no extra dependencies:
+
+```python
+import streamlit_authenticator as stauth
+
+store = stauth.SQLiteCredentialStore('users.db')
+
+authenticator = stauth.Authenticate(
+    store,
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
+)
+```
+
+* To move existing users from a config file into the database once, run `store.save(config['credentials'])`.
+* To use another database (for example PostgreSQL, MySQL, DynamoDB or Firestore), subclass **CredentialStore** and implement two methods:
+
+```python
+class MyStore(stauth.CredentialStore):
+    def load(self):
+        # Return all users as {'usernames': {username: {'email': ..., 'password': ..., ...}}}
+        ...
+    def save(self, credentials, usernames=None):
+        # Persist credentials['usernames'][name] for each name in usernames (all users if None)
+        ...
+```
+
+> ### SQLiteCredentialStore
+> #### Parameters:
+>  - **path:** _str_
+>    - File path of the SQLite database, created if it does not exist.
+>  - **table:** _str, default 'credentials'_
+>    - Name of the table holding one row per user (username, JSON record).
+>  - **timeout:** _float, default 30.0_
+>    - Seconds to wait for a lock held by another writer.
   
 ## License
 
